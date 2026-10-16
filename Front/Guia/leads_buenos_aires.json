@@ -1,0 +1,468 @@
+[
+  {
+    "id": "lead-bue-001",
+    "nombre": "Restaurantes Tradicional Buenos Aires",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.8,
+    "numResenas": 285,
+    "telefono": "+54 11 547 2131",
+    "web": null,
+    "email": null,
+    "linkedin": null,
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Restaurantes Tradicional Buenos Aires: propuesta para recuperar la reputación online en Buenos Aires",
+      "cuerpo": "Hola, equipo de Restaurantes Tradicional Buenos Aires:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.8★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-002",
+    "nombre": "Restaurantes San José",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.2,
+    "numResenas": 21,
+    "telefono": "+54 11 575 3074",
+    "web": null,
+    "email": null,
+    "linkedin": null,
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "La calidad no se parece en nada a lo que muestran en sus redes sociales.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Restaurantes San José: propuesta para recuperar la reputación online en Buenos Aires",
+      "cuerpo": "Hola, equipo de Restaurantes San José:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.2★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-003",
+    "nombre": "Centro de Restaurantes El Roble",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.4,
+    "numResenas": 309,
+    "telefono": "+54 11 591 3568",
+    "web": "https://www.centroderestauranteselroble.com",
+    "email": "contacto@centroderestauranteselroble.com",
+    "linkedin": null,
+    "problema": "citas",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 1
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Centro de Restaurantes El Roble (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Centro de Restaurantes El Roble:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.4★ y que los clientes experimentan dificultades constantes para coordinar, agendar o respetar sus citas.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-004",
+    "nombre": "Restaurantes & Asociados Buenos Aires",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.2,
+    "numResenas": 223,
+    "telefono": "+54 11 517 3069",
+    "web": "https://www.restaurantesasociadosbuenosaires.com",
+    "email": null,
+    "linkedin": "https://linkedin.com/company/restaurantesasociadosbuenosaires",
+    "problema": "atencion",
+    "confianzaIA": 80,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "La calidad no se parece en nada a lo que muestran en sus redes sociales.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 1
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Restaurantes & Asociados Buenos Aires (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Restaurantes & Asociados Buenos Aires:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.2★ y que varias opiniones recientes señalan inconformidades con la atención al cliente, lo cual impacta directamente en las recomendaciones públicas.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-005",
+    "nombre": "Especialistas en Restaurantes del Norte",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.5,
+    "numResenas": 295,
+    "telefono": "+54 11 411 6979",
+    "web": "https://www.especialistasenrestaurantesdelnorte.com",
+    "email": "contacto@especialistasenrestaurantesdelnorte.com",
+    "linkedin": "https://linkedin.com/company/especialistasenrestaurantesdelnorte",
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 1
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Especialistas en Restaurantes del Norte (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Especialistas en Restaurantes del Norte:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.5★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-006",
+    "nombre": "Restaurantes Los Andes",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.0,
+    "numResenas": 144,
+    "telefono": "+54 11 492 2255",
+    "web": "https://www.restauranteslosandes.com",
+    "email": "contacto@restauranteslosandes.com",
+    "linkedin": null,
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Recuperemos las estrellas de Restaurantes Los Andes",
+      "cuerpo": "Hola, equipo de Restaurantes Los Andes:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.0★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-007",
+    "nombre": "Grupo Profesional Restaurantes",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.1,
+    "numResenas": 206,
+    "telefono": "+54 11 410 2289",
+    "web": "https://www.grupoprofesionalrestaurantes.com",
+    "email": null,
+    "linkedin": null,
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Grupo Profesional Restaurantes: propuesta para recuperar la reputación online en Buenos Aires",
+      "cuerpo": "Hola, equipo de Grupo Profesional Restaurantes:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.1★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-008",
+    "nombre": "Restaurantes Plaza Mayor",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.6,
+    "numResenas": 234,
+    "telefono": "+54 11 492 6999",
+    "web": "https://www.restaurantesplazamayor.com",
+    "email": "contacto@restaurantesplazamayor.com",
+    "linkedin": "https://linkedin.com/company/restaurantesplazamayor",
+    "problema": "citas",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Restaurantes Plaza Mayor (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Restaurantes Plaza Mayor:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.6★ y que los clientes experimentan dificultades constantes para coordinar, agendar o respetar sus citas.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-009",
+    "nombre": "Restaurantes Premier Buenos Aires",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 2.8,
+    "numResenas": 244,
+    "telefono": "+54 11 420 1490",
+    "web": "https://www.restaurantespremierbuenosaires.com",
+    "email": "contacto@restaurantespremierbuenosaires.com",
+    "linkedin": "https://linkedin.com/company/restaurantespremierbuenosaires",
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 2
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Imposible sacar turno: por WhatsApp te clavan el visto y por teléfono te cortan.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "Tardaron 45 minutos después del turno asignado. Nadie se disculpó.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 4",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Restaurantes Premier Buenos Aires (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Restaurantes Premier Buenos Aires:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 2.8★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  },
+  {
+    "id": "lead-bue-010",
+    "nombre": "Servicios Integrales Restaurantes",
+    "rubro": "Restaurantes",
+    "ciudad": "Buenos Aires",
+    "fuente": "Google Maps",
+    "rating": 3.1,
+    "numResenas": 71,
+    "telefono": "+54 11 500 9198",
+    "web": "https://www.serviciosintegralesrestaurantes.com",
+    "email": "contacto@serviciosintegralesrestaurantes.com",
+    "linkedin": null,
+    "problema": "higiene",
+    "confianzaIA": 85,
+    "reviewsNegativas": [
+      {
+        "autor": "Usuario Anónimo 1",
+        "fecha": "2026-10-16",
+        "texto": "Los baños estaban clausurados y todo el lugar con muy mal olor.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 2",
+        "fecha": "2026-10-16",
+        "texto": "Me cobraron un recargo excesivo no informado en ningún lado. Malísima experiencia.",
+        "estrellas": 1
+      },
+      {
+        "autor": "Usuario Anónimo 3",
+        "fecha": "2026-10-16",
+        "texto": "El recepcionista nos atendió con desprecio y tardaron más de una hora.",
+        "estrellas": 2
+      }
+    ],
+    "draft": {
+      "asunto": "Diagnóstico de reputación para Servicios Integrales Restaurantes (Buenos Aires)",
+      "cuerpo": "Hola, equipo de Servicios Integrales Restaurantes:\n\nMi nombre es Valeria Ríos y soy consultora en reputación de marcas locales. Revisando los principales negocios de restaurantes en Buenos Aires, detectamos que hoy cuentan con una calificación promedio de 3.1★ y que se registran menciones críticas sobre la limpieza del establecimiento, el factor #1 que detiene a clientes nuevos antes de visitarlos.\n\nEn RepuSense trabajamos directamente con dueños y gerentes para revertir malas rachas, gestionar profesionalmente las quejas públicas y volver a captar clientes que hoy eligen a la competencia.\n\n¿Tendrían 10 minutos esta semana para una llamada breve? Les compartiré un informe diagnóstico sin costo.\n\nSaludos cordiales,\nValeria Ríos — Equipo RepuSense"
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-10-16",
+    "vendedor": null
+  }
+]
