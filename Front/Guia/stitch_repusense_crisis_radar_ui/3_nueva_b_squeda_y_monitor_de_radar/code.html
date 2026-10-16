@@ -1,0 +1,365 @@
+<!DOCTYPE html><html class="h-full bg-[#050B14]" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RepuSense - Nueva Búsqueda de Radar</title>
+<!-- Google Fonts: Inter & Space Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              950: '#050B14',
+              900: '#0B1320',
+              850: '#0E1726',
+              800: '#131F33',
+              700: '#1C2C45',
+              600: '#283B59',
+            },
+            teal: {
+              accent: '#19CE9F',
+              hover: '#15B78D',
+              deep: '#0B3A36',
+              muted: '#0F2928'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for Radar and Log Pulse Animation -->
+<style data-purpose="radar-effects">
+    @keyframes radar-sweep {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    .radar-sweep-effect {
+      background: conic-gradient(from 0deg, rgba(25, 206, 159, 0.28) 0deg, rgba(25, 206, 159, 0) 65deg, transparent 360deg);
+      animation: radar-sweep 3.5s linear infinite;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1C2C45;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full text-slate-300 font-sans antialiased overflow-hidden flex bg-[#050B14]">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-[#070D18] border-r border-[#152033] flex flex-col justify-between h-full select-none" data-purpose="sidebar">
+<div class="p-6">
+<!-- Logo RepuSense -->
+<div class="flex items-center gap-3 mb-9">
+<div class="w-9 h-9 rounded-xl bg-[#092B27] border border-[#145C52] flex items-center justify-center text-teal-accent shadow-[0_0_15px_rgba(25,206,159,0.25)]">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<path d="M12 2a10 10 0 0 1 10 10"></path>
+<circle cx="12" cy="12" r="6"></circle>
+<circle cx="12" cy="12" fill="currentColor" r="2"></circle>
+</svg>
+</div>
+<div>
+<h1 class="font-display font-bold text-white tracking-wide text-base leading-none">RepuSense</h1>
+<span class="text-[10px] tracking-wider text-slate-400 uppercase font-semibold">RADAR DE REPUTACIÓN</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav aria-label="Navegación principal" class="space-y-1.5">
+<a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0D1829] transition-colors text-sm font-medium" href="#">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<path d="M12 3v9l4 4"></path>
+</svg>
+<span>Radar</span>
+</a>
+<!-- Active Menu Item: Nueva Búsqueda -->
+<a class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg bg-[#142033] text-white font-medium text-sm border border-[#1E304B] shadow-inner" href="#">
+<svg class="w-4 h-4 text-teal-accent" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+<circle cx="11" cy="11" r="7"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+<span>Nueva búsqueda</span>
+</a>
+<!-- Menu Item: Leads con badge -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#0D1829] transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+<circle cx="9" cy="7" r="4"></circle>
+<path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+</svg>
+<span>Leads</span>
+</div>
+<span class="text-[11px] font-semibold text-teal-accent bg-[#0B2E28] border border-[#135A4F] px-2 py-0.5 rounded-full">128 nuevos</span>
+</a>
+</nav>
+</div>
+<!-- User Profile & Config Bottom Footer -->
+<div class="p-4 border-t border-[#152033] space-y-3">
+<div class="flex items-center gap-3 px-2 py-1.5">
+<div class="w-9 h-9 rounded-full bg-[#0E3531] border border-[#19CE9F]/40 flex items-center justify-center text-teal-accent font-semibold text-xs shadow-sm">
+          VR
+        </div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-white">Valeria Ríos</span>
+<span class="text-[11px] text-slate-400">Equipo de ventas</span>
+</div>
+</div>
+<a class="flex items-center gap-2.5 px-2 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors" href="#">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="3"></circle>
+<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+</svg>
+<span>Configuración</span>
+</a>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 flex flex-col h-full overflow-y-auto bg-[#070D18]/90 custom-scrollbar">
+<!-- Top Breadcrumb & Title Section -->
+<section class="px-8 pt-7 pb-5" data-purpose="page-header">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B2A27] border border-[#135A4F] text-[11px] font-medium text-slate-300 mb-3">
+<span class="inline-block w-2 h-2 rounded-full bg-teal-accent animate-ping mr-0.5"></span>
+<span class="font-semibold text-teal-accent">Escaneo en Vivo</span>
+<span class="text-slate-500">•</span>
+<span class="text-slate-300">Extracción de Google Maps / TripAdvisor / Yelp</span>
+</div>
+<h2 class="text-2xl lg:text-3xl font-display font-bold text-white tracking-tight">Nueva Búsqueda de Radar</h2>
+<p class="text-slate-400 text-sm mt-1.5 max-w-3xl">
+        Configura los parámetros para escanear y detectar negocios en crisis de reputación con datos enriquecidos por IA.
+      </p>
+</section>
+<!-- Content Columns Grid -->
+<div class="px-8 pb-8 flex-1 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+<!-- LEFT CARD: Parámetros de Prospección -->
+<!-- BEGIN: ParametersCard -->
+<section class="xl:col-span-6 bg-[#0B1320] border border-[#17253B] rounded-2xl p-6 shadow-xl relative" data-purpose="form-parameters">
+<!-- Header -->
+<div class="flex items-start gap-3 mb-6">
+<div class="p-2 rounded-lg bg-[#0C242A] text-teal-accent border border-[#14534B]">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="font-display text-lg font-semibold text-white">Parámetros de Prospección</h3>
+<p class="text-xs text-slate-400 mt-0.5">Define la ubicación, el tipo de negocio y las plataformas a rastrear</p>
+</div>
+</div>
+<form class="space-y-5" onsubmit="event.preventDefault();">
+<!-- Field: Ciudad Objetivo -->
+<div>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-300 mb-1.5">
+<svg class="w-3.5 h-3.5 text-teal-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Ciudad objetivo</span>
+</label>
+<div class="relative">
+<select class="w-full bg-[#0E1726] border border-[#1D2F4B] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-accent appearance-none cursor-pointer">
+<option selected="">Bogotá</option>
+<option>Medellín</option>
+<option>Cali</option>
+<option>Barranquilla</option>
+</select>
+<div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+<!-- Field: Rubro o Nicho -->
+<div>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-300 mb-1.5">
+<svg class="w-3.5 h-3.5 text-teal-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Rubro o Nicho</span>
+</label>
+<div class="relative">
+<select class="w-full bg-[#0E1726] border border-[#1D2F4B] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-teal-accent appearance-none cursor-pointer">
+<option selected="">Clínicas dentales</option>
+<option>Restaurantes y Bares</option>
+<option>Hoteles Boutique</option>
+<option>Gimnasios y Centros Fitness</option>
+</select>
+<div class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+<!-- Field: Plataformas a Rastrear -->
+<div>
+<label class="flex items-center gap-2 text-xs font-medium text-slate-300 mb-2">
+<svg class="w-3.5 h-3.5 text-teal-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Plataformas a rastrear</span>
+</label>
+<div class="grid grid-cols-3 gap-2.5">
+<!-- Platform Google Maps (Checked) -->
+<label class="cursor-pointer flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#092B28]/60 border border-[#176255] text-xs font-semibold text-white transition-all shadow-sm">
+<input checked="" class="w-4 h-4 rounded text-teal-accent focus:ring-0 focus:ring-offset-0 bg-[#0B1320] border-[#1E695B] accent-[#19CE9F]" type="checkbox">
+<span>Google Maps</span>
+</label>
+<!-- Platform TripAdvisor (Checked) -->
+<label class="cursor-pointer flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#092B28]/60 border border-[#176255] text-xs font-semibold text-white transition-all shadow-sm">
+<input checked="" class="w-4 h-4 rounded text-teal-accent focus:ring-0 focus:ring-offset-0 bg-[#0B1320] border-[#1E695B] accent-[#19CE9F]" type="checkbox">
+<span>TripAdvisor</span>
+</label>
+<!-- Platform Yelp (Unchecked) -->
+<label class="cursor-pointer flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#0E1726] border border-[#1B2A42] text-xs font-medium text-slate-400 hover:border-slate-700 transition-all">
+<input class="w-4 h-4 rounded text-teal-accent focus:ring-0 focus:ring-offset-0 bg-[#0B1320] border-slate-700 accent-[#19CE9F]" type="checkbox">
+<span>Yelp</span>
+</label>
+</div>
+</div>
+<!-- Section: Filtros de Negocio -->
+<div class="pt-2">
+<div class="flex items-center gap-2 mb-3">
+<svg class="w-3.5 h-3.5 text-teal-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<h4 class="text-xs font-bold uppercase tracking-wider text-teal-accent">Filtros de Negocio (Reglas de Calificación)</h4>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Rating Máximo -->
+<div>
+<label class="block text-xs font-medium text-slate-300 mb-1.5">Rating máximo</label>
+<input class="w-full bg-[#0E1726] border border-[#1D2F4B] rounded-xl px-3.5 py-2 text-sm text-white font-medium focus:outline-none focus:border-teal-accent" type="text" value="3,5">
+<span class="block text-[11px] text-slate-400 mt-1">Recomendado: ≤ 3.5★</span>
+</div>
+<!-- Mínimo de Reseñas -->
+<div>
+<label class="block text-xs font-medium text-slate-300 mb-1.5">Mínimo de reseñas</label>
+<input class="w-full bg-[#0E1726] border border-[#1D2F4B] rounded-xl px-3.5 py-2 text-sm text-white font-medium focus:outline-none focus:border-teal-accent" type="text" value="10">
+<span class="block text-[11px] text-slate-400 mt-1">Garantiza negocio activo</span>
+</div>
+</div>
+</div>
+<!-- Action Button: Iniciar Escaneo -->
+<div class="pt-3">
+<button class="w-full py-3.5 px-4 rounded-xl bg-teal-accent hover:bg-teal-hover text-[#051614] font-bold text-sm flex items-center justify-center gap-2.5 transition-all shadow-[0_0_20px_rgba(25,206,159,0.35)] active:scale-[0.99]" type="button">
+<svg class="w-4 h-4 text-[#051614]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<circle cx="12" cy="12" r="6"></circle>
+<circle cx="12" cy="12" fill="currentColor" r="2"></circle>
+</svg>
+<span>Iniciar Escaneo Radar</span>
+</button>
+</div>
+</form>
+</section>
+<!-- END: ParametersCard -->
+<!-- RIGHT CARD: Monitor de Ejecución -->
+<!-- BEGIN: ExecutionMonitorCard -->
+<section class="xl:col-span-6 bg-[#0B1320] border border-[#17253B] rounded-2xl p-6 shadow-xl flex flex-col justify-between" data-purpose="execution-monitor">
+<div>
+<!-- Header -->
+<div class="flex items-start gap-3 mb-5">
+<div class="p-2 rounded-lg bg-[#0C242A] text-teal-accent border border-[#14534B]">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h3 class="font-display text-lg font-semibold text-white">Monitor de Ejecución</h3>
+<p class="text-xs text-slate-400 mt-0.5">Rastreo, enriquecimiento semántico con IA y resolución anti-duplicados</p>
+</div>
+</div>
+<!-- Radar Graphic Screen (Completed State) -->
+<div class="bg-[#080E18] border border-[#162338] rounded-xl p-5 relative overflow-hidden flex flex-col items-center justify-center text-center my-3 min-h-[175px]">
+<!-- Radar Background Ring Lines -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+<div class="w-44 h-44 rounded-full border border-teal-500/20"></div>
+<div class="absolute w-32 h-32 rounded-full border border-teal-500/30"></div>
+<div class="absolute w-20 h-20 rounded-full border border-teal-500/40"></div>
+<!-- Rotating beam -->
+<div class="absolute w-44 h-44 rounded-full radar-sweep-effect"></div>
+</div>
+<!-- Status Indicator Content -->
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-[#0D2F28] border-2 border-teal-accent flex items-center justify-center text-teal-accent mb-2.5 shadow-[0_0_15px_rgba(25,206,159,0.3)]">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<h4 class="font-display text-white font-bold text-base">Escaneo Completado con Éxito</h4>
+<p class="text-xs text-slate-400 mt-1 max-w-xs">Base de datos actualizada sin crear registros duplicados</p>
+</div>
+</div>
+<!-- Terminal Log Section: REGISTRO DEL PIPELINE -->
+<div class="mt-4">
+<span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-2">REGISTRO DEL PIPELINE</span>
+<div class="bg-[#060B13] border border-[#142033] rounded-xl p-3.5 font-mono text-[11px] leading-relaxed text-slate-300 space-y-1.5 shadow-inner">
+<div class="flex items-start gap-2">
+<span class="text-teal-accent font-bold">&gt;</span>
+<span class="text-teal-400">Iniciando radar de reputación RepuSense...</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="text-teal-accent font-bold">&gt;</span>
+<span>Conectando scraper con <strong class="text-white">Google Maps, TripAdvisor</strong> para Clínicas dentales en Bogotá...</span>
+</div>
+<div class="flex items-start gap-2">
+<span class="text-teal-accent font-bold">&gt;</span>
+<span>Aplicando filtros de negocio: <span class="text-amber-300">Rating ≤ 3.5★</span> y <span class="text-amber-300">≥ 10 opiniones...</span></span>
+</div>
+<div class="flex items-start gap-2">
+<span class="text-teal-accent font-bold">&gt;</span>
+<span class="text-slate-400">Extrayendo últimas reseñas negativas de negocios detectados...</span>
+</div>
+<!-- Green Status Toast inside Pipeline -->
+<div class="mt-2.5 pt-2 border-t border-[#122035] flex items-center gap-2 text-teal-accent font-semibold">
+<svg class="w-4 h-4 text-teal-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+<path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Escaneo completado: 17 nuevos leads agregados</span>
+</div>
+</div>
+</div>
+<!-- Summary Metric Cards -->
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div class="bg-[#0A1424] border border-[#16253C] rounded-xl p-3">
+<span class="text-[11px] font-medium text-slate-400 block mb-1">Nuevos Leads</span>
+<span class="font-display text-2xl font-bold text-teal-accent tracking-tight">+17</span>
+</div>
+<div class="bg-[#0A1424] border border-[#16253C] rounded-xl p-3">
+<span class="text-[11px] font-medium text-slate-400 block mb-1">Actualizados (Anti-duplicado)</span>
+<span class="font-display text-2xl font-bold text-sky-400 tracking-tight">3</span>
+</div>
+</div>
+</div>
+<!-- Call-to-action Button to Leads Table -->
+<div class="mt-5">
+<a class="w-full py-3.5 px-4 rounded-xl bg-teal-accent hover:bg-teal-hover text-[#041715] font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_0_22px_rgba(25,206,159,0.35)] group" href="#">
+<span>Ver Leads Detectados en la Tabla</span>
+<svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</a>
+</div>
+</section>
+<!-- END: ExecutionMonitorCard -->
+</div>
+</main>
+<!-- END: MainContent -->
+</body></html>
