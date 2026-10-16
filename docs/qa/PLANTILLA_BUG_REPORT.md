@@ -5,7 +5,7 @@
 ---
 
 ### 1. Título del Bug
-`[MÓDULO] Descripción breve y clara del comportamiento anómalo`  
+`[MÓDULO] Descripción breve y clara del comportamiento anómalo`
 *(Ejemplo: `[EXTRACCIÓN] Los negocios con exactamente 10 reseñas son descartados erróneamente`)*
 
 ---
@@ -14,9 +14,9 @@
 - **ID del Caso de Prueba asociado:** (ej. `TC-EXT-04` o `N/A`)
 - **Severidad:** [Crítica / Alta / Media / Baja]
 - **Prioridad:** [P1 - Bloqueante / P2 - Alta / P3 - Normal / P4 - Menor]
-- **Reportado por:** [Maria Chiribao / Dharo Gabriel Fernandez]
+- **Reportado por:** [Maria Chiribao]
 - **Fecha:** DD/MM/AAAA
-- **Entorno / Navegador:** (ej. Chrome v120 / Windows 11 / Node 24 / Python 3.14)
+- **Entorno / Navegador:** (ej. Chrome v120 / Windows 10 / Node 24 / Python 3.14)
 
 ---
 
