@@ -9,7 +9,13 @@ import {
   construirListado,
   LEADS,
 } from "@/lib/mock/dataset";
-import type { Lead, LeadEstado, LeadQuery, Scan } from "@/lib/types";
+import type {
+  Lead,
+  LeadEstado,
+  LeadQuery,
+  Scan,
+  ScanRequest,
+} from "@/lib/types";
 
 let leads: Lead[] = LEADS.map((l) => ({ ...l }));
 let scans: Scan[] = SCANS.map((s) => ({ ...s }));
@@ -45,15 +51,63 @@ export const mockBaseQuery: BaseQueryFn<
   }
 
   if (url === "scans" && method === "POST") {
-    const req = body as {
-      ciudad: string;
-      rubro: string;
-      plataformas: string[];
-      ratingMax: number;
-      resenasMin: number;
-    };
-    const nuevos = 18 + Math.floor(Math.random() * 30);
-    const actualizados = Math.floor(Math.random() * 9);
+    const req = body as ScanRequest;
+
+    let respuesta: { leads?: Lead[]; error?: string };
+    try {
+      const res = await fetch("/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req),
+      });
+      respuesta = await res.json();
+      if (!res.ok) {
+        return {
+          error: {
+            status: res.status,
+            data: respuesta.error ?? "El scraper falló.",
+          },
+        };
+      }
+    } catch (e) {
+      return {
+        error: {
+          status: 599,
+          data: `No se pudo contactar el scraper: ${String(e)}`,
+        },
+      };
+    }
+
+    const entrantes = respuesta.leads ?? [];
+    let nuevos = 0;
+    let actualizados = 0;
+    const inicio = Date.now();
+
+    for (const entrante of entrantes) {
+      const index = leads.findIndex(
+        (l) =>
+          l.nombre.toLowerCase() === entrante.nombre.toLowerCase() &&
+          l.ciudad === entrante.ciudad,
+      );
+      if (index >= 0) {
+        leads[index] = {
+          ...leads[index],
+          rating: entrante.rating,
+          numResenas: entrante.numResenas,
+          problema: entrante.problema,
+          confianzaIA: entrante.confianzaIA,
+          reviewsNegativas: entrante.reviewsNegativas,
+          draft: entrante.draft,
+          actualizado: true,
+          ultimoEscaneo: entrante.ultimoEscaneo,
+        };
+        actualizados += 1;
+      } else {
+        leads = [{ ...entrante, estado: "nuevo", vendedor: null }, ...leads];
+        nuevos += 1;
+      }
+    }
+
     const scan: Scan = {
       id: `scan-${Date.now()}`,
       ciudad: req.ciudad,
@@ -66,7 +120,7 @@ export const mockBaseQuery: BaseQueryFn<
       actualizados,
       total: nuevos + actualizados,
       estado: "completado",
-      duracionSeg: 90 + Math.floor(Math.random() * 120),
+      duracionSeg: Math.round((Date.now() - inicio) / 1000),
     };
     scans = [scan, ...scans];
     return {

@@ -44,6 +44,42 @@ npm run typecheck  # tsc --noEmit
 El login es **demo**: cualquier email/contraseña entra. El operador se asigna según el
 email (ver `lib/constants.ts` → `VENDEDORES`), por defecto `valeria.rios@repusense.io`.
 
+### 2.1 Datos reales desde el scraper
+
+El front ya viene con los datos que generó el scraper, commiteados en
+`lib/mock/leads.generated.json` (**110 leads** de 8 ciudades y 6 rubros). No hay que
+correr nada para verlos: `npm run dev` los levanta automáticamente.
+
+Para **regenerarlos** con el scraper:
+
+```bash
+npm run scrape
+```
+
+- Corre `Guia/repusense_scraper.py` para 11 combinaciones de ciudad/rubro y junta
+  todo en `lib/mock/leads.generated.json`.
+- `lib/mock/dataset.ts` importa ese JSON y lo usa como fuente de datos (si el archivo
+  no existiera, cae a un dataset sintético de respaldo).
+- **Requiere Python 3** instalado (el scraper no usa dependencias externas, no hace
+  falta `pip install`). Si tu intérprete es `py`, usá: `PYTHON=py npm run scrape`.
+- Para ampliar el dataset, agregá más combos en `scripts/scrape.mjs`.
+
+### 2.2 El formulario de "Nueva Búsqueda" corre el scraper
+
+La pantalla **Nueva Búsqueda** no simula: al apretar *Lanzar escaneo radar* envía
+`ciudad`, `rubro`, plataformas, rating y reseñas al endpoint `POST /api/scan`
+(`app/api/scan/route.ts`), que ejecuta el scraper de Python con esos parámetros y
+devuelve los leads. Estos se agregan/actualizan en la app y se invalidan `Dashboard`,
+`Leads` y `Scans`, así que el panel y la lista se refrescan solos.
+
+- Es una **API Route de Next** (corre en el servidor Node del propio front, no hace
+  falta un backend aparte). Sigue requiriendo **Python 3** en la máquina que sirve la app.
+- Si el mismo negocio ya existe (mismo nombre + ciudad), se marca como **actualizado**
+  en vez de duplicarse; el resto entra como lead **nuevo** en estado `nuevo`.
+
+> Nota: el scraper es una **simulación** de extracción (genera negocios de muestra con
+> la forma real de los datos), no hace scraping real de Google Maps.
+
 ---
 
 ## 3. Estructura de carpetas
@@ -77,7 +113,7 @@ Front/
 │  ├─ format.ts                  # Helpers de formato + clasificación de severidad
 │  ├─ csv.ts                     # Exportación a CSV
 │  ├─ cn.ts                      # Helper de clases
-│  └─ mock/dataset.ts            # Dataset de demo (214 leads + 8 scans) y cálculos
+│  ├─ mock/dataset.ts            # Fuente de datos: importa el JSON del scraper (+ respaldo)
 │
 ├─ store/                        # Redux Toolkit + RTK Query
 │  ├─ index.ts                   # makeStore + tipos RootState/AppDispatch
@@ -89,6 +125,7 @@ Front/
 │     ├─ leadsApi.ts             # createApi + endpoints (RTK Query)
 │     └─ mockBaseQuery.ts        # Base query "mock" (in-memory) para modo demo
 │
+├─ scripts/scrape.mjs            # Orquestador del scraper (npm run scrape)
 ├─ public/favicon.svg
 ├─ tailwind.config.ts            # Tokens de diseño (colores, fuentes, animaciones)
 └─ tsconfig.json                 # Alias "@/*" → raíz de Front/
