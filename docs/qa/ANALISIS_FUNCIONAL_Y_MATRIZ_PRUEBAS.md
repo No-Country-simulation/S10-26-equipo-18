@@ -1,18 +1,17 @@
 # Plan de Pruebas y Análisis Funcional — Radar de Reputación en Crisis
 
-**Equipo:** S10-26-equipo-18  
-**Proyecto:** Radar de Reputación en Crisis (Simulación Laboral Abierta — NoCountry)  
-**Versión:** 1.0  
-**Fecha:** Octubre 2026  
+**Equipo:** S10-26-equipo-18
+**Proyecto:** Radar de Reputación en Crisis (Simulación Laboral Abierta — NoCountry)
+**Versión:** 1.0
+**Fecha:** Octubre 2026
 **Responsables del área QA:**
 - Maria Chiribao (*QA Tester*)
-- Dharo Gabriel Fernandez Carmona (*QA Engineer*)
 
 ---
 
 ## 1. Introducción y Propósito
 
-El propósito de este documento es definir el marco funcional, los criterios de aceptación y los casos de prueba para el MVP de **Radar de Reputación en Crisis**. 
+El propósito de este documento es definir el marco funcional, los criterios de aceptación y los casos de prueba para el MVP de **Radar de Reputación en Crisis**.
 Este sistema automatiza la detección de negocios locales con crisis de reputación (1.5 a 3.5 estrellas), enriquece su información con IA y datos de contacto, y proporciona un dashboard para la gestión comercial y generación de propuestas B2B.
 
 El objetivo del equipo de QA es asegurar que el pipeline de extracción, enriquecimiento y visualización cumpla con los estándares de calidad y soporte de forma confiable la meta del Demo Day (**al menos 200 leads reales**).
@@ -45,8 +44,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** obtener una lista de negocios que operen en dicha zona.
 
 > **Criterio de Aceptación (AC-01.1):**
-> **Dado** que el usuario ingresa una ciudad válida (ej. `Bogotá`) y un rubro (ej. `Clínicas dentales`),  
-> **Cuando** se ejecuta la extracción,  
+> **Dado** que el usuario ingresa una ciudad válida (ej. `Bogotá`) y un rubro (ej. `Clínicas dentales`),
+> **Cuando** se ejecuta la extracción,
 > **Entonces** el sistema debe consultar la fuente configurada y devolver los negocios correspondientes a esa ubicación y categoría.
 
 #### US-02: Filtros de reputación y volumen
@@ -55,13 +54,13 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** enfocarme únicamente en leads con problemas de reputación reales y operando.
 
 > **Criterio de Aceptación (AC-02.1):**
-> **Dado** un conjunto de negocios extraídos,  
-> **Cuando** se evalúa su calificación,  
+> **Dado** un conjunto de negocios extraídos,
+> **Cuando** se evalúa su calificación,
 > **Entonces** solo deben registrarse aquellos con calificación entre **1.5 y 3.5 estrellas** inclusive.
 
 > **Criterio de Aceptación (AC-02.2):**
-> **Dado** un negocio con calificación entre 1.5 y 3.5 estrellas,  
-> **Cuando** se evalúa la cantidad total de reseñas,  
+> **Dado** un negocio con calificación entre 1.5 y 3.5 estrellas,
+> **Cuando** se evalúa la cantidad total de reseñas,
 > **Entonces** solo debe aceptarse si cuenta con **más de 10 reseñas** (evitando negocios abandonados o con muestras insignificantes).
 
 #### US-03: Deduplicación y actualización (*Upsert*)
@@ -70,8 +69,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** mantener una base de datos limpia y actualizada.
 
 > **Criterio de Aceptación (AC-03.1):**
-> **Dado** un negocio ya registrado en la base de datos (identificado por su `place_id` o ID único de fuente),  
-> **Cuando** vuelve a aparecer en una nueva búsqueda,  
+> **Dado** un negocio ya registrado en la base de datos (identificado por su `place_id` o ID único de fuente),
+> **Cuando** vuelve a aparecer en una nueva búsqueda,
 > **Entonces** el sistema debe actualizar sus métricas y fecha de última actualización sin duplicar el registro.
 
 ---
@@ -84,13 +83,13 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** conocer de inmediato cuál es su principal debilidad sin leer decenas de comentarios.
 
 > **Criterio de Aceptación (AC-04.1):**
-> **Dado** un negocio con reseñas negativas (1 a 3 estrellas),  
-> **Cuando** se envían hasta 5 reseñas recientes al modelo de IA,  
+> **Dado** un negocio con reseñas negativas (1 a 3 estrellas),
+> **Cuando** se envían hasta 5 reseñas recientes al modelo de IA,
 > **Entonces** el sistema debe clasificar el problema en una categoría estandarizada (ej. `Mala atención al cliente`, `Precios elevados`, `Problemas de higiene`, `Demoras en el servicio`, `Otro`).
 
 > **Criterio de Aceptación (AC-04.2):**
-> **Dado** un error de conexión o timeout con el proveedor de IA,  
-> **Cuando** falla el procesamiento,  
+> **Dado** un error de conexión o timeout con el proveedor de IA,
+> **Cuando** falla el procesamiento,
 > **Entonces** el lead debe guardarse con estado `Pendiente de análisis` sin interrumpir la extracción general.
 
 #### US-05: Redacción de borrador comercial personalizado
@@ -99,8 +98,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** contactar al lead con un mensaje altamente personalizado y empático.
 
 > **Criterio de Aceptación (AC-05.1):**
-> **Dado** un negocio analizado con una queja principal detectada,  
-> **Cuando** se solicita el borrador comercial,  
+> **Dado** un negocio analizado con una queja principal detectada,
+> **Cuando** se solicita el borrador comercial,
 > **Entonces** la IA genera:
 > 1. Un asunto persuasivo que mencione el dolor del negocio.
 > 2. Un párrafo introductorio que mencione el rubro y la oportunidad de mejora sin sonar acusatorio.
@@ -115,8 +114,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** poder contactar a los tomadores de decisión.
 
 > **Criterio de Aceptación (AC-06.1):**
-> **Dado** que un negocio dispone de URL de sitio web,  
-> **Cuando** el pipeline visita la página de inicio o `/contacto`,  
+> **Dado** que un negocio dispone de URL de sitio web,
+> **Cuando** el pipeline visita la página de inicio o `/contacto`,
 > **Entonces** debe extraer direcciones de correo válidas descartando formatos estáticos inválidos (ej. archivos de imagen o ejemplos tipo `info@domain.com`).
 
 #### US-07: Información de LinkedIn
@@ -134,8 +133,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** priorizar los contactos según mis objetivos diarios.
 
 > **Criterio de Aceptación (AC-08.1):**
-> **Dado** que el usuario ingresa al Dashboard,  
-> **Cuando** aplica filtros por `Ciudad`, `Problema detectado`, `Rango de calificación` o `Estado`,  
+> **Dado** que el usuario ingresa al Dashboard,
+> **Cuando** aplica filtros por `Ciudad`, `Problema detectado`, `Rango de calificación` o `Estado`,
 > **Entonces** la tabla debe actualizar los resultados de inmediato sin recargar toda la página.
 
 #### US-09: Exportación a CSV
@@ -144,8 +143,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** compartirlo con el equipo o importarlo en herramientas externas.
 
 > **Criterio de Aceptación (AC-09.1):**
-> **Dado** un conjunto de leads filtrados o totales,  
-> **Cuando** el usuario presiona "Exportar CSV",  
+> **Dado** un conjunto de leads filtrados o totales,
+> **Cuando** el usuario presiona "Exportar CSV",
 > **Entonces** se descarga un archivo CSV con codificación UTF-8 que incluye todos los campos (Nombre, Teléfono, Email, Rating, Problema, etc.) sin caracteres corruptos.
 
 #### US-10: Copia de borrador de correo
@@ -154,8 +153,8 @@ El objetivo del equipo de QA es asegurar que el pipeline de extracción, enrique
 - **Para** pegarlo directamente en mi cliente de correo o CRM.
 
 > **Criterio de Aceptación (AC-10.1):**
-> **Dado** que el usuario visualiza el detalle de un lead,  
-> **Cuando** hace clic en "Copiar borrador",  
+> **Dado** que el usuario visualiza el detalle de un lead,
+> **Cuando** hace clic en "Copiar borrador",
 > **Entonces** el texto completo del asunto y cuerpo se copia al portapapeles y se muestra una notificación visual de confirmación (*Toast*).
 
 ---
