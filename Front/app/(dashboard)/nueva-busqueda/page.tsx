@@ -47,15 +47,16 @@ export default function NuevaBusquedaPage() {
     idRef.current = 0;
 
     push(`[INIT] Configurando radar · ${ciudad} · ${rubro}`);
-    await sleep(350);
-    push(
-      `[NET] Conectando con ${plataformas.join(" + ") || "Google Maps"}...`,
-    );
-    await sleep(450);
+    await sleep(250);
+    push(`[NET] Conectando con ${plataformas.join(" + ") || "Google Maps"}...`);
+    await sleep(300);
     push(
       `[SCAN] Buscando negocios con ≤ ${ratingMax.toFixed(1)}★ y ≥ ${resenasMin} reseñas`,
     );
-    await sleep(500);
+    await sleep(300);
+    push("[AI] Analizando reseñas negativas (6 categorías)...");
+    await sleep(250);
+    push("[PY] Ejecutando scraper...");
 
     try {
       const res = await createScan({
@@ -66,19 +67,23 @@ export default function NuevaBusquedaPage() {
         resenasMin,
       }).unwrap();
 
-      push("[AI] Extrayendo reseñas negativas recientes...");
-      await sleep(450);
-      push("[AI] Clasificando en 6 categorías de dolor (LLM)...");
-      await sleep(450);
       push("[AI] Redactando draft de primer contacto...");
-      await sleep(400);
+      await sleep(250);
       push(
         `[OK] ${res.nuevos} leads nuevos · ${res.actualizados} actualizados · ${res.total} en total`,
         "ok",
       );
       setResult(res);
-    } catch {
-      push("[ERR] El escaneo falló. Reintentá en unos segundos.", "warn");
+    } catch (err) {
+      const detalle = (err as { data?: unknown })?.data;
+      push(
+        `[ERR] ${
+          typeof detalle === "string"
+            ? detalle
+            : "El escaneo falló. Reintentá en unos segundos."
+        }`,
+        "warn",
+      );
     } finally {
       setRunning(false);
     }

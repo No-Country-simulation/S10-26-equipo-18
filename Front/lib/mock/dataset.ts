@@ -2,6 +2,7 @@ import type {
   DashboardStats,
   Draft,
   Lead,
+  LeadEstado,
   LeadListResponse,
   Problema,
   Scan,
@@ -9,6 +10,7 @@ import type {
 } from "../types";
 import { CIUDADES, PROBLEMAS, RUBROS } from "../constants";
 import { clasificarSeveridad } from "../format";
+import rawGenerado from "./leads.generated.json";
 
 const REVIEW_TEXTOS: Record<Problema, string> = {
   atencion:
@@ -245,18 +247,74 @@ function generarLeads(): Lead[] {
   return leads;
 }
 
-export const LEADS: Lead[] = generarLeads();
+const GENERADO = rawGenerado as unknown as Lead[];
 
-export const SCANS: Scan[] = [
-  { id: "scan-001", ciudad: "Buenos Aires", rubro: "Restaurantes", plataformas: ["Google Maps"], ratingMax: 3.5, resenasMin: 20, fecha: "2026-10-16T09:12:00", nuevos: 42, actualizados: 8, total: 50, estado: "completado", duracionSeg: 148 },
-  { id: "scan-002", ciudad: "CDMX", rubro: "Clínicas Dentales", plataformas: ["Google Maps", "Yelp"], ratingMax: 3.4, resenasMin: 30, fecha: "2026-10-14T15:40:00", nuevos: 31, actualizados: 5, total: 36, estado: "completado", duracionSeg: 173 },
-  { id: "scan-003", ciudad: "Bogotá", rubro: "Centros Estéticos", plataformas: ["Google Maps"], ratingMax: 3.5, resenasMin: 25, fecha: "2026-10-12T11:05:00", nuevos: 27, actualizados: 12, total: 39, estado: "completado", duracionSeg: 121 },
-  { id: "scan-004", ciudad: "Medellín", rubro: "Hoteles Boutique", plataformas: ["TripAdvisor", "Google Maps"], ratingMax: 3.3, resenasMin: 40, fecha: "2026-10-10T18:22:00", nuevos: 19, actualizados: 3, total: 22, estado: "completado", duracionSeg: 96 },
-  { id: "scan-005", ciudad: "Lima", rubro: "Gimnasios", plataformas: ["Google Maps"], ratingMax: 3.5, resenasMin: 15, fecha: "2026-10-08T08:47:00", nuevos: 24, actualizados: 6, total: 30, estado: "completado", duracionSeg: 134 },
-  { id: "scan-006", ciudad: "Cali", rubro: "Veterinarias", plataformas: ["Google Maps", "Yelp"], ratingMax: 3.2, resenasMin: 20, fecha: "2026-10-05T13:15:00", nuevos: 16, actualizados: 2, total: 18, estado: "completado", duracionSeg: 88 },
-  { id: "scan-007", ciudad: "Guadalajara", rubro: "Restaurantes", plataformas: ["Google Maps"], ratingMax: 3.5, resenasMin: 50, fecha: "2026-10-02T20:03:00", nuevos: 38, actualizados: 9, total: 47, estado: "completado", duracionSeg: 165 },
-  { id: "scan-008", ciudad: "Santiago", rubro: "Clínicas Dentales", plataformas: ["Google Maps"], ratingMax: 3.4, resenasMin: 25, fecha: "2026-09-29T10:31:00", nuevos: 21, actualizados: 4, total: 25, estado: "completado", duracionSeg: 112 },
-];
+/**
+ * El scraper entrega todos los leads en estado "nuevo" (no gestiona pipeline).
+ * Para poder probar la UI completa asignamos, de forma determinista, algunos
+ * estados y vendedores. Si el dataset ya trae estados variados, se respeta.
+ */
+function enriquecerPipeline(leads: Lead[]): Lead[] {
+  if (leads.some((l) => l.estado && l.estado !== "nuevo")) return leads;
+  const vendedores = ["ven-01", "ven-02", "ven-03"];
+  return leads.map((lead, i) => {
+    const r = (i * 7) % 10;
+    let estado: LeadEstado = "nuevo";
+    if (r === 3 || r === 8) estado = "contactado";
+    else if (r === 6) estado = "convertido";
+    else if (r === 9) estado = "perdido";
+    return {
+      ...lead,
+      estado,
+      actualizado: estado !== "nuevo",
+      vendedor: estado === "nuevo" ? null : vendedores[i % vendedores.length],
+    };
+  });
+}
+
+/** Deriva el historial de escaneos agrupando los leads del scraper por ciudad + rubro. */
+function derivarScans(leads: Lead[]): Scan[] {
+  const grupos = new Map<string, Lead[]>();
+  for (const lead of leads) {
+    const key = `${lead.ciudad}||${lead.rubro}`;
+    const lista = grupos.get(key) ?? [];
+    lista.push(lead);
+    grupos.set(key, lista);
+  }
+  return [...grupos.entries()].map(([key, lista], i) => {
+    const [ciudad, rubro] = key.split("||");
+    const plataformas = [...new Set(lista.map((l) => l.fuente))];
+    const fecha = lista
+      .map((l) => l.ultimoEscaneo)
+      .sort()
+      .at(-1);
+    return {
+      id: `scan-${String(i + 1).padStart(3, "0")}`,
+      ciudad,
+      rubro,
+      plataformas,
+      ratingMax: 3.5,
+      resenasMin: 10,
+      fecha: fecha ? `${fecha}T09:00:00` : new Date().toISOString(),
+      nuevos: lista.length,
+      actualizados: 0,
+      total: lista.length,
+      estado: "completado" as const,
+      duracionSeg: 60 + lista.length * 9,
+    };
+  });
+}
+
+const SCRAPED: Lead[] = enriquecerPipeline(GENERADO);
+
+/**
+ * Fuente de datos de la app:
+ * 1) Si existe el JSON generado por el scraper (npm run scrape), se usa ese.
+ * 2) Si no, se cae al dataset sintético de respaldo.
+ */
+export const LEADS: Lead[] = SCRAPED.length > 0 ? SCRAPED : generarLeads();
+
+export const SCANS: Scan[] = derivarScans(LEADS);
 
 export function aplicarFiltros(leads: Lead[], query: {
   search?: string;
