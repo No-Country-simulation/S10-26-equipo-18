@@ -8,7 +8,7 @@ Para mantener el repositorio ordenado y evitar conflictos en nuestro entorno mon
 
 ```
 main ─────────────────────────── (Producción / Demo · Protegida · Solo vía PR)
- └── dev ──────────────────────── (Integración · Protegida · Solo vía PR)
+ └── dev ──────────────────────── (Integración · Push directo permitido)
       ├── feat/usuario/nombre ─── Nuevas funcionalidades
       ├── release/vX.X ────────── Pruebas E2E y estabilización
       └── fix/usuario/nombre ──── Hotfixes y resolución de bugs
@@ -38,11 +38,13 @@ release/v1.0
 
 ## 🔒 Políticas de Protección del Repositorio
 
-El repositorio cuenta con **Rulesets** configurados en GitHub para garantizar la calidad del código:
+El repositorio cuenta con **Rulesets** configurados en GitHub:
 
-1. **Push directo bloqueado** — Es imposible subir código directamente a `main` o `dev` desde la terminal.
-2. **Revisión obligatoria** — Todo PR requiere al menos **1 aprobación** de otro miembro del equipo antes de poder ser mergeado.
-3. **Historial inmutable** — El force-push (`git push -f`) está bloqueado en las ramas principales.
+1. **Push directo bloqueado en `main`** — Solo se puede actualizar `main` mediante un Pull Request aprobado.
+2. **Revisión obligatoria en `main`** — Todo PR a `main` requiere al menos **1 aprobación** de otro miembro del equipo.
+3. **Historial inmutable en `main`** — El force-push (`git push -f`) está bloqueado.
+
+> `dev` **no tiene protección** — se puede mergear y pushear directamente para agilizar el trabajo diario.
 
 ---
 
@@ -61,11 +63,12 @@ git add .
 git commit -m "feat: descripción del cambio"
 git push origin feat/tu-usuario/nombre-funcionalidad
 
-# 4. Abrís un Pull Request hacia dev en GitHub
+# 4. Mergeás tu rama a dev (directo o vía PR, como prefieras)
+git checkout dev
+git merge feat/tu-usuario/nombre-funcionalidad
+git push origin dev
 
-# 5. Un compañero revisa y aprueba el PR
-
-# 6. Se hace merge — tu código pasa a integrar dev ✅
+# ✅ Tu código ya está en dev
 ```
 
 ---
@@ -104,8 +107,8 @@ Seguimos el estándar **Conventional Commits**. El formato es:
 ## 📋 Reglas de Trabajo
 
 - ❌ **Nunca** trabajar directo en `main` — es solo para despliegues.
-- ✅ Solo se puede hacer merge a `main` desde `dev` mediante un **Pull Request**.
-- ✅ Solo se puede hacer merge a `dev` desde una rama `feat/*` o `fix/*` mediante un **PR**.
+- ✅ Solo se puede hacer merge a `main` desde `dev` mediante un **Pull Request** con al menos 1 aprobación.
+- ✅ Para `dev` podés mergear directamente desde tu rama o abrir un PR — a criterio del equipo.
 - ✅ Antes de subir código, ejecutar:
 
 ```bash
