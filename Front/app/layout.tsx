@@ -23,10 +23,37 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
+const TITULO = "RepuSense | Radar de Reputación en Crisis";
+const DESCRIPCION =
+  "Prospección B2B que detecta negocios locales en crisis reputacional y genera el primer contacto con IA.";
+const SITIO = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "RepuSense | Radar de Reputación en Crisis",
-  description:
-    "Prospección B2B que detecta negocios locales en crisis reputacional y genera el primer contacto con IA.",
+  metadataBase: new URL(SITIO),
+  title: TITULO,
+  description: DESCRIPCION,
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: "RepuSense",
+    title: TITULO,
+    description: DESCRIPCION,
+    url: "/",
+    images: [
+      {
+        url: "/openGraph.png",
+        width: 1200,
+        height: 798,
+        alt: "RepuSense — Radar de Reputación en Crisis",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO,
+    description: DESCRIPCION,
+    images: ["/openGraph.png"],
+  },
 };
 
 export default function RootLayout({
