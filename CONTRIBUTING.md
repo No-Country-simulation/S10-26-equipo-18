@@ -1,53 +1,114 @@
-Estrategia de Ramas
+# 🌿 Estrategia de Ramas — GitFlow
 
-Para mantener el repositorio ordenado y evitar conflictos en nuestro entorno monorepo, hemos migrado de un esquema de ramas sueltas (como front, qa o ramas numeradas) a un GitFlow estructurado.
+Para mantener el repositorio ordenado y evitar conflictos en nuestro entorno monorepo, migramos de un esquema de ramas sueltas (`front`, `qa`, ramas numeradas) a un **GitFlow estructurado**.
 
-Árbol de Integración
+---
 
-main ───────────────────── (Producción / Demo, Protegida, Solo vía PR)
-  └── dev ──────────────── (Integración, Protegida, Solo vía PR)
-       ├── feat/usuario/nombre ─── (Trabajo individual de nuevas funcionalidades)
-       ├── release/vX.X ── (Pruebas E2E y estabilización)
-       └── fix/usuario/nombre ──── (Hotfixes y resolución de bugs)
+## 🌲 Árbol de Integración
 
-Tipos de Ramas y Convenciones
+```
+main ─────────────────────────── (Producción / Demo · Protegida · Solo vía PR)
+ └── dev ──────────────────────── (Integración · Protegida · Solo vía PR)
+      ├── feat/usuario/nombre ─── Nuevas funcionalidades
+      ├── release/vX.X ────────── Pruebas E2E y estabilización
+      └── fix/usuario/nombre ──── Hotfixes y resolución de bugs
+```
 
-main (Rama Productiva): Código estable listo para producción y para la demostración del MVP. Nadie puede hacer push directo aquí. Todo cambio ingresa mediante un Pull Request (PR) revisado.
+---
 
-dev (Rama de Desarrollo): Entorno principal de integración donde se unifica el trabajo del frontend y el backend. Es el paso previo a producción y también está protegida.
+## 🏷️ Tipos de Ramas y Convenciones
 
-feat/* (Features): Ramas de trabajo para desarrollar un requisito o funcionalidad específica.
-    Ejemplo: feat/maub/google-maps-scraper, feat/dashboard-ui.
-    Flujo: Nacen de dev y vuelven a dev mediante un PR.
+| Rama | Propósito | Origen → Destino |
+|------|-----------|-----------------|
+| `main` | Código estable listo para producción / demo MVP | `dev` → `main` (solo PR) |
+| `dev` | Integración de frontend y backend | `feat/*` / `fix/*` → `dev` (solo PR) |
+| `feat/*` | Desarrollar una funcionalidad específica | `dev` → `dev` |
+| `release/*` | Pruebas E2E y pulido final antes del lanzamiento | `dev` → `main` |
+| `fix/*` | Solucionar bugs o errores aislados | `dev` / `main` → `dev` |
 
-release/* (Estabilización): Ramas dedicadas exclusivamente a realizar pruebas End-to-End (E2E) y pulir detalles finales antes de un lanzamiento.
-    Flujo: Nacen de dev y, tras validar las pruebas, se integran a main mediante PR.
+### Ejemplos de nombres
 
-fix/* (Hotfixes / Bugs): Ramas para solucionar errores aislados o bugs detectados durante el desarrollo o en producción.
-    Ejemplo: fix/maub/exportacion-csv, fix/filtro-estado-lead.
-    Flujo: Nacen de dev (o de main si es crítico) y vuelven mediante PR.
+```
+feat/maub/google-maps-scraper
+fix/maub/exportacion-csv
+release/v1.0
+```
 
-Políticas y Protecciones del Repositorio (Criterios de Aceptación)
-Para garantizar la calidad del código, el repositorio cuenta con reglas estrictas (Rulesets) a nivel de configuración en GitHub:
-    1. Push directo bloqueado: Es imposible subir código directamente a main o a dev desde la terminal.
-    2. Revisión obligatoria: Todo PR requiere un mínimo de 1 aprobación (approval) de otro miembro del equipo antes de poder ser mergeado.
-    3. Historial inmutable: Los comandos destructivos como el force-push (git push -f) están bloqueados en las ramas principales.
+---
 
-Flujo de Trabajo Diario del Equipo
-    1. Actualizás tu entorno local con la última versión:
-        git checkout dev
-        git pull origin dev
-    2. Creás tu rama de trabajo:
-        git checkout -b feat/tu-usuario/nombre-funcionalidad
-    3. Trabajás en tu rama: Hacés commit y push cuando necesites.
-    4. Solicitás el Pull Request (PR): Cuando termines, creás el PR hacia dev.
-    5. Revisión: Otro miembro del equipo revisa tu código.
-    6. Merge: Una vez aprobado, se hace merge y tu código pasa a integrar dev.
+## 🔒 Políticas de Protección del Repositorio
 
-Reglas de Trabajo
-Nunca trabajar directo en main: main es solo para despliegues.
-Solo se puede hacer merge a main desde dev mediante un Pull Request (PR).
-Solo se puede hacer merge a dev desde una rama feat/ o fix/ mediante un PR.
-Antes de subir código, ejecutar npm run lint y npm run build para asegurar la calidad.
+El repositorio cuenta con **Rulesets** configurados en GitHub para garantizar la calidad del código:
 
+1. **Push directo bloqueado** — Es imposible subir código directamente a `main` o `dev` desde la terminal.
+2. **Revisión obligatoria** — Todo PR requiere al menos **1 aprobación** de otro miembro del equipo antes de poder ser mergeado.
+3. **Historial inmutable** — El force-push (`git push -f`) está bloqueado en las ramas principales.
 
+---
+
+## 🔄 Flujo de Trabajo Diario
+
+```bash
+# 1. Actualizás tu entorno local con la última versión
+git checkout dev
+git pull origin dev
+
+# 2. Creás tu rama de trabajo
+git checkout -b feat/tu-usuario/nombre-funcionalidad
+
+# 3. Trabajás en tu rama — hacés commit y push cuando necesites
+git add .
+git commit -m "feat: descripción del cambio"
+git push origin feat/tu-usuario/nombre-funcionalidad
+
+# 4. Abrís un Pull Request hacia dev en GitHub
+
+# 5. Un compañero revisa y aprueba el PR
+
+# 6. Se hace merge — tu código pasa a integrar dev ✅
+```
+
+---
+
+## ✍️ Convención de Commits
+
+Seguimos el estándar **Conventional Commits**. El formato es:
+
+```
+<tipo>(<scope opcional>): <descripción corta en imperativo>
+```
+
+### Tipos disponibles
+
+| Tipo | Cuándo usarlo | Ejemplo |
+|------|--------------|---------|
+| `feat` | Nueva funcionalidad | `feat: agregar filtro por estado de lead` |
+| `fix` | Corrección de un bug | `fix: corregir exportación de CSV vacío` |
+| `docs` | Solo documentación | `docs: actualizar CONTRIBUTING.md` |
+| `style` | Formato, espacios, comas (sin lógica) | `style: formatear componente Header` |
+| `refactor` | Refactor sin nueva funcionalidad ni bug fix | `refactor: extraer lógica de auth a hook` |
+| `test` | Agregar o corregir tests | `test: agregar tests unitarios al servicio de leads` |
+| `chore` | Tareas de mantenimiento, dependencias | `chore: actualizar dependencias de npm` |
+| `clean` | Eliminar código muerto, logs, comentarios | `clean: eliminar console.logs del módulo de scraper` |
+| `build` | Cambios en build system o herramientas externas | `build: configurar vite para producción` |
+| `ci` | Cambios en pipelines / GitHub Actions | `ci: agregar workflow de lint automático` |
+
+### Reglas del mensaje
+
+- Usar **imperativo** en la descripción: `agregar`, `corregir`, `eliminar` — no `agregué` ni `agrega`.
+- Máximo **72 caracteres** en la primera línea.
+- No terminar con punto.
+
+---
+
+## 📋 Reglas de Trabajo
+
+- ❌ **Nunca** trabajar directo en `main` — es solo para despliegues.
+- ✅ Solo se puede hacer merge a `main` desde `dev` mediante un **Pull Request**.
+- ✅ Solo se puede hacer merge a `dev` desde una rama `feat/*` o `fix/*` mediante un **PR**.
+- ✅ Antes de subir código, ejecutar:
+
+```bash
+npm run lint
+npm run build
+```
