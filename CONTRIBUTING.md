@@ -18,13 +18,13 @@ main ─────────────────────────
 
 ## 🏷️ Tipos de Ramas y Convenciones
 
-| Rama | Propósito | Origen → Destino |
-|------|-----------|-----------------|
-| `main` | Código estable listo para producción / demo MVP | `dev` → `main` (solo PR) |
-| `dev` | Integración de frontend y backend | `feat/*` / `fix/*` → `dev` (solo PR) |
-| `feat/*` | Desarrollar una funcionalidad específica | `dev` → `dev` |
-| `release/*` | Pruebas E2E y pulido final antes del lanzamiento | `dev` → `main` |
-| `fix/*` | Solucionar bugs o errores aislados | `dev` / `main` → `dev` |
+| Rama | Propósito |
+|------|-----------|
+| `main` | Código estable listo para producción / demo MVP |
+| `dev` | Integración de frontend y backend |
+| `feat/*` | Desarrollar una funcionalidad específica |
+| `release/*` | Pruebas E2E y pulido final antes del lanzamiento |
+| `fix/*` | Solucionar bugs o errores aislados |
 
 ### Ejemplos de nombres
 
