@@ -1,0 +1,851 @@
+<!DOCTYPE html><html class="h-full bg-[#0a0d14]" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RepuSense - Leads &amp; Outreach IA</title>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            dark: {
+              950: '#06080d',
+              900: '#0a0d14',
+              850: '#0e121b',
+              800: '#141923',
+              700: '#1e2432',
+              600: '#2b3345',
+            },
+            tealAccent: {
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars">
+    /* Custom subtle dark scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0d14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e2432;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2b3345;
+    }
+  </style>
+<style data-purpose="layout-refinements">
+    .badge-purple {
+      background-color: rgba(99, 102, 241, 0.12);
+      color: #a5b4fc;
+      border: 1px solid rgba(129, 140, 248, 0.2);
+    }
+    .badge-red {
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+    .badge-yellow {
+      background-color: rgba(234, 179, 8, 0.12);
+      color: #fde047;
+      border: 1px solid rgba(250, 204, 21, 0.2);
+    }
+    .badge-orange {
+      background-color: rgba(249, 115, 22, 0.12);
+      color: #fdba74;
+      border: 1px solid rgba(251, 146, 60, 0.2);
+    }
+    .badge-green {
+      background-color: rgba(20, 184, 166, 0.12);
+      color: #2dd4bf;
+      border: 1px solid rgba(45, 212, 191, 0.25);
+    }
+  </style>
+</head>
+<body class="h-full text-slate-300 font-sans antialiased overflow-hidden flex bg-[#0a0d14]">
+<!-- BEGIN: Sidebar -->
+<aside class="w-60 flex-shrink-0 bg-[#07090e] border-r border-[#161c28] flex flex-col justify-between select-none z-20" data-purpose="main-sidebar">
+<!-- Top Branding & Navigation -->
+<div>
+<!-- Brand Logo Header -->
+<div class="px-5 py-5 flex items-center space-x-3 border-b border-[#141923]/60">
+<div class="w-8 h-8 rounded-full bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<circle cx="12" cy="12" r="6"></circle>
+<circle cx="12" cy="12" r="2"></circle>
+</svg>
+</div>
+<div>
+<div class="text-sm font-semibold tracking-wide text-white leading-tight">RepuSense</div>
+<div class="text-[10px] tracking-wider text-slate-500 font-medium">RADAR DE REPUTACIÓN</div>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="p-3 space-y-1">
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-[#121722] text-xs font-medium transition-colors" href="#">
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+</svg>
+<span>Radar</span>
+</a>
+<a class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-[#121722] text-xs font-medium transition-colors" href="#">
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+<span>Nueva búsqueda</span>
+</a>
+<!-- Active Leads Page Item -->
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-[#141b27] text-white text-xs font-medium border border-teal-500/20 shadow-sm" href="#">
+<div class="flex items-center space-x-3">
+<svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+<circle cx="9" cy="7" r="4"></circle>
+<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+</svg>
+<span class="font-semibold">Leads</span>
+</div>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30">128 nuevos</span>
+</a>
+</nav>
+</div>
+<!-- User Profile & Config -->
+<div class="p-3 border-t border-[#161c28]">
+<div class="flex items-center space-x-3 px-2 py-2">
+<div class="w-8 h-8 rounded-full bg-teal-900/40 border border-teal-500/30 flex items-center justify-center text-teal-300 font-semibold text-xs">
+          VR
+        </div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-white">Valeria Ríos</span>
+<span class="text-[10px] text-slate-500">Equipo de ventas</span>
+</div>
+</div>
+<a class="mt-2 flex items-center space-x-2 px-2 py-1.5 text-[11px] text-slate-400 hover:text-slate-200 hover:bg-[#121722] rounded-md transition-colors" href="#">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="3"></circle>
+<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+</svg>
+<span>Configuración</span>
+</a>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainContentArea -->
+<main class="flex-1 flex overflow-hidden bg-[#0c1017]">
+<!-- Table & List View Column -->
+<div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- Top Bar: Title & Action Buttons -->
+<header class="px-7 pt-7 pb-4 flex items-center justify-between" data-purpose="content-header">
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-white">Leads</h1>
+<p class="text-xs text-slate-400 mt-1 font-medium">
+<span class="text-slate-200 font-semibold">24</span> leads · 
+            <span class="text-teal-400 font-semibold">24 nuevos</span> · 
+            <span class="text-slate-300">19 con email</span>
+</p>
+</div>
+<div class="flex items-center space-x-2.5">
+<button class="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-[#141b27] hover:bg-[#1c2536] border border-[#232d3f] text-xs font-semibold text-slate-200 transition" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+</svg>
+<span>Re-escanear</span>
+</button>
+<button class="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-[#071311] text-xs font-bold transition shadow-sm" type="button">
+<svg class="w-3.5 h-3.5 text-[#071311]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="7 10 12 15 17 10"></polyline>
+<line x1="12" x2="12" y1="15" y2="3"></line>
+</svg>
+<span>Exportar CSV</span>
+</button>
+</div>
+</header>
+<!-- BEGIN: FiltersBar -->
+<section class="px-7 py-3" data-purpose="leads-filter-toolbar">
+<!-- Filter Controls Row -->
+<div class="flex items-center space-x-2 flex-wrap gap-y-2">
+<!-- Search input -->
+<div class="relative flex-1 min-w-[210px] max-w-[270px]">
+<svg class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="11" cy="11" r="8"></circle>
+<line x1="21" x2="16.65" y1="21" y2="16.65"></line>
+</svg>
+<input class="w-full pl-9 pr-3 py-1.5 bg-[#121722] border border-[#222b3d] rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-teal-500" placeholder="Buscar nombre o email..." type="text" value="">
+</div>
+<!-- Dropdown: Bogotá -->
+<div class="relative">
+<select class="appearance-none bg-[#121722] border border-[#222b3d] text-xs font-medium text-slate-200 py-1.5 pl-3 pr-8 rounded-lg focus:outline-none focus:border-teal-500 cursor-pointer">
+<option selected="">Bogotá</option>
+<option>Medellín</option>
+<option>Cali</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
+</div>
+</div>
+<!-- Dropdown: Clínicas dentales -->
+<div class="relative">
+<select class="appearance-none bg-[#121722] border border-[#222b3d] text-xs font-medium text-slate-200 py-1.5 pl-3 pr-8 rounded-lg focus:outline-none focus:border-teal-500 cursor-pointer">
+<option selected="">Clínicas dentales</option>
+<option>Restaurantes</option>
+<option>Hoteles</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
+</div>
+</div>
+<!-- Dropdown: Cualquier problema -->
+<div class="relative">
+<select class="appearance-none bg-[#121722] border border-[#222b3d] text-xs font-medium text-slate-200 py-1.5 pl-3 pr-8 rounded-lg focus:outline-none focus:border-teal-500 cursor-pointer">
+<option selected="">Cualquier problema</option>
+<option>Calidad inconsistente</option>
+<option>Mala atención al cliente</option>
+<option>Precios altos</option>
+<option>Problemas de higiene</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
+</div>
+</div>
+<!-- Dropdown: Nuevo -->
+<div class="relative">
+<select class="appearance-none bg-[#121722] border border-[#222b3d] text-xs font-medium text-slate-200 py-1.5 pl-3 pr-8 rounded-lg focus:outline-none focus:border-teal-500 cursor-pointer">
+<option selected="">Nuevo</option>
+<option>Contactado</option>
+<option>Convertido</option>
+<option>Perdido</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
+</div>
+</div>
+</div>
+<!-- Filter Sub-row: Con email & Sort button -->
+<div class="flex items-center justify-between mt-3">
+<button class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-md bg-[#141b27] border border-[#232d3f] text-xs text-slate-300 hover:text-white" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span>Con email</span>
+</button>
+<!-- Sort dropdown -->
+<button class="inline-flex items-center space-x-1.5 text-xs text-slate-400 hover:text-slate-200 font-medium" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="m3 16 4 4 4-4"></path>
+<path d="M7 20V4"></path>
+<path d="m21 8-4-4-4 4"></path>
+<path d="M17 4v16"></path>
+</svg>
+<span>Rating: menor primero</span>
+<svg class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
+</button>
+</div>
+</section>
+<!-- END: FiltersBar -->
+<!-- BEGIN: LeadsTable -->
+<section class="px-7 pb-8 pt-2 flex-1" data-purpose="leads-data-table">
+<table class="w-full text-left text-xs border-collapse">
+<thead>
+<tr class="text-slate-400 font-semibold border-b border-[#1b2230]">
+<th class="pb-3 pr-4 font-semibold text-slate-400" scope="col">Negocio</th>
+<th class="pb-3 px-3 font-semibold text-slate-400" scope="col">Ciudad / Rubro</th>
+<th class="pb-3 px-3 font-semibold text-slate-400" scope="col">Rating</th>
+<th class="pb-3 px-3 font-semibold text-slate-400" scope="col">Problema detectado (IA)</th>
+<th class="pb-3 px-3 font-semibold text-slate-400" scope="col">Contacto</th>
+<th class="pb-3 pl-3 font-semibold text-slate-400" scope="col">Estado</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#151c27]">
+<!-- Row 1: Dientes Sanos (Active / Selected Row) -->
+<tr class="bg-[#121926]/90 hover:bg-[#151f30] cursor-pointer transition border-l-2 border-l-teal-500">
+<td class="py-3 pl-2 pr-4">
+<div class="font-semibold text-white">Dientes Sanos</div>
+<div class="text-[11px] text-slate-400">TripAdvisor</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.6</span>
+<span class="text-slate-400 font-normal">(362)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-purple">
+                  Calidad inconsistente
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto.dientessanos@yah...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 2: Dental Care 24 -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="flex items-center space-x-1.5">
+<span class="font-semibold text-white">Dental Care 24</span>
+<span class="text-teal-400/80">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+</span>
+</div>
+<div class="text-[11px] text-slate-400">Yelp</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.7</span>
+<span class="text-slate-400 font-normal">(425)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-purple">
+                  Calidad inconsistente
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto.dentalcare24@hot...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 3: Clínicas dentale Central Bogotá -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="flex items-center space-x-1.5">
+<span class="font-semibold text-white">Clínicas dentale Central Bogotá</span>
+<span class="text-teal-400/80">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+</span>
+</div>
+<div class="text-[11px] text-slate-400">Google Maps</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.7</span>
+<span class="text-slate-400 font-normal">(89)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-red">
+                  Mala atención al cliente
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto@clnicasdentalecen...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 4: Grupo Clínicas dentales del Sol -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="flex items-center space-x-1.5">
+<span class="font-semibold text-white">Grupo Clínicas dentales del Sol</span>
+<span class="text-teal-400/80">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+</span>
+</div>
+<div class="text-[11px] text-slate-400">Google Maps</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.7</span>
+<span class="text-slate-400 font-normal">(54)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-orange">
+                  Precios altos
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto@grupoclnicasdent...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 5: OdontoCare Centro -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="font-semibold text-white">OdontoCare Centro</div>
+<div class="text-[11px] text-slate-400">TripAdvisor</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.8</span>
+<span class="text-slate-400 font-normal">(31)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-yellow">
+                  Problemas de higiene
+                </span>
+</td>
+<td class="py-3 px-3">
+<span class="text-[11px] italic text-slate-400">Solo tel: +57 601 561 6617</span>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 6: Clínicas dentales Bogotá Norte #13 -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="font-semibold text-white">Clínicas dentales Bogotá Norte #13</div>
+<div class="text-[11px] text-slate-400">Google Maps</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>1.8</span>
+<span class="text-slate-400 font-normal">(177)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-red">
+                  Mala atención al cliente
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto@clnicasdentalesbo...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 7: DentArt -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="font-semibold text-white">DentArt</div>
+<div class="text-[11px] text-slate-400">TripAdvisor</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>2.0</span>
+<span class="text-slate-400 font-normal">(418)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-yellow">
+                  Problemas de higiene
+                </span>
+</td>
+<td class="py-3 px-3">
+<span class="text-[11px] italic text-slate-400">Solo tel: +57 601 447 1492</span>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 8: Ortodoncia Moderna -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="font-semibold text-white">Ortodoncia Moderna</div>
+<div class="text-[11px] text-slate-400">TripAdvisor</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>2.1</span>
+<span class="text-slate-400 font-normal">(356)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-red">
+                  Mala atención al cliente
+                </span>
+</td>
+<td class="py-3 px-3">
+<span class="text-[11px] italic text-slate-400">Solo tel: +57 601 592 8556</span>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+<!-- Row 9: Clínicas dentales & Especialistas -->
+<tr class="hover:bg-[#121824] cursor-pointer transition">
+<td class="py-3 pl-2 pr-4">
+<div class="flex items-center space-x-1.5">
+<span class="font-semibold text-white">Clínicas dentales &amp; Especialistas</span>
+<span class="text-teal-400/80">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+</span>
+</div>
+<div class="text-[11px] text-slate-400">TripAdvisor</div>
+</td>
+<td class="py-3 px-3">
+<div class="font-medium text-slate-200">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas dentales</div>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-[11px]">
+<span>★</span>
+<span>2.1</span>
+<span class="text-slate-400 font-normal">(61)</span>
+</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-purple">
+                  Calidad inconsistente
+                </span>
+</td>
+<td class="py-3 px-3">
+<div class="inline-flex items-center space-x-1.5 text-slate-300">
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="truncate max-w-[155px]">contacto@clnicasdentaleses...</span>
+</div>
+</td>
+<td class="py-3 pl-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">
+                  Nuevo
+                </span>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<!-- END: LeadsTable -->
+</div>
+<!-- BEGIN: LeadDrawerSlideOver -->
+<!-- Slide-over Tactical Drawer panel on the right -->
+<aside class="w-[490px] flex-shrink-0 bg-[#0d121c] border-l border-[#1a2233] flex flex-col h-full shadow-2xl relative z-30" data-purpose="lead-detail-drawer">
+<!-- Drawer Header & Close -->
+<div class="p-6 pb-4 border-b border-[#182030] relative">
+<div class="flex items-start justify-between">
+<div>
+<h2 class="text-xl font-bold text-white tracking-tight">Dientes Sanos</h2>
+<div class="text-xs text-slate-400 mt-0.5">
+              Clínicas dentales · Bogotá · TripAdvisor
+            </div>
+</div>
+<div class="flex items-center space-x-2.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium badge-green">Nuevo</span>
+<button class="text-slate-400 hover:text-white transition" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<line x1="18" x2="6" y1="6" y2="18"></line>
+<line x1="6" x2="18" y1="6" y2="18"></line>
+</svg>
+</button>
+</div>
+</div>
+<!-- Rating and Issue Badges -->
+<div class="flex items-center space-x-2.5 mt-3.5">
+<span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-red-950/60 border border-red-500/30 text-red-400 font-semibold text-xs">
+<span>★</span>
+<span>1.6 · 362 reseñas</span>
+</span>
+<span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium badge-purple">
+            Calidad inconsistente
+          </span>
+</div>
+</div>
+<!-- Drawer Scrollable Body Content -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Section: DATOS DE CONTACTO -->
+<section data-purpose="contact-data-section">
+<h3 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-3">DATOS DE CONTACTO</h3>
+<div class="bg-[#111724] border border-[#1d273a] rounded-xl p-3.5 space-y-2.5 text-xs">
+<!-- Phone -->
+<div class="flex items-center justify-between group">
+<div class="flex items-center space-x-3 text-slate-200">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+</svg>
+<span>+57 601 492 7075</span>
+</div>
+<button class="text-slate-500 hover:text-slate-300" title="Copiar teléfono">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect height="14" rx="2" ry="2" width="14" x="8" y="8"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+</button>
+</div>
+<!-- Email -->
+<div class="flex items-center justify-between group">
+<div class="flex items-center space-x-3 text-slate-200">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+</svg>
+<span class="text-teal-400/90 font-medium">contacto.dientessanos@yahoo.com</span>
+</div>
+<button class="text-slate-500 hover:text-slate-300" title="Copiar email">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect height="14" rx="2" ry="2" width="14" x="8" y="8"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+</button>
+</div>
+<!-- Website -->
+<div class="flex items-center justify-between group">
+<div class="flex items-center space-x-3 text-slate-200">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="2" x2="22" y1="12" y2="12"></line>
+<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+</svg>
+<span>https://www.dientessanos.mx</span>
+</div>
+<button class="text-slate-500 hover:text-slate-300" title="Copiar web">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect height="14" rx="2" ry="2" width="14" x="8" y="8"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+</button>
+</div>
+<!-- LinkedIn -->
+<div class="flex items-center justify-between group">
+<div class="flex items-center space-x-3 text-slate-400">
+<svg class="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+<path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.45 1.45 0 1 0-.01-2.9 1.45 1.45 0 0 0 .01 2.9m1.39 9.74v-8.37H5.07v8.37h2.78z"></path>
+</svg>
+<span class="italic text-slate-500 text-[11px]">Perfil no localizado</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: ÚLTIMAS RESEÑAS NEGATIVAS -->
+<section data-purpose="negative-reviews-section">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">ÚLTIMAS RESEÑAS NEGATIVAS</h3>
+<span class="text-[10px] text-slate-400 font-medium">IA · Calidad inconsistente (73% confianza)</span>
+</div>
+<div class="space-y-2.5">
+<!-- Review 1 -->
+<div class="bg-[#111724] border border-[#1d273a] rounded-xl p-3">
+<div class="flex items-center justify-between text-xs mb-1.5">
+<span class="font-semibold text-white">Mariana G.</span>
+<span class="text-[10px] text-slate-500 font-medium">2026-06-22</span>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed italic">
+                "La comida no es la misma de antes. Sabores flojos y porciones cada vez más pequeñas."
+              </p>
+</div>
+<!-- Review 2 -->
+<div class="bg-[#111724] border border-[#1d273a] rounded-xl p-3">
+<div class="flex items-center justify-between text-xs mb-1.5">
+<span class="font-semibold text-white">Andrés P.</span>
+<span class="text-[10px] text-slate-500 font-medium">2026-07-21</span>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed italic">
+                "El tratamiento no funcionó y cuando reclamé me dijeron que \"cada organismo es distinto\"."
+              </p>
+</div>
+<!-- Review 3 -->
+<div class="bg-[#111724] border border-[#1d273a] rounded-xl p-3">
+<div class="flex items-center justify-between text-xs mb-1.5">
+<span class="font-semibold text-white">Isabela C.</span>
+<span class="text-[10px] text-slate-500 font-medium">2026-09-13</span>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed italic">
+                "Inconsistente: un día excelente, al siguiente terrible. No se puede confiar."
+              </p>
+</div>
+</div>
+</section>
+<!-- Section: DRAFT DE CORREO EN FRÍO GENERADO POR IA -->
+<section data-purpose="ai-cold-email-draft">
+<div class="rounded-xl border border-teal-500/30 bg-[#0d1721] p-4 relative overflow-hidden shadow-lg">
+<!-- Draft Header Badge -->
+<div class="flex items-center space-x-2 text-[11px] font-bold text-teal-400 uppercase tracking-wider mb-3">
+<svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+</svg>
+<span>DRAFT DE CORREO EN FRÍO GENERADO POR IA</span>
+</div>
+<!-- Subject line -->
+<div class="text-xs font-bold text-white mb-2">
+              Asunto: Dientes Sanos: su reputación online necesita atención
+            </div>
+<!-- Email Body Content -->
+<div class="text-[11.5px] leading-relaxed text-slate-300 space-y-3 font-normal">
+<p>Hola, equipo de Dientes Sanos:</p>
+<p>
+                Mi nombre es Valeria y soy consultora de reputación digital. Al revisar la presencia de negocios de clínicas dentales en Bogotá, notamos que Dientes Sanos tiene una calificación de 1.6 estrellas, y que las últimas reseñas señalan que la calidad se volvió inconsistente, y eso está frenando a clientes nuevos antes de que te conozcan.
+              </p>
+<p>
+                Trabajamos con negocios de Bogotá ayudándoles a revertir exactamente este tipo de situación: responder y atenuar las reseñas negativas, destacar las opiniones reales satisfechas y recuperar la confianza de quienes hoy dudan antes de visitarlos.
+              </p>
+<p>
+                ¿Tendrían 15 minutos esta semana para una llamada sin compromiso? Puedo compartirles un diagnóstico gratuito de su reputación online.
+              </p>
+<div>
+<p>Un saludo,</p>
+<p class="font-medium text-slate-200">Valeria Ríos — RepuSense Agency</p>
+</div>
+</div>
+<!-- Copy draft Button -->
+<div class="mt-4 pt-2">
+<button class="inline-flex items-center space-x-2 px-3.5 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-[#071311] text-xs font-bold transition shadow-sm" type="button">
+<svg class="w-4 h-4 text-[#071311]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<rect height="14" rx="2" ry="2" width="14" x="8" y="8"></rect>
+<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+</svg>
+<span>Copiar draft</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Drawer Footer: Estado del Lead con Dropdown Flotante Interactivo -->
+<div class="p-4 border-t border-[#182030] bg-[#0b0f17] relative" data-purpose="lead-status-footer">
+<div class="flex items-center justify-between">
+<div>
+<div class="text-xs font-semibold text-slate-200">Estado del lead</div>
+<div class="text-[10px] text-slate-500">Sin asignar · escaneado 2026-09-27</div>
+</div>
+<!-- Select Trigger Box -->
+<div class="relative">
+<button class="w-32 inline-flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#121722] border border-[#232d3f] text-xs text-white hover:border-slate-500 transition" id="leadStatusButton" type="button">
+<span class="font-medium" id="leadStatusLabel">Contactado</span>
+<svg class="w-3.5 h-3.5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+<path clip-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fill-rule="evenodd"></path>
+</svg>
+</button>
+<!-- Dropdown Menu (Pop-up above/at state selector matching Image 8) -->
+<div class="absolute right-0 bottom-full mb-1.5 w-36 bg-[#101622] border border-[#20293a] rounded-lg shadow-2xl py-1 z-40 text-xs" id="leadStatusDropdown">
+<a class="flex items-center justify-between px-3 py-1.5 text-slate-300 hover:bg-[#182233] hover:text-white transition" href="#">
+<span>Nuevo</span>
+</a>
+<a class="flex items-center justify-between px-3 py-1.5 bg-[#172338] text-white font-semibold transition border-l-2 border-teal-400" href="#">
+<span>Contactado</span>
+<svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+</a>
+<a class="flex items-center justify-between px-3 py-1.5 text-slate-300 hover:bg-[#182233] hover:text-white transition" href="#">
+<span>Convertido</span>
+</a>
+<a class="flex items-center justify-between px-3 py-1.5 text-slate-300 hover:bg-[#182233] hover:text-white transition" href="#">
+<span>Perdido</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: LeadDrawerSlideOver -->
+</main>
+<!-- END: MainContentArea -->
+<!-- Interactivity Script -->
+<script data-purpose="toggle-status-dropdown">
+    const statusBtn = document.getElementById('leadStatusButton');
+    const statusDropdown = document.getElementById('leadStatusDropdown');
+
+    if (statusBtn && statusDropdown) {
+      statusBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        statusDropdown.classList.toggle('hidden');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!statusDropdown.contains(e.target) && e.target !== statusBtn) {
+          statusDropdown.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body></html>

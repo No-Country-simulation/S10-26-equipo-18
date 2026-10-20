@@ -1,0 +1,501 @@
+<!DOCTYPE html><html class="h-full bg-[#070b14]" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RepuSense - Radar de Reputación en Crisis</title>
+<!-- Google Fonts: Space Grotesk & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-error-container": "#ffdad6",
+          "secondary": "#44e2cd",
+          "text-primary": "#ffffff",
+          "surface-container-lowest": "#0a0e17",
+          "on-error": "#690005",
+          "surface-bright": "#353944",
+          "error-container": "#93000a",
+          "on-secondary-fixed": "#00201c",
+          "secondary-container": "#03c6b2",
+          "on-secondary": "#003731",
+          "on-primary-fixed": "#00201c",
+          "tertiary-fixed-dim": "#ffb59e",
+          "tertiary": "#ffb59e",
+          "surface-dim": "#070b14",
+          "on-secondary-container": "#004d44",
+          "on-background": "#dfe2f0",
+          "outline": "#859490",
+          "primary-container": "#14b8a6",
+          "tertiary-container": "#f38764",
+          "secondary-fixed": "#62fae3",
+          "sidebar": "#080d19",
+          "on-primary": "#003731",
+          "surface-container": "#1b2029",
+          "surface-container-highest": "#31353f",
+          "secondary-fixed-dim": "#3cddc7",
+          "outline-variant": "#3c4947",
+          "surface-container-low": "#171c25",
+          "on-tertiary": "#5e1800",
+          "on-secondary-fixed-variant": "#005047",
+          "error": "#ffb4ab",
+          "inverse-surface": "#dfe2f0",
+          "inverse-on-surface": "#2c303b",
+          "on-primary-fixed-variant": "#005048",
+          "on-tertiary-container": "#6c2106",
+          "text-muted": "#94a3b8",
+          "primary": "#4fdbc8",
+          "on-primary-container": "#00423b",
+          "surface": "#070b14",
+          "on-tertiary-fixed-variant": "#7c2d11",
+          "surface-variant": "#31353f",
+          "inverse-primary": "#006b5f",
+          "primary-fixed-dim": "#4fdbc8",
+          "primary-glow": "#2dd4bf",
+          "tertiary-fixed": "#ffdbd0",
+          "on-surface-variant": "#bbcac6",
+          "on-tertiary-fixed": "#3a0b00",
+          "primary-fixed": "#71f8e4",
+          "border": "#1a2233",
+          "surface-container-high": "#262a34",
+          "surface-tint": "#4fdbc8",
+          "on-surface": "#dfe2f0",
+          "background": "#0f131d",
+          tactical: {
+            950: '#030712',
+            900: '#070f1a',
+            850: '#0b1626',
+            800: '#0f1f33',
+            card: 'rgba(11, 22, 38, 0.78)',
+            border: '#19304a',
+          }
+        },
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+          display: ['Space Grotesk', 'sans-serif'],
+          grotesk: ['Space Grotesk', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<!-- BEGIN: Custom Radar & Animation Styles -->
+<style data-purpose="radar-effects">
+    /* Continuous smooth 360-degree radar sweep */
+    @keyframes radar-sweep-360 {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Radar sweep cone with exact 45-degree sector */
+    .radar-sweep-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      animation: radar-sweep-360 8s linear infinite;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .radar-sector-45 {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        rgba(79, 219, 200, 0.35) 0deg,
+        rgba(79, 219, 200, 0.18) 18deg,
+        rgba(79, 219, 200, 0.05) 36deg,
+        rgba(79, 219, 200, 0) 45deg,
+        transparent 45deg
+      );
+    }
+
+    /* Leading crisp beam line at the edge of the sweep */
+    .radar-leading-ray {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 50%;
+      height: 1.5px;
+      transform-origin: 0% 0%;
+      background: linear-gradient(90deg, rgba(79, 219, 200, 0.95) 0%, rgba(79, 219, 200, 0.5) 55%, transparent 100%);
+      box-shadow: 0 0 10px rgba(79, 219, 200, 0.85), 0 0 4px rgba(79, 219, 200, 1);
+    }
+
+    /* Radar scan grid rings */
+    .radar-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 9999px;
+      border: 1px solid rgba(79, 219, 200, 0.12);
+      pointer-events: none;
+    }
+
+    .radar-crosshair {
+      position: absolute;
+      background: rgba(79, 219, 200, 0.1);
+      pointer-events: none;
+    }
+
+    /* Floating micro nodes */
+    @keyframes pulse-float {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.35;
+      }
+      50% {
+        transform: translateY(-8px) scale(1.3);
+        opacity: 0.95;
+        box-shadow: 0 0 14px rgba(79, 219, 200, 0.95);
+      }
+    }
+
+    .micro-node {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: #4fdbc8;
+      border-radius: 50%;
+      animation: pulse-float 4s ease-in-out infinite;
+    }
+
+    /* Glassmorphism subtle card styling */
+    .glass-card {
+      background: rgba(11, 20, 34, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(44, 73, 105, 0.65);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 35px 2px rgba(79, 219, 200, 0.05);
+    }
+
+    /* Smooth glow button effect */
+    .btn-teal-glow {
+      box-shadow: 0 0 24px -2px rgba(79, 219, 200, 0.4), 0 4px 14px 0 rgba(79, 219, 200, 0.25);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-teal-glow:hover {
+      box-shadow: 0 0 32px 0 rgba(79, 219, 200, 0.6), 0 6px 20px 0 rgba(79, 219, 200, 0.35);
+      transform: translateY(-1px);
+    }
+    .btn-teal-glow:active {
+      transform: translateY(0px) scale(0.99);
+    }
+  </style>
+<!-- END: Custom Radar & Animation Styles -->
+</head>
+<body class="bg-[#050a14] text-slate-200 antialiased selection:bg-[#4fdbc8] selection:text-[#003731] m-0 p-0 overflow-hidden flex items-center justify-center font-sans" style="width: 1280px; min-width: 1280px; max-width: 1280px; height: 1024px; min-height: 1024px; max-height: 1024px; margin: 0 auto; position: relative;">
+<!-- BEGIN: Tactical Background Grid & Radar Sweep -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden" data-purpose="radar-background">
+<!-- Subtle dotted grid overlay -->
+<div class="absolute inset-0 bg-[radial-gradient(#1e3a5f_1.2px,transparent_1.2px)] [background-size:28px_28px] opacity-35"></div>
+<!-- Radar coordinate ticks & degree markings -->
+<div class="absolute w-[920px] h-[920px] rounded-full border border-[#4fdbc8]/10 pointer-events-none flex items-center justify-center">
+<span class="absolute top-2 text-[10px] font-mono tracking-widest text-[#4fdbc8]/40">000° N</span>
+<span class="absolute bottom-2 text-[10px] font-mono tracking-widest text-[#4fdbc8]/40">180° S</span>
+<span class="absolute right-2 text-[10px] font-mono tracking-widest text-[#4fdbc8]/40">090° E</span>
+<span class="absolute left-2 text-[10px] font-mono tracking-widest text-[#4fdbc8]/40">270° W</span>
+</div>
+<!-- Polar Coordinate Rings -->
+<div class="radar-ring w-[240px] h-[240px] border-[#4fdbc8]/20"></div>
+<div class="radar-ring w-[460px] h-[460px] border-dashed border-[#4fdbc8]/15"></div>
+<div class="radar-ring w-[680px] h-[680px] border-[#4fdbc8]/15"></div>
+<div class="radar-ring w-[920px] h-[920px] border-dashed border-slate-700/35"></div>
+<div class="radar-ring w-[1160px] h-[1160px] border-slate-800/40"></div>
+<div class="radar-ring w-[1380px] h-[1380px] border-dashed border-slate-800/25"></div>
+<!-- Crosshair Lines -->
+<div class="radar-crosshair w-full h-[1px] top-1/2 left-0 -translate-y-1/2"></div>
+<div class="radar-crosshair h-full w-[1px] left-1/2 top-0 -translate-x-1/2"></div>
+<div class="radar-crosshair w-[88%] h-[1px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rotate-45 opacity-35"></div>
+<div class="radar-crosshair w-[88%] h-[1px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-45 opacity-35"></div>
+<!-- Rotating 45-degree Radar Sweep Sector -->
+<div class="absolute w-[920px] h-[920px] rounded-full overflow-hidden flex items-center justify-center">
+<div class="radar-sweep-container">
+<div class="radar-sector-45"></div>
+<div class="radar-leading-ray"></div>
+</div>
+</div>
+<!-- Micro Floating Nodes / Targets -->
+<div class="micro-node top-[18%] left-[22%] [animation-delay:0.3s]"></div>
+<div class="micro-node top-[30%] left-[14%] [animation-delay:1.5s]"></div>
+<div class="micro-node top-[22%] right-[25%] [animation-delay:0.8s]"></div>
+<div class="micro-node top-[42%] right-[16%] [animation-delay:2.1s]"></div>
+<div class="micro-node bottom-[26%] left-[20%] [animation-delay:2.9s]"></div>
+<div class="micro-node bottom-[18%] right-[24%] [animation-delay:1.2s]"></div>
+<div class="micro-node bottom-[36%] right-[28%] [animation-delay:0.5s]"></div>
+<div class="micro-node top-[58%] left-[28%] [animation-delay:1.9s]"></div>
+<div class="micro-node bottom-[45%] left-[16%] [animation-delay:3.2s]"></div>
+<div class="micro-node top-[15%] right-[38%] [animation-delay:2.4s]"></div>
+</div>
+<!-- END: Tactical Background Grid & Radar Sweep -->
+<!-- Latency & Status HUD Top Bar (tactical micro-labels) -->
+<div class="absolute top-6 left-8 flex items-center gap-2 text-[11px] font-mono text-slate-400/80 pointer-events-none select-none">
+<span class="w-2 h-2 rounded-full bg-[#4fdbc8] animate-pulse"></span>
+<span class="tracking-wider uppercase text-slate-300">RADAR ACTIVE</span>
+<span class="text-slate-600">|</span>
+<span class="text-slate-400">LAT: 24ms</span>
+<span class="text-slate-600">|</span>
+<span class="text-[#4fdbc8]/80 font-medium">B2B PIPELINE READY</span>
+</div>
+<div class="absolute top-6 right-8 flex items-center gap-2 text-[11px] font-mono text-slate-400/80 pointer-events-none select-none">
+<span class="text-slate-400">SYS_ID: REPUSENSE-CORE-V2</span>
+<span class="text-slate-600">|</span>
+<span class="text-slate-300">1280×1024 PX</span>
+</div>
+<!-- BEGIN: Main Login Content Container (Centered in 1280x1024 viewport) -->
+<main class="relative z-10 w-full max-w-[480px] flex flex-col items-center justify-center my-auto px-4">
+<!-- BEGIN: Header / Logo & Subtitle Block -->
+<header class="text-center mb-5 flex flex-col items-center">
+<!-- Radar Target Isotype with pulsing beacon -->
+<div class="relative mb-3 flex items-center justify-center" data-purpose="brand-icon">
+<div class="w-14 h-14 rounded-2xl bg-[#091322] border border-[#4fdbc8]/35 flex items-center justify-center shadow-lg shadow-[#4fdbc8]/15 ring-1 ring-[#4fdbc8]/20">
+<svg class="w-7 h-7 text-[#4fdbc8]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<circle cx="12" cy="12" r="6"></circle>
+<circle cx="12" cy="12" r="2"></circle>
+<line x1="12" x2="12" y1="2" y2="4"></line>
+<line x1="12" x2="12" y1="20" y2="22"></line>
+<line x1="2" x2="4" y1="12" y2="12"></line>
+<line x1="20" x2="22" y1="12" y2="12"></line>
+</svg>
+</div>
+<!-- Beacon pulse dot -->
+<span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4fdbc8] opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#4fdbc8] border-2 border-[#050a14]"></span>
+</span>
+</div>
+<!-- Main Title -->
+<h1 class="text-[32px] leading-tight font-display font-bold tracking-tight text-white mb-1">
+      RepuSense
+    </h1>
+<!-- Tactical Subtitle -->
+<p class="text-[11px] font-display font-bold tracking-widest text-[#4fdbc8] uppercase mb-2">
+      RADAR DE REPUTACIÓN EN CRISIS
+    </p>
+<!-- Description Text -->
+<p class="text-[12px] text-slate-300 max-w-[390px] leading-relaxed mb-3 text-center">
+      Plataforma B2B SaaS de prospección comercial automatizada para agencias de PR y Marketing Digital
+    </p>
+<!-- Badge NoCountry -->
+
+</header>
+<!-- END: Header / Logo & Subtitle Block -->
+<!-- BEGIN: Glassmorphism Login Card -->
+<section class="w-full glass-card rounded-2xl p-6 md:p-7 text-left shadow-2xl relative border border-[#223e59]/80">
+<!-- Card Title & Instructions -->
+<div class="mb-4">
+<h2 class="text-[19px] font-semibold text-white font-display tracking-tight">
+        Ingreso al Sistema
+      </h2>
+<p class="text-xs text-slate-400 mt-1">
+        Selecciona uno de los 3 vendedores del equipo o ingresa tus credenciales
+      </p>
+</div>
+<!-- Quick Sales Selector Header -->
+<div class="flex items-center justify-between text-xs mb-2.5">
+<span class="font-medium text-slate-300">Equipo de Ventas (Acceso Rápido)</span>
+<span class="text-[#4fdbc8] hover:text-[#62fae3] text-[11px] font-medium transition cursor-default">
+        1 clic para cambiar
+      </span>
+</div>
+<!-- Quick Sales Team Selection List -->
+<div class="space-y-2 mb-4" data-purpose="quick-access-selection">
+<!-- User 1: Valeria Ríos (Active) -->
+<button class="w-full flex items-center justify-between p-2.5 rounded-xl border border-[#4fdbc8]/80 bg-[#4fdbc8]/10 text-left transition-all hover:bg-[#4fdbc8]/15 group ring-1 ring-[#4fdbc8]/40" data-email="valeria.rios@repusense.io" data-name="Valeria Ríos" data-role="agent-select" id="user-btn-valeria" type="button">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-[#0d1a29] text-[#4fdbc8] border border-[#4fdbc8]/40 flex items-center justify-center font-display font-bold text-xs shrink-0 shadow-sm">
+            VR
+          </div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-semibold text-white">Valeria Ríos</span>
+<span class="h-1.5 w-1.5 rounded-full bg-[#4fdbc8] inline-block"></span>
+</div>
+<p class="text-[11px] text-slate-400">Consultora Senior de Reputación</p>
+</div>
+</div>
+<!-- Active Check Icon -->
+<div class="text-[#4fdbc8] pr-1" data-check="true">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" fill-rule="evenodd"></path>
+</svg>
+</div>
+</button>
+<!-- User 2: Martín Sosa -->
+<button class="w-full flex items-center justify-between p-2.5 rounded-xl border border-slate-800/80 bg-slate-900/50 text-left transition-all hover:bg-slate-800/60 hover:border-slate-700 group" data-email="martin.sosa@repusense.io" data-name="Martín Sosa" data-role="agent-select" id="user-btn-martin" type="button">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-slate-800/90 text-slate-400 border border-slate-700/60 flex items-center justify-center font-display font-bold text-xs shrink-0">
+            MS
+          </div>
+<div>
+<span class="text-xs font-semibold text-slate-300 group-hover:text-white transition">Martín Sosa</span>
+<p class="text-[11px] text-slate-400">Especialista en Outbound B2B</p>
+</div>
+</div>
+<!-- Inactive check placeholder -->
+<div class="hidden text-[#4fdbc8] pr-1" data-check="false">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" fill-rule="evenodd"></path>
+</svg>
+</div>
+</button>
+<!-- User 3: Camila Torres -->
+<button class="w-full flex items-center justify-between p-2.5 rounded-xl border border-slate-800/80 bg-slate-900/50 text-left transition-all hover:bg-slate-800/60 hover:border-slate-700 group" data-email="camila.torres@repusense.io" data-name="Camila Torres" data-role="agent-select" id="user-btn-camila" type="button">
+<div class="flex items-center space-x-3">
+<div class="w-8 h-8 rounded-lg bg-slate-800/90 text-slate-400 border border-slate-700/60 flex items-center justify-center font-display font-bold text-xs shrink-0">
+            CT
+          </div>
+<div>
+<span class="text-xs font-semibold text-slate-300 group-hover:text-white transition">Camila Torres</span>
+<p class="text-[11px] text-slate-400">Prospección Comercial &amp; Cuentas</p>
+</div>
+</div>
+<!-- Inactive check placeholder -->
+<div class="hidden text-[#4fdbc8] pr-1" data-check="false">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+<path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" fill-rule="evenodd"></path>
+</svg>
+</div>
+</button>
+</div>
+<!-- BEGIN: Credentials Form -->
+<form class="space-y-3.5" onsubmit="event.preventDefault();">
+<!-- Corporate Email Field -->
+<div>
+<label class="flex items-center gap-1.5 text-xs text-slate-300 font-medium mb-1.5">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Correo Corporativo</span>
+</label>
+<div class="relative">
+<input class="w-full bg-[#08121f]/95 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 font-mono focus:border-[#4fdbc8] focus:ring-1 focus:ring-[#4fdbc8] outline-none transition" id="input-email" placeholder="nombre@repusense.io" type="email" value="valeria.rios@repusense.io">
+</div>
+</div>
+<!-- Password Field -->
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="flex items-center gap-1.5 text-xs text-slate-300 font-medium">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Contraseña</span>
+</label>
+<a class="text-[11px] text-slate-400 hover:text-[#4fdbc8] transition" href="#">
+            ¿Olvidaste tu clave?
+          </a>
+</div>
+<div class="relative">
+<input class="w-full bg-[#08121f]/95 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 tracking-widest focus:border-[#4fdbc8] focus:ring-1 focus:ring-[#4fdbc8] outline-none transition" id="input-password" type="password" value="repusense12345">
+</div>
+</div>
+<!-- Submit CTA Button -->
+<div class="pt-1.5">
+<button class="w-full py-3 px-4 rounded-xl font-display font-bold text-xs text-[#003731] bg-[#4fdbc8] hover:bg-[#62fae3] btn-teal-glow active:scale-[0.99] transition duration-150 flex items-center justify-center gap-2 cursor-pointer" id="submit-login-btn" type="submit">
+<span id="cta-agent-text" class="">Ingresar como Valeria Ríos</span>
+<svg class="w-4 h-4 text-[#003731]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3"></path>
+</svg>
+</button>
+</div>
+</form>
+<!-- END: Credentials Form -->
+<!-- Card Footer Security Trust Mark -->
+<footer class="mt-4 pt-3 flex items-center justify-center gap-1.5 text-[11px] text-slate-400 border-t border-slate-800/70">
+<svg class="w-3.5 h-3.5 text-[#4fdbc8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+</svg>
+<span class="">Acceso seguro con control anti-duplicados y pipeline IA</span>
+</footer>
+</section>
+<!-- END: Glassmorphism Login Card -->
+</main>
+<!-- END: Main Login Content Container -->
+<!-- BEGIN: Interactive Switcher Script -->
+<script data-purpose="user-switcher">
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('[data-role="agent-select"]');
+    const emailInput = document.getElementById('input-email');
+    const ctaText = document.getElementById('cta-agent-text');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Reset all buttons style to inactive
+        buttons.forEach(b => {
+          b.classList.remove('border-[#4fdbc8]/80', 'bg-[#4fdbc8]/10', 'ring-1', 'ring-[#4fdbc8]/40');
+          b.classList.add('border-slate-800/80', 'bg-slate-900/50');
+          
+          // Reset avatar badge style
+          const av = b.querySelector('.w-8.h-8');
+          if (av) {
+            av.classList.remove('bg-[#0d1a29]', 'text-[#4fdbc8]', 'border-[#4fdbc8]/40');
+            av.classList.add('bg-slate-800/90', 'text-slate-400', 'border-slate-700/60');
+          }
+
+          // Hide checkmarks
+          const check = b.querySelector('[data-check]');
+          if (check) {
+            check.classList.add('hidden');
+          }
+
+          // Remove green dot indicator from name if present
+          const dot = b.querySelector('.bg-\\[\\#4fdbc8\\]');
+          if (dot && dot.tagName.toLowerCase() === 'span') {
+            dot.remove();
+          }
+        });
+
+        // Set active state for clicked button
+        btn.classList.add('border-[#4fdbc8]/80', 'bg-[#4fdbc8]/10', 'ring-1', 'ring-[#4fdbc8]/40');
+        btn.classList.remove('border-slate-800/80', 'bg-slate-900/50');
+
+        const activeAv = btn.querySelector('.w-8.h-8');
+        if (activeAv) {
+          activeAv.classList.add('bg-[#0d1a29]', 'text-[#4fdbc8]', 'border-[#4fdbc8]/40');
+          activeAv.classList.remove('bg-slate-800/90', 'text-slate-400', 'border-slate-700/60');
+        }
+
+        const check = btn.querySelector('[data-check]');
+        if (check) {
+          check.classList.remove('hidden');
+        }
+
+        // Add status dot if not present
+        const nameContainer = btn.querySelector('.text-xs.font-semibold');
+        if (nameContainer && !nameContainer.nextElementSibling?.classList.contains('bg-[#4fdbc8]')) {
+          const dot = document.createElement('span');
+          dot.className = 'h-1.5 w-1.5 rounded-full bg-[#4fdbc8] inline-block ml-1.5';
+          nameContainer.parentNode.insertBefore(dot, nameContainer.nextSibling);
+        }
+
+        // Update input email & submit text
+        const name = btn.getAttribute('data-name');
+        const email = btn.getAttribute('data-email');
+        if (emailInput && email) {
+          emailInput.value = email;
+        }
+        if (ctaText && name) {
+          ctaText.textContent = `Ingresar como ${name}`;
+        }
+      });
+    });
+  });
+</script>
+<!-- END: Interactive Switcher Script -->
+
+
+</body></html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html><html class="dark" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RepuSense | Design System &amp; Tactical Spec Sheet</title>
+<!-- Google Fonts: Space Grotesk, Inter, JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#070b14',
+              surface: '#0a0f1c',
+              sidebar: '#080d19',
+              border: '#1e293b',
+              teal: '#14b8a6',
+              glow: '#2dd4bf',
+            },
+            severity: {
+              critical: '#f43f5e',
+              warning: '#f59e0b',
+              stable: '#10b981',
+            },
+            pain: {
+              attention: '#f43f5e',
+              pricing: '#f97316',
+              hygiene: '#eab308',
+              delays: '#0ea5e9',
+              quality: '#8b5cf6',
+              scheduling: '#14b8a6',
+            }
+          },
+          fontFamily: {
+            grotesk: ['"Space Grotesk"', 'sans-serif'],
+            inter: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          boxShadow: {
+            'teal-glow': '0 0 24px -2px rgba(45, 212, 191, 0.35)',
+            'subtle-glow': '0 0 15px -3px rgba(20, 184, 166, 0.2)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Styles for Radar Grid and Visual FX -->
+<style data-purpose="command-center-fx">
+    body {
+      background-color: #070b14;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.08) 0%, transparent 65%),
+        linear-gradient(to right, rgba(30, 41, 59, 0.25) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.25) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #080d19;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #14b8a6;
+    }
+  </style>
+</head>
+<body class="font-inter antialiased min-h-screen text-slate-200">
+<!-- BEGIN: MainHeader -->
+<header class="border-b border-slate-800 bg-[#080d19]/90 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Brand Ident -->
+<div class="flex items-center space-x-3.5">
+<div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 shadow-subtle-glow">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<path d="M12 2a10 10 0 0 1 10 10"></path>
+<path d="M12 6a6 6 0 0 1 6 6"></path>
+<path d="M12 10a2 2 0 0 1 2 2"></path>
+</svg>
+</div>
+<div>
+<div class="flex items-center space-x-2">
+<h1 class="font-grotesk text-xl font-bold tracking-tight text-white">RepuSense</h1>
+<span class="font-mono text-[10px] bg-teal-950 text-teal-400 border border-teal-800/80 px-2 py-0.5 rounded-full font-medium">SYS-DESIGN v2.4</span>
+</div>
+<p class="font-inter text-xs text-slate-400 uppercase tracking-widest font-semibold mt-0.5">Radar de Reputación · Tactical Specification Sheet</p>
+</div>
+</div>
+<!-- Quick Status Badges -->
+<div class="hidden md:flex items-center space-x-4 font-mono text-xs">
+<div class="flex items-center space-x-2 bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-300">
+<span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+<span>ESTADO: <strong class="text-teal-300">ACTIVO</strong></span>
+</div>
+<div class="bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg text-slate-400">
+          ESCALA: <span class="text-slate-200">1084x600 · DESKTOP FIRST</span>
+</div>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+<!-- Overview Banner -->
+<section class="bg-[#0a0f1c] border border-slate-800/90 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+<div class="absolute -right-8 -top-8 w-64 h-64 bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="max-w-3xl space-y-2">
+<div class="inline-flex items-center gap-1.5 text-teal-400 font-mono text-xs font-medium uppercase tracking-wider">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>
+          Documentación Oficial de Arquitectura Visual
+        </div>
+<h2 class="font-grotesk text-2xl lg:text-3xl font-bold text-white tracking-tight">Manual Táctico de Tokens, Paletas y Tipografía RepuSense</h2>
+<p class="font-inter text-sm text-slate-400 leading-relaxed">
+          Guía de estilo centralizada diseñada para estandarizar módulos de prospección B2B, alertas críticas de reseñas y visualización de matrices de reputación de marca.
+        </p>
+</div>
+</section>
+<!-- BEGIN: SemanticColorPalette -->
+<section class="space-y-6" data-purpose="semantic-palette">
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-800 pb-4 gap-2">
+<div>
+<span class="font-inter text-xs text-teal-400 font-semibold uppercase tracking-widest">Sección 01</span>
+<h2 class="font-grotesk text-2xl font-bold text-white">1. Matriz de Paleta de Colores Semántica</h2>
+</div>
+<p class="text-xs font-mono text-slate-400">TOKENS EXPORTABLES CSS / TAILWIND COMPLIANT</p>
+</div>
+<!-- Surface & Core Colors -->
+<div>
+<h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+          Fondos, Superficies &amp; Jerarquía Estructural
+        </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Background -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-4 rounded-xl space-y-3">
+<div class="h-20 w-full rounded-lg bg-[#070b14] border border-slate-700/60 flex items-end p-2.5 shadow-inner">
+<span class="font-mono text-[11px] bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">#070b14</span>
+</div>
+<div>
+<div class="font-grotesk font-bold text-white text-base">Fondo General (Canvas)</div>
+<p class="text-xs text-slate-400 mt-0.5">hsl(222 47% 5%)</p>
+<p class="text-xs text-slate-500 mt-2">Backdrop principal de la app y capas de nivel 0.</p>
+</div>
+</div>
+<!-- Cards / Surfaces -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-4 rounded-xl space-y-3">
+<div class="h-20 w-full rounded-lg bg-[#0a0f1c] border border-slate-700 flex items-end p-2.5 shadow-inner">
+<span class="font-mono text-[11px] bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">#0a0f1c</span>
+</div>
+<div>
+<div class="font-grotesk font-bold text-white text-base">Tarjetas &amp; Módulos</div>
+<p class="text-xs text-slate-400 mt-0.5">hsl(222 44% 7%)</p>
+<p class="text-xs text-slate-500 mt-2">Superficie de analíticas, paneles de gráficos y modales.</p>
+</div>
+</div>
+<!-- Sidebar -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-4 rounded-xl space-y-3">
+<div class="h-20 w-full rounded-lg bg-[#080d19] border border-slate-700/80 flex items-end p-2.5 shadow-inner">
+<span class="font-mono text-[11px] bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">#080d19</span>
+</div>
+<div>
+<div class="font-grotesk font-bold text-white text-base">Sidebar &amp; Navegación</div>
+<p class="text-xs text-slate-400 mt-0.5">hsl(224 48% 6%)</p>
+<p class="text-xs text-slate-500 mt-2">Nivel lateral persistente y contenedores dock.</p>
+</div>
+</div>
+<!-- Borders -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-4 rounded-xl space-y-3">
+<div class="h-20 w-full rounded-lg bg-[#1e293b] flex items-end p-2.5">
+<span class="font-mono text-[11px] bg-slate-900/90 text-slate-300 px-2 py-0.5 rounded border border-slate-700">#1e293b</span>
+</div>
+<div>
+<div class="font-grotesk font-bold text-white text-base">Bordes Tácticos (Slate-800)</div>
+<p class="text-xs text-slate-400 mt-0.5">hsl(215 28% 17%)</p>
+<p class="text-xs text-slate-500 mt-2">Líneas divisorias, cuadrículas y delineado de tablas.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Accent Radar Teal & Severity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+<!-- Acentos de Marca -->
+<div class="bg-[#0a0f1c] border border-slate-800 rounded-xl p-5 space-y-4">
+<h3 class="text-sm font-semibold uppercase tracking-wider text-teal-400 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+            Acento Primario: Radar Teal System
+          </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div class="p-3 rounded-lg bg-[#070b14] border border-teal-500/20 flex items-center space-x-3.5">
+<div class="w-12 h-12 rounded-lg bg-[#14b8a6] shadow-subtle-glow flex-shrink-0"></div>
+<div>
+<span class="font-grotesk font-bold text-white text-sm block">Radar Teal Core</span>
+<span class="font-mono text-xs text-teal-400">#14b8a6</span>
+<p class="text-[11px] text-slate-400 mt-0.5">CTA primario, escaneo activo y radar sweep.</p>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-[#070b14] border border-teal-400/20 flex items-center space-x-3.5">
+<div class="w-12 h-12 rounded-lg bg-[#2dd4bf] shadow-teal-glow flex-shrink-0"></div>
+<div>
+<span class="font-grotesk font-bold text-white text-sm block">Radar Teal Glow</span>
+<span class="font-mono text-xs text-teal-300">#2dd4bf</span>
+<p class="text-[11px] text-slate-400 mt-0.5">Efectos de hover, focus rings y pings del radar.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Semáforo de Severidad -->
+<div class="bg-[#0a0f1c] border border-slate-800 rounded-xl p-5 space-y-4">
+<h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            Semáforo de Severidad de Calificación
+          </h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="p-3 rounded-lg bg-[#070b14] border border-rose-900/40">
+<div class="w-full h-8 rounded bg-[#f43f5e] mb-2 flex items-center justify-center font-mono text-[10px] text-white font-bold">CRÍTICA</div>
+<div class="font-grotesk text-xs font-bold text-white">Crítica (&lt;2.5★)</div>
+<div class="font-mono text-[11px] text-rose-400 mt-0.5">#f43f5e</div>
+<div class="text-[10px] text-slate-400 mt-1">Urgencia máxima de abordaje</div>
+</div>
+<div class="p-3 rounded-lg bg-[#070b14] border border-amber-900/40">
+<div class="w-full h-8 rounded bg-[#f59e0b] mb-2 flex items-center justify-center font-mono text-[10px] text-black font-bold">RIESGO</div>
+<div class="font-grotesk text-xs font-bold text-white">Riesgo (2.5-3.4★)</div>
+<div class="font-mono text-[11px] text-amber-400 mt-0.5">#f59e0b</div>
+<div class="text-[10px] text-slate-400 mt-1">Prioridad media comercial</div>
+</div>
+<div class="p-3 rounded-lg bg-[#070b14] border border-emerald-900/40">
+<div class="w-full h-8 rounded bg-[#10b981] mb-2 flex items-center justify-center font-mono text-[10px] text-black font-bold">VIGILANCIA</div>
+<div class="font-grotesk text-xs font-bold text-white">Vigilancia (≥3.5★)</div>
+<div class="font-mono text-[11px] text-emerald-400 mt-0.5">#10b981</div>
+<div class="text-[10px] text-slate-400 mt-1">Monitoreo orgánico</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Badges de Dolor IA Semántica -->
+<div class="bg-[#0a0f1c] border border-slate-800 rounded-xl p-5 space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+            Badges de Dolor IA (Clasificación Semántica de Quejas Negativas)
+          </h3>
+<span class="text-xs font-mono text-slate-400">6 Categorías Principales</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+<!-- Dolor 1 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#f43f5e] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Atención al Cliente</span>
+<span class="font-mono text-[11px] text-rose-400 font-medium">#f43f5e</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Trato descortés o falta de personal.</p>
+</div>
+<!-- Dolor 2 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#f97316] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Precios Altos</span>
+<span class="font-mono text-[11px] text-orange-400 font-medium">#f97316</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Cobros ocultos o relación costo-calidad.</p>
+</div>
+<!-- Dolor 3 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#eab308] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Problemas Higiene</span>
+<span class="font-mono text-[11px] text-yellow-400 font-medium">#eab308</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Falta de limpieza en el local.</p>
+</div>
+<!-- Dolor 4 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#0ea5e9] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Demoras / Lentitud</span>
+<span class="font-mono text-[11px] text-sky-400 font-medium">#0ea5e9</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Tiempo de espera prolongado.</p>
+</div>
+<!-- Dolor 5 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#8b5cf6] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Calidad Deficiente</span>
+<span class="font-mono text-[11px] text-purple-400 font-medium">#8b5cf6</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Inconsistencia en el producto final.</p>
+</div>
+<!-- Dolor 6 -->
+<div class="bg-[#070b14] p-3 rounded-lg border border-slate-800 flex flex-col justify-between">
+<div>
+<div class="w-full h-3 rounded-t bg-[#14b8a6] mb-2"></div>
+<span class="font-grotesk font-bold text-xs text-white block">Caos Citas / Agenda</span>
+<span class="font-mono text-[11px] text-teal-400 font-medium">#14b8a6</span>
+</div>
+<p class="text-[10px] text-slate-400 mt-2">Overbooking y citas canceladas.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- END: SemanticColorPalette -->
+<!-- BEGIN: TypographyHierarchy -->
+<section class="space-y-6" data-purpose="typography-spec">
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-800 pb-4 gap-2">
+<div>
+<span class="font-inter text-xs text-teal-400 font-semibold uppercase tracking-widest">Sección 02</span>
+<h2 class="font-grotesk text-2xl font-bold text-white">2. Cuadro de Jerarquía Tipográfica Unificada</h2>
+</div>
+<p class="text-xs font-mono text-slate-400">3 FAMILIAS TIPOGRÁFICAS ESTRATÉGICAS</p>
+</div>
+<!-- Table Specification -->
+<div class="bg-[#0a0f1c] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#080d19] border-b border-slate-800 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+<th class="py-3.5 px-4 font-medium">Familia &amp; Rol</th>
+<th class="py-3.5 px-4 font-medium">Elemento / Caso de Uso</th>
+<th class="py-3.5 px-4 font-medium">Dimensiones &amp; Tracking</th>
+<th class="py-3.5 px-4 font-medium min-w-[280px]">Muestra En Vivo</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800/70 text-sm">
+<!-- Space Grotesk: Logo -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-teal-400 font-semibold">Space Grotesk</td>
+<td class="py-3.5 px-4 font-medium text-white">Logo Principal</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">24px · Bold (700) · -0.02em</td>
+<td class="py-3.5 px-4 font-grotesk text-2xl font-bold text-white tracking-tight">RepuSense</td>
+</tr>
+<!-- Space Grotesk: H1 -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-teal-400 font-semibold">Space Grotesk</td>
+<td class="py-3.5 px-4 font-medium text-white">H1 Título Pantalla</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">30px · Bold (700) · -0.025em</td>
+<td class="py-3.5 px-4 font-grotesk text-3xl font-bold text-slate-100">Panel de Control RepuSense</td>
+</tr>
+<!-- Space Grotesk: Tabular KPIs -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-teal-400 font-semibold">Space Grotesk</td>
+<td class="py-3.5 px-4 font-medium text-white">Métricas KPI (Tabular)</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">30px · Bold (700) · tabular-nums</td>
+<td class="py-3.5 px-4 font-grotesk text-3xl font-bold tabular-nums text-teal-400">242 <span class="text-sm font-inter text-slate-400 font-normal">leads</span></td>
+</tr>
+<!-- Space Grotesk: H2 / H3 -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-teal-400 font-semibold">Space Grotesk</td>
+<td class="py-3.5 px-4 font-medium text-white">H2 / H3 Títulos Bloque</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">16-18px · SemiBold (600)</td>
+<td class="py-3.5 px-4 font-grotesk text-lg font-semibold text-white">Distribución de Problemas Detectados</td>
+</tr>
+<!-- Space Grotesk: Rating Badges -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-teal-400 font-semibold">Space Grotesk</td>
+<td class="py-3.5 px-4 font-medium text-white">Badges de Calificación</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">14px · SemiBold (600)</td>
+<td class="py-3.5 px-4">
+<span class="inline-flex items-center gap-1 font-grotesk font-semibold text-sm bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2.5 py-0.5 rounded-full">
+                    ★ 2.1 Crítica
+                  </span>
+</td>
+</tr>
+<!-- Inter: Tagline -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-sky-400 font-semibold">Inter UI</td>
+<td class="py-3.5 px-4 font-medium text-white">Subtítulos &amp; Taglines</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">11px · SemiBold · tracking-widest</td>
+<td class="py-3.5 px-4 font-inter text-[11px] font-semibold text-teal-400 tracking-widest uppercase">RADAR OPERATIVO ACTIVO</td>
+</tr>
+<!-- Inter: Nav / Botones -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-sky-400 font-semibold">Inter UI</td>
+<td class="py-3.5 px-4 font-medium text-white">Navegación &amp; Botones</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">14px · Medium (500)</td>
+<td class="py-3.5 px-4 font-inter text-sm font-medium text-slate-300">Explorador de Leads &amp; Filtros</td>
+</tr>
+<!-- Inter: Table Head -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-sky-400 font-semibold">Inter UI</td>
+<td class="py-3.5 px-4 font-medium text-white">Cabeceras de Tabla (TH)</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">12px · Medium (500) · Uppercase</td>
+<td class="py-3.5 px-4 font-inter text-xs font-medium text-slate-400 uppercase tracking-wider">NEGOCIO / SUCURSAL</td>
+</tr>
+<!-- Inter: Reseñas / Body -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-sky-400 font-semibold">Inter UI</td>
+<td class="py-3.5 px-4 font-medium text-white">Texto de Reseña Negativa</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">13px · Regular (400) · Line-height 1.6</td>
+<td class="py-3.5 px-4 font-inter text-[13px] leading-[1.6] text-slate-300">"El tiempo de espera superó los 50 minutos y la atención en recepción fue displicente."</td>
+</tr>
+<!-- Monospace: Code / Logs / Emails -->
+<tr class="hover:bg-slate-900/40 transition">
+<td class="py-3.5 px-4 font-mono text-xs text-amber-400 font-semibold">JetBrains Mono</td>
+<td class="py-3.5 px-4 font-medium text-white">Emails Corporativos / Logs</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-400">11-12px · Regular / Medium</td>
+<td class="py-3.5 px-4 font-mono text-xs text-slate-300 bg-slate-950/60 p-2 rounded border border-slate-800">valeria.rios@repusense.io · [STATUS_200_RADAR_OK]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- END: TypographyHierarchy -->
+<!-- BEGIN: InteractiveSampleComponents -->
+<section class="space-y-6" data-purpose="component-showcase">
+<div class="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-800 pb-4 gap-2">
+<div>
+<span class="font-inter text-xs text-teal-400 font-semibold uppercase tracking-widest">Sección 03</span>
+<h2 class="font-grotesk text-2xl font-bold text-white">3. Componentes Visuales Tácticos Ensamblados</h2>
+</div>
+<p class="text-xs font-mono text-slate-400">ESTILOS REALES PARA IMPLEMENTACIÓN INMEDIATA</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+<!-- Mini KPI 1 -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-5 rounded-xl space-y-3 relative">
+<div class="flex items-center justify-between text-xs font-inter uppercase text-slate-400 tracking-wider">
+<span>LEADS TOTALES</span>
+<span class="w-2 h-2 rounded-full bg-teal-400"></span>
+</div>
+<div class="font-grotesk text-3xl font-bold text-white tabular-nums">242</div>
+<div class="flex items-center space-x-1.5 text-xs text-teal-400 font-medium">
+<span class="bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded text-[11px] font-mono">127 nuevos</span>
+<span class="text-slate-400">para contactar</span>
+</div>
+</div>
+<!-- Mini KPI 2: Crítica -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-5 rounded-xl space-y-3">
+<div class="flex items-center justify-between text-xs font-inter uppercase text-slate-400 tracking-wider">
+<span>EN CRISIS CRÍTICA</span>
+<svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="font-grotesk text-3xl font-bold text-rose-500 tabular-nums">104</div>
+<div class="text-xs text-slate-400">
+<span class="text-rose-400 font-mono font-medium">43%</span> en máxima urgencia
+          </div>
+</div>
+<!-- Mini KPI 3: Email Ready -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-5 rounded-xl space-y-3">
+<div class="flex items-center justify-between text-xs font-inter uppercase text-slate-400 tracking-wider">
+<span>CONTACTO DIRECTO</span>
+<svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="font-grotesk text-3xl font-bold text-sky-400 tabular-nums">155</div>
+<div class="text-xs text-slate-400">Listos con IA de cold email</div>
+</div>
+<!-- Mini KPI 4: Abordados -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-5 rounded-xl space-y-3">
+<div class="flex items-center justify-between text-xs font-inter uppercase text-slate-400 tracking-wider">
+<span>PIPELINE EFECTIVO</span>
+<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="font-grotesk text-3xl font-bold text-emerald-400 tabular-nums">101</div>
+<div class="text-xs text-slate-400">Tasa de abordaje: <strong class="text-emerald-300">42%</strong></div>
+</div>
+</div>
+<!-- Action Elements Showcase -->
+<div class="bg-[#0a0f1c] border border-slate-800 p-6 rounded-xl flex flex-wrap items-center justify-between gap-6">
+<!-- Interactive Buttons -->
+<div class="space-y-2">
+<span class="text-xs font-mono text-slate-400 uppercase tracking-wider block">Botones de Acción Radar</span>
+<div class="flex flex-wrap items-center gap-3">
+<button class="bg-[#14b8a6] hover:bg-[#2dd4bf] text-[#070b14] font-inter font-semibold text-sm px-5 py-2.5 rounded-lg shadow-teal-glow transition duration-200 flex items-center space-x-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path></svg>
+<span>Lanzar Escaneo Radar</span>
+</button>
+<button class="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-inter font-medium text-sm px-4 py-2.5 rounded-lg transition">
+              Ver Leads (242)
+            </button>
+</div>
+</div>
+<!-- Pain Badges Preview -->
+<div class="space-y-2">
+<span class="text-xs font-mono text-slate-400 uppercase tracking-wider block">Chips Semánticos de Reseña</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 text-xs rounded-full font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30">Mala atención</span>
+<span class="px-2.5 py-1 text-xs rounded-full font-medium bg-sky-500/10 text-sky-400 border border-sky-500/30">Demoras</span>
+<span class="px-2.5 py-1 text-xs rounded-full font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">Higiene</span>
+<span class="px-2.5 py-1 text-xs rounded-full font-medium bg-purple-500/10 text-purple-400 border border-purple-500/30">Calidad</span>
+</div>
+</div>
+<!-- Terminal Badge -->
+<div class="space-y-2">
+<span class="text-xs font-mono text-slate-400 uppercase tracking-wider block">ID Operador</span>
+<div class="flex items-center space-x-2 bg-[#070b14] border border-slate-800 px-3 py-1.5 rounded-lg font-mono text-xs">
+<span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 font-bold flex items-center justify-center text-[10px]">VR</span>
+<span class="text-slate-300">Valeria Ríos</span>
+<span class="text-teal-400 font-semibold">[Ventas B2B]</span>
+</div>
+</div>
+</div>
+</section>
+<!-- END: InteractiveSampleComponents -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: Footer -->
+<footer class="border-t border-slate-800 bg-[#080d19] mt-16">
+<div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 font-mono gap-4">
+<div class="flex items-center space-x-3">
+<span class="text-teal-400 font-bold">RepuSense Design System</span>
+<span>·</span>
+<span>Resolución Oficial: 1084x600 Desktop Spec</span>
+</div>
+<div>
+        Generado con Tailwind CSS v3 &amp; Semantic HTML5 Compliance
+      </div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

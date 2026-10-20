@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-[#030712]" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RepuSense - Panel de Control</title>
+<!-- Google Fonts: Space Grotesk & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            tactical: {
+              bg: '#030712',
+              card: '#080e1a',
+              border: '#111d31',
+              hover: '#0e182b'
+            },
+            repu: {
+              teal: '#14b8a6',
+              'teal-dark': '#0f766e',
+              rose: '#f43f5e',
+              sky: '#0ea5e9',
+              yellow: '#eab308',
+              violet: '#8b5cf6',
+              orange: '#f97316',
+              emerald: '#10b981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styling">
+    body {
+      background-color: #030712;
+      color: #e2e8f0;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #050b16;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #152238;
+      border-radius: 3px;
+    }
+
+    /* Keyframe Animations: Infinite Continuous Loop for Bar Chart */
+    @keyframes barFillLoop {
+      0% {
+        transform: scaleX(0.08);
+        opacity: 0.4;
+      }
+      50% {
+        transform: scaleX(1);
+        opacity: 1;
+        filter: drop-shadow(0 0 8px currentColor);
+      }
+      100% {
+        transform: scaleX(0.08);
+        opacity: 0.4;
+      }
+    }
+
+    .animated-bar {
+      transform-origin: left;
+      animation: barFillLoop 4s ease-in-out infinite;
+    }
+
+    /* Keyframe Animations: Infinite Counter-Clockwise Rotation for Donut */
+    @keyframes donutCounterClockwiseLoop {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(-360deg);
+      }
+    }
+
+    .animated-donut-ring {
+      transform-origin: center;
+      animation: donutCounterClockwiseLoop 8s linear infinite;
+    }
+  </style>
+</head>
+<body class="h-full flex overflow-hidden font-sans antialiased text-slate-200 bg-[#030712]">
+<!-- BEGIN: Tactical Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-[#050a15] border-r border-[#111e33] flex flex-col justify-between" data-purpose="sidebar">
+<div class="p-5">
+<!-- App Brand / Logo -->
+<div class="flex items-center space-x-3 mb-8">
+<div class="w-9 h-9 rounded-full bg-[#072422] border border-[#14b8a6]/40 flex items-center justify-center text-[#14b8a6] shadow-[0_0_12px_rgba(20,184,166,0.25)]">
+<!-- Radar Icon -->
+<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" style="animation-duration: 9s;" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9" stroke-dasharray="2 4" stroke-width="2"></circle>
+<circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+<circle cx="12" cy="12" fill="currentColor" r="1.5"></circle>
+<path d="M12 12L18 6" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<h2 class="font-display font-bold text-white tracking-wide text-base leading-tight">RepuSense</h2>
+<span class="text-[10px] tracking-widest text-slate-400 font-semibold block uppercase">Radar de Reputación</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="space-y-1.5" data-purpose="sidebar-navigation">
+<!-- Active Nav: Radar -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#0c1a2e] text-white border border-[#14b8a6]/30 font-medium text-sm group transition-all shadow-sm" href="#">
+<div class="flex items-center space-x-3">
+<svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9" stroke-width="2"></circle>
+<path d="M12 8v4l3 3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="font-semibold text-slate-100">Radar</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#14b8a6] shadow-[0_0_8px_#14b8a6]"></span>
+</a>
+<!-- Nueva búsqueda -->
+<a class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-[#0a1324] font-medium text-sm transition-all" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Nueva búsqueda</span>
+</a>
+<!-- Leads Link with Badge -->
+<a class="flex items-center justify-between px-3.5 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-[#0a1324] font-medium text-sm transition-all" href="#">
+<div class="flex items-center space-x-3">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Leads</span>
+</div>
+<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-[#082928] text-[#14b8a6] border border-[#14b8a6]/40">
+            58 nuevos
+          </span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Bottom: User & Settings -->
+<div class="p-4 border-t border-[#111e33] bg-[#040813]" data-purpose="user-footer">
+<!-- Configuración y Reglas -->
+<a class="flex items-center space-x-2.5 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors pb-3 mb-3 border-b border-[#0f1b2e]" href="#">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Configuración y Reglas</span>
+</a>
+<!-- User profile info -->
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-3 min-w-0">
+<img alt="Valeria Ríos" class="w-9 h-9 rounded-full object-cover border border-[#14b8a6]/40 shadow-sm flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1WUXSwlq7EVyoQzB8ioPxRjLFnGNo1VxGB5Ukg5ThKO_gzyCzIOjwOIoeBdphfLvsqmY6by41zu_syaTOIdg1OVLn4rq3fKorpLZ1S62Ix_AMTfKcAZzAAtxGiQGmYKnWqJe4bHIAUXsibMNIV8ATKp3XQz8B8naOOnxON55qLYMJFmic1aTkwcxfnbdtjCSPm7MW44UD87nH2sYu7f9Sj9MfSeVedsmZ2VFL0IUITPFYB8fPIQ7BxWWWI"/>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-slate-200 truncate">Valeria Ríos</p>
+<p class="text-[10px] text-slate-400 truncate">Consultora Senior de Reputación</p>
+</div>
+</div>
+<!-- Logout icon -->
+<button class="p-1.5 text-slate-400 hover:text-rose-400 transition-colors" title="Cerrar sesión">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</div>
+</aside>
+<!-- END: Tactical Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 overflow-y-auto custom-scroll bg-[#030712] p-6 lg:p-8" data-purpose="main-dashboard">
+<div class="max-w-[1280px] mx-auto space-y-6">
+<!-- BEGIN: Header Section -->
+<header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2" data-purpose="page-header">
+<div>
+<!-- System Status Badge -->
+<div class="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-full bg-[#062420] border border-[#14b8a6]/40 mb-2">
+<span class="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+<span class="text-[10px] font-bold text-[#14b8a6] tracking-wider uppercase">RADAR OPERATIVO ACTIVO</span>
+</div>
+<!-- Title & Subtitle -->
+<h1 class="text-2xl lg:text-3xl font-display font-bold text-white tracking-tight">Panel de Control RepuSense</h1>
+<p class="text-sm text-slate-400 mt-1">Detección automatizada de crisis de reputación para prospección comercial B2B</p>
+</div>
+<!-- Action CTAs -->
+<div class="flex items-center space-x-3">
+<button class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-[#0a1324] hover:bg-[#0f1c36] text-slate-200 border border-[#182845] text-xs font-semibold tracking-wide transition-all shadow-sm">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Ver Leads (214)</span>
+</button>
+<button class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-[#14b8a6] hover:bg-[#0f766e] text-[#03221b] font-bold text-xs tracking-wide transition-all shadow-lg shadow-[#14b8a6]/20">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9" stroke-width="2.5"></circle>
+<path d="M12 12l5-5" stroke-linecap="round" stroke-width="2.5"></path>
+</svg>
+<span>Lanzar Escaneo Radar</span>
+</button>
+</div>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: KPI Cards Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-purpose="kpi-metrics-row">
+<!-- KPI 1: LEADS TOTALES -->
+<div class="bg-[#080e1a] border border-[#111d31] rounded-xl p-4 flex flex-col justify-between hover:border-[#1e3458] transition-colors shadow-sm">
+<div class="flex items-center justify-between text-slate-400">
+<span class="text-[11px] font-bold tracking-wider uppercase font-sans">Leads Totales</span>
+<svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9" stroke-width="2"></circle>
+<path d="M12 8v4l3 3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-display font-bold text-white tracking-tight tabular-nums">214</span>
+<p class="text-xs text-slate-400 mt-1 font-medium">
+<span class="text-[#14b8a6] font-semibold">+58 nuevos</span> para contactar
+            </p>
+</div>
+</div>
+<!-- KPI 2: EN CRISIS CRÍTICA (<2.5★) -->
+<div class="bg-[#080e1a] border border-[#111d31] rounded-xl p-4 flex flex-col justify-between hover:border-[#1e3458] transition-colors shadow-sm">
+<div class="flex items-center justify-between text-slate-400">
+<div class="flex items-center space-x-1.5">
+<span class="text-[11px] font-bold tracking-wider uppercase font-sans">En Crisis Crítica (&lt;2.5★)</span>
+</div>
+<span class="px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded bg-[#2b0c16] text-[#f43f5e] border border-[#f43f5e]/30">Alta Prioridad</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-display font-bold text-[#f43f5e] tracking-tight tabular-nums">64</span>
+<p class="text-xs text-slate-400 mt-1 font-medium">29.9% del total en máxima urgencia</p>
+</div>
+</div>
+<!-- KPI 3: CONTACTO DIRECTO (EMAIL) -->
+<div class="bg-[#080e1a] border border-[#111d31] rounded-xl p-4 flex flex-col justify-between hover:border-[#1e3458] transition-colors shadow-sm">
+<div class="flex items-center justify-between text-slate-400">
+<span class="text-[11px] font-bold tracking-wider uppercase font-sans">Contacto Directo (Email)</span>
+<svg class="w-4 h-4 text-[#0ea5e9]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-display font-bold text-[#0ea5e9] tracking-tight tabular-nums">142</span>
+<p class="text-xs text-slate-400 mt-1 font-medium">66.3% listos para cold email con IA</p>
+</div>
+</div>
+<!-- KPI 4: CONTACTADOS / PIPELINE -->
+<div class="bg-[#080e1a] border border-[#111d31] rounded-xl p-4 flex flex-col justify-between hover:border-[#1e3458] transition-colors shadow-sm">
+<div class="flex items-center justify-between text-slate-400">
+<span class="text-[11px] font-bold tracking-wider uppercase font-sans">Contactados / Pipeline</span>
+<svg class="w-4 h-4 text-[#10b981]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-display font-bold text-[#10b981] tracking-tight tabular-nums">78</span>
+<p class="text-xs text-slate-400 mt-1 font-medium">Tasa de abordaje: 36%</p>
+</div>
+</div>
+</section>
+<!-- END: KPI Cards Grid -->
+<!-- BEGIN: Visualizations Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-5" data-purpose="charts-section">
+<!-- Left Visual: AI Issues Distribution Bar Chart (Continuous Infinite Loop) -->
+<div class="lg:col-span-8 bg-[#080e1a] border border-[#111d31] rounded-xl p-6 flex flex-col justify-between" data-purpose="bar-chart-card">
+<div>
+<!-- Section Header -->
+<div class="flex items-center space-x-2 text-[#14b8a6]">
+<svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<h2 class="text-base font-display font-bold text-white tracking-tight">Distribución de Problemas Detectados por IA</h2>
+</div>
+<p class="text-xs text-slate-400 mt-0.5">Clasificación semántica continua de reseñas negativas para ganchos de prospección</p>
+<!-- Chart Horizontal Bars Container with staggered continuous infinite loop -->
+<!-- Max scale: 60. Values: 49 (81.6%), 42 (70%), 38 (63.3%), 35 (58.3%), 31 (51.6%), 27 (45%) -->
+<div class="mt-7 space-y-3.5 pr-2">
+<!-- 1. Mala atención al cliente (Rose #f43f5e) - valor 49 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Mala atención al cliente</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#f43f5e] text-[#f43f5e] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 81.6%; animation-delay: 0s;">
+<span class="text-[11px] font-bold text-white drop-shadow tabular-nums">49</span>
+</div>
+</div>
+</div>
+<!-- 2. Caos en citas y agenda (Teal #14b8a6) - valor 42 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Caos en citas y agenda</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#14b8a6] text-[#14b8a6] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 70%; animation-delay: 0.2s;">
+<span class="text-[11px] font-bold text-slate-950 font-black tabular-nums">42</span>
+</div>
+</div>
+</div>
+<!-- 3. Demoras / servicio lento (Sky #0ea5e9) - valor 38 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Demoras / servicio lento</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#0ea5e9] text-[#0ea5e9] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 63.3%; animation-delay: 0.4s;">
+<span class="text-[11px] font-bold text-white drop-shadow tabular-nums">38</span>
+</div>
+</div>
+</div>
+<!-- 4. Calidad inconsistente (Violet #8b5cf6) - valor 35 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Calidad inconsistente</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#8b5cf6] text-[#8b5cf6] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 58.3%; animation-delay: 0.6s;">
+<span class="text-[11px] font-bold text-white drop-shadow tabular-nums">35</span>
+</div>
+</div>
+</div>
+<!-- 5. Precios altos (Orange #f97316) - valor 31 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Precios altos</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#f97316] text-[#f97316] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 51.6%; animation-delay: 0.8s;">
+<span class="text-[11px] font-bold text-white drop-shadow tabular-nums">31</span>
+</div>
+</div>
+</div>
+<!-- 6. Problemas de higiene (Yellow #eab308) - valor 27 -->
+<div class="flex items-center text-xs group">
+<span class="w-44 text-right pr-4 text-slate-300 font-medium leading-tight truncate">Problemas de higiene</span>
+<div class="flex-1 bg-transparent h-7 flex items-center border-l border-[#1c2c48] pl-0">
+<div class="h-6 bg-[#eab308] text-[#eab308] rounded-r-md shadow-sm animated-bar flex items-center justify-end pr-2.5" style="width: 45%; animation-delay: 1.0s;">
+<span class="text-[11px] font-bold text-slate-950 font-black tabular-nums">27</span>
+</div>
+</div>
+</div>
+<!-- Base Axis Indicators (0, 15, 30, 45, 60) -->
+<div class="flex items-center text-[10px] text-slate-400 pt-1">
+<div class="w-44"></div>
+<div class="flex-1 flex justify-between border-t border-[#1c2c48] pt-1 px-1 tabular-nums font-mono">
+<span>0</span>
+<span>15</span>
+<span>30</span>
+<span>45</span>
+<span>60</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Cities with Most Incidents Footer -->
+<div class="mt-6 pt-4 border-t border-[#111d31] flex flex-wrap items-center gap-2 text-xs">
+<span class="text-slate-400 font-medium">Ciudades con más incidentes:</span>
+<div class="flex flex-wrap items-center gap-1.5 font-medium">
+<span class="px-2.5 py-1 rounded bg-[#0c1628] border border-[#162947] text-slate-300">Bogotá: <strong class="text-[#14b8a6]">63</strong></span>
+<span class="px-2.5 py-1 rounded bg-[#0c1628] border border-[#162947] text-slate-300">Lima: <strong class="text-[#14b8a6]">44</strong></span>
+<span class="px-2.5 py-1 rounded bg-[#0c1628] border border-[#162947] text-slate-300">CDMX: <strong class="text-[#14b8a6]">43</strong></span>
+<span class="px-2.5 py-1 rounded bg-[#0c1628] border border-[#162947] text-slate-300">Medellín: <strong class="text-[#14b8a6]">39</strong></span>
+<span class="px-2.5 py-1 rounded bg-[#0c1628] border border-[#162947] text-slate-300">Guadalajara: <strong class="text-[#14b8a6]">31</strong></span>
+</div>
+</div>
+</div>
+<!-- Right Visual: Rating Severity Donut Chart (Infinite Counter-Clockwise Rotation Loop) -->
+<div class="lg:col-span-4 bg-[#080e1a] border border-[#111d31] rounded-xl p-6 flex flex-col justify-between" data-purpose="donut-chart-card">
+<div>
+<h2 class="text-base font-display font-bold text-white tracking-tight">Severidad del Rating</h2>
+<p class="text-xs text-slate-400 mt-0.5">Segmentación por nivel de urgencia reputacional</p>
+<!-- Donut Container with Infinite Counter-Clockwise Animation Ring -->
+<!-- Circumference C = 2 * PI * 60 ≈ 376.99
+                 Total = 214 leads:
+                 1. Crítica (<2.0★): 64 -> 64/214 = 29.91% -> arc = 112.75px (stroke #f43f5e)
+                 2. Grave (2.0-2.5★): 58 -> 58/214 = 27.10% -> arc = 102.18px (stroke #f97316)
+                 3. Riesgo (2.6-3.0★): 52 -> 52/214 = 24.30% -> arc = 91.61px (stroke #eab308)
+                 4. Alerta (3.1-3.5★): 40 -> 40/214 = 18.69% -> arc = 70.46px (stroke #14b8a6)
+                 Sum of arcs = 377.
+            -->
+<div class="relative flex items-center justify-center my-6">
+<svg class="w-52 h-52 animated-donut-ring overflow-visible" viewbox="0 0 160 160">
+<!-- Segment 1: Crítica (<2.0★) - 64 leads (offset 0, arc 112.8) Starts at top (-90deg relative to standard coordinate system) -->
+<circle cx="80" cy="80" fill="transparent" r="60" stroke="#f43f5e" stroke-dasharray="112.8 264.2" stroke-dashoffset="94.25" stroke-width="22"></circle>
+<!-- Segment 2: Grave (2.0–2.5★) - 58 leads (offset -112.8) -->
+<circle cx="80" cy="80" fill="transparent" r="60" stroke="#f97316" stroke-dasharray="102.2 274.8" stroke-dashoffset="-18.55" stroke-width="22"></circle>
+<!-- Segment 3: Riesgo (2.6–3.0★) - 52 leads (offset -215.0) -->
+<circle cx="80" cy="80" fill="transparent" r="60" stroke="#eab308" stroke-dasharray="91.6 285.4" stroke-dashoffset="-120.75" stroke-width="22"></circle>
+<!-- Segment 4: Alerta (3.1–3.5★) - 40 leads (offset -306.6) -->
+<circle cx="80" cy="80" fill="transparent" r="60" stroke="#14b8a6" stroke-dasharray="70.5 306.5" stroke-dashoffset="-212.35" stroke-width="22"></circle>
+</svg>
+<!-- Central Glow & Fixed Non-Rotating Text -->
+<div class="absolute w-[88px] h-[88px] rounded-full bg-[#080e1a] border border-[#14233c] flex flex-col items-center justify-center shadow-[0_0_24px_rgba(20,184,166,0.15)] pointer-events-none text-center">
+<span class="text-[9px] font-bold tracking-widest text-[#14b8a6] uppercase font-sans">SEVERIDAD</span>
+<span class="text-xl font-display font-bold text-white tracking-tight leading-tight my-0.5 tabular-nums">214</span>
+<span class="text-[9px] font-semibold tracking-wider text-slate-400 uppercase font-sans">TOTAL LEADS</span>
+</div>
+</div>
+</div>
+<!-- Donut Legend (4 metrics clear and complete) -->
+<div class="pt-3 border-t border-[#111d31] space-y-2 text-xs" data-purpose="rating-legend">
+<div class="grid grid-cols-2 gap-x-2 gap-y-2.5">
+<!-- Crítica (<2.0★): 64 -->
+<div class="flex items-center space-x-2 min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-[#f43f5e] flex-shrink-0 shadow-[0_0_6px_#f43f5e]"></span>
+<span class="text-slate-300 text-[11px] whitespace-nowrap">Crítica (&lt;2.0★): <strong class="text-white font-bold tabular-nums">64</strong></span>
+</div>
+<!-- Grave (2.0–2.5★): 58 -->
+<div class="flex items-center space-x-2 min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-[#f97316] flex-shrink-0 shadow-[0_0_6px_#f97316]"></span>
+<span class="text-slate-300 text-[11px] whitespace-nowrap">Grave (2.0–2.5★): <strong class="text-white font-bold tabular-nums">58</strong></span>
+</div>
+<!-- Riesgo (2.6–3.0★): 52 -->
+<div class="flex items-center space-x-2 min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-[#eab308] flex-shrink-0 shadow-[0_0_6px_#eab308]"></span>
+<span class="text-slate-300 text-[11px] whitespace-nowrap">Riesgo (2.6–3.0★): <strong class="text-white font-bold tabular-nums">52</strong></span>
+</div>
+<!-- Alerta (3.1–3.5★): 40 -->
+<div class="flex items-center space-x-2 min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-[#14b8a6] flex-shrink-0 shadow-[0_0_6px_#14b8a6]"></span>
+<span class="text-slate-300 text-[11px] whitespace-nowrap">Alerta (3.1–3.5★): <strong class="text-white font-bold tabular-nums">40</strong></span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Visualizations Section -->
+<!-- BEGIN: Historial de Escaneos Radar Table Section -->
+<section class="bg-[#080e1a] border border-[#111d31] rounded-xl p-6" data-purpose="scans-history-section">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+<div class="flex items-center space-x-3">
+<h2 class="text-base font-display font-bold text-white tracking-tight">Historial de Escaneos Radar <span class="text-slate-400 font-normal text-xs">(14 ejecuciones)</span></h2>
+<span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-[#062420] text-[#14b8a6] border border-[#14b8a6]/40 flex items-center space-x-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#14b8a6]"></span>
+<span>Motor anti-duplicados activo</span>
+</span>
+</div>
+<button class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#0d1726] hover:bg-[#122036] text-slate-300 border border-[#192b45] text-xs font-medium transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Descargar logs</span>
+</button>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs border-collapse">
+<thead>
+<tr class="border-b border-[#132238] text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+<th class="py-3 px-3">CIUDAD Y RUBRO</th>
+<th class="py-3 px-3">PLATAFORMAS ANALIZADAS</th>
+<th class="py-3 px-3">FILTROS APLICADOS</th>
+<th class="py-3 px-3">FECHA Y HORA</th>
+<th class="py-3 px-3">NUEVOS LEADS</th>
+<th class="py-3 px-3">CONTROL ANTI-DUPLICADO</th>
+<th class="py-3 px-3 text-right">ACCIÓN</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#101c2e] text-slate-300 font-medium">
+<!-- Fila 1: Bogotá -->
+<tr class="hover:bg-[#0c1628]/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-white">Bogotá</div>
+<div class="text-[11px] text-slate-400">Clínicas Dentales</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center space-x-1 text-[11px] text-slate-300">
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Google Maps</span>
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Doctoralia</span>
+</div>
+</td>
+<td class="py-3 px-3 text-[11px] text-slate-300">&lt;3.5★, &gt;15 reseñas</td>
+<td class="py-3 px-3 text-[11px] text-slate-400 tabular-nums">Hoy, 10:42 AM</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center font-bold text-[#14b8a6] tabular-nums font-display">+63</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 text-[10px] text-emerald-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>0 repetidos</span>
+</span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-[#0f2336] hover:bg-[#14b8a6] hover:text-[#03221b] text-[#14b8a6] text-[11px] font-semibold transition-all">
+<span>Ver Leads</span>
+<span>&gt;</span>
+</button>
+</td>
+</tr>
+<!-- Fila 2: Medellín -->
+<tr class="hover:bg-[#0c1628]/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-white">Medellín</div>
+<div class="text-[11px] text-slate-400">Restaurantes Gourmet</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center space-x-1 text-[11px] text-slate-300">
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">TripAdvisor</span>
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Maps</span>
+</div>
+</td>
+<td class="py-3 px-3 text-[11px] text-slate-300">&lt;3.0★, quejas comida</td>
+<td class="py-3 px-3 text-[11px] text-slate-400 tabular-nums">Hoy, 08:15 AM</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center font-bold text-[#14b8a6] tabular-nums font-display">+39</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 text-[10px] text-emerald-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>12 filtrados</span>
+</span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-[#0f2336] hover:bg-[#14b8a6] hover:text-[#03221b] text-[#14b8a6] text-[11px] font-semibold transition-all">
+<span>Ver Leads</span>
+<span>&gt;</span>
+</button>
+</td>
+</tr>
+<!-- Fila 3: CDMX -->
+<tr class="hover:bg-[#0c1628]/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-white">CDMX</div>
+<div class="text-[11px] text-slate-400">Hoteles Boutique</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center space-x-1 text-[11px] text-slate-300">
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Booking</span>
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Google Maps</span>
+</div>
+</td>
+<td class="py-3 px-3 text-[11px] text-slate-300">&lt;3.8★, foco limpieza</td>
+<td class="py-3 px-3 text-[11px] text-slate-400 tabular-nums">Ayer, 18:30 PM</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center font-bold text-[#14b8a6] tabular-nums font-display">+43</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 text-[10px] text-emerald-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>0 repetidos</span>
+</span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-[#0f2336] hover:bg-[#14b8a6] hover:text-[#03221b] text-[#14b8a6] text-[11px] font-semibold transition-all">
+<span>Ver Leads</span>
+<span>&gt;</span>
+</button>
+</td>
+</tr>
+<!-- Fila 4: Lima -->
+<tr class="hover:bg-[#0c1628]/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-white">Lima</div>
+<div class="text-[11px] text-slate-400">Centros Estéticos</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center space-x-1 text-[11px] text-slate-300">
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Instagram</span>
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Maps</span>
+</div>
+</td>
+<td class="py-3 px-3 text-[11px] text-slate-300">&lt;3.2★, caos agenda</td>
+<td class="py-3 px-3 text-[11px] text-slate-400 tabular-nums">Ayer, 14:10 PM</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center font-bold text-[#14b8a6] tabular-nums font-display">+44</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 text-[10px] text-emerald-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>8 filtrados</span>
+</span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-[#0f2336] hover:bg-[#14b8a6] hover:text-[#03221b] text-[#14b8a6] text-[11px] font-semibold transition-all">
+<span>Ver Leads</span>
+<span>&gt;</span>
+</button>
+</td>
+</tr>
+<!-- Fila 5: Cali -->
+<tr class="hover:bg-[#0c1628]/60 transition-colors">
+<td class="py-3 px-3">
+<div class="font-semibold text-white">Cali</div>
+<div class="text-[11px] text-slate-400">Hospitales Veterinarios</div>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center space-x-1 text-[11px] text-slate-300">
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Google Maps</span>
+<span class="px-1.5 py-0.5 rounded bg-[#101c2e] text-slate-300">Facebook</span>
+</div>
+</td>
+<td class="py-3 px-3 text-[11px] text-slate-300">&lt;3.0★, demoras urgencias</td>
+<td class="py-3 px-3 text-[11px] text-slate-400 tabular-nums">24 Oct, 09:20 AM</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center font-bold text-[#14b8a6] tabular-nums font-display">+26</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center space-x-1 text-[10px] text-emerald-400">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>0 repetidos</span>
+</span>
+</td>
+<td class="py-3 px-3 text-right">
+<button class="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-[#0f2336] hover:bg-[#14b8a6] hover:text-[#03221b] text-[#14b8a6] text-[11px] font-semibold transition-all">
+<span>Ver Leads</span>
+<span>&gt;</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: Historial de Escaneos Radar Table Section -->
+</div>
+</main>
+<!-- END: Main Content Area -->
+</body></html>
