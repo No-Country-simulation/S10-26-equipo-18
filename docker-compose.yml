@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: ./Front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ./Front/.env.local
+        required: false
+    restart: unless-stopped
