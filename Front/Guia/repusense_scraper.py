@@ -205,8 +205,12 @@ class RepuSenseScraper:
 
         for i in range(min(limite, len(semilla_nombres))):
             nombre = semilla_nombres[i]
-            rating = round(random.uniform(1.6, self.rating_max), 1)
-            num_resenas = random.randint(self.resenas_min, 380)
+            rating = round(random.uniform(1.5, self.rating_max), 1)
+            if rating < 1.5:
+                rating = 1.5
+            if rating > self.rating_max:
+                rating = round(self.rating_max, 1)
+            num_resenas = random.randint(1, 10)
 
             # Extraer 3-5 reseñas negativas
             sample_reviews = random.sample(quejas_muestra, k=random.randint(3, 4))
