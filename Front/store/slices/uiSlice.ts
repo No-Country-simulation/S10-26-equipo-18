@@ -12,16 +12,22 @@ export const filtrosIniciales: LeadQuery = {
   sort: "rating-asc",
 };
 
+type Tema = "oscuro" | "claro";
+
 interface UiState {
   configOpen: boolean;
   selectedLeadId: string | null;
   filtros: LeadQuery;
+  tema: Tema;
+  sidebarColapsado: boolean;
 }
 
 const initialState: UiState = {
   configOpen: false,
   selectedLeadId: null,
   filtros: filtrosIniciales,
+  tema: "oscuro",
+  sidebarColapsado: false,
 };
 
 const uiSlice = createSlice({
@@ -49,6 +55,18 @@ const uiSlice = createSlice({
     resetFiltros(state) {
       state.filtros = filtrosIniciales;
     },
+    setTema(state, action: PayloadAction<Tema>) {
+      state.tema = action.payload;
+    },
+    alternarTema(state) {
+      state.tema = state.tema === "oscuro" ? "claro" : "oscuro";
+    },
+    toggleSidebar(state) {
+      state.sidebarColapsado = !state.sidebarColapsado;
+    },
+    setSidebarColapsado(state, action: PayloadAction<boolean>) {
+      state.sidebarColapsado = action.payload;
+    },
   },
 });
 
@@ -59,5 +77,9 @@ export const {
   setFiltro,
   setFiltros,
   resetFiltros,
+  setTema,
+  alternarTema,
+  toggleSidebar,
+  setSidebarColapsado,
 } = uiSlice.actions;
 export default uiSlice.reducer;

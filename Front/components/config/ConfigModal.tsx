@@ -46,7 +46,7 @@ export function ConfigModal() {
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={() => dispatch(cerrarConfig())}
       />
-      <div className="relative w-full max-w-lg animate-fade-in overflow-hidden rounded-2xl border border-line bg-surface shadow-2xl">
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in rounded-2xl border border-line bg-surface shadow-2xl">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div>
             <h2 className="font-grotesk text-lg font-bold text-white">
@@ -154,7 +154,7 @@ export function ConfigModal() {
           </section>
         </div>
 
-        <div className="flex items-center justify-between border-t border-line px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-5 py-4">
           <Button variant="secondary" size="sm" onClick={restablecer}>
             Restablecer datos demo
           </Button>
