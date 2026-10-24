@@ -1,0 +1,34 @@
+# dependencies 
+/venv/
+/env/
+ENV/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# distribution / build
+/build/
+/dist/
+*.egg-info/
+
+# testing / coverage
+.pytest_cache/
+.coverage
+/htmlcov/
+
+# local env files
+.env
+
+# misc
+.DS_Store
+*.pem
+
+# ide
+.vscode/
+.idea/
+
+# debug
+pip-debug.log*
