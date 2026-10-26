@@ -151,8 +151,9 @@ class RepuSenseScraper:
         self.ciudad = ciudad
         self.rubro = rubro
         self.plataforma = plataforma
-        self.rating_max = rating_max
-        self.resenas_min = resenas_min
+        # Rango cerrado 1.5–3.5: se excluyen ratings anteriores y posteriores.
+        self.rating_max = min(3.5, max(1.5, rating_max))
+        self.resenas_min = min(600, max(10, resenas_min))
 
     def ejecutar_extraccion(self, limite: int = 25) -> List[Dict[str, Any]]:
         """
@@ -206,20 +207,17 @@ class RepuSenseScraper:
         for i in range(min(limite, len(semilla_nombres))):
             nombre = semilla_nombres[i]
             rating = round(random.uniform(1.5, self.rating_max), 1)
-            if rating < 1.5:
-                rating = 1.5
-            if rating > self.rating_max:
-                rating = round(self.rating_max, 1)
-            num_resenas = random.randint(1, 10)
+            rating = min(self.rating_max, max(1.5, rating))
+            num_resenas = random.randint(self.resenas_min, 600)
 
-            # Extraer 3-5 reseñas negativas
-            sample_reviews = random.sample(quejas_muestra, k=random.randint(3, 4))
+            # El MVP registra las 5 reseñas negativas más recientes (1–3 estrellas)
+            sample_reviews = random.sample(quejas_muestra, k=min(5, len(quejas_muestra)))
             reviews_objs = [
                 {
                     "autor": f"Usuario Anónimo {idx + 1}",
                     "fecha": fecha_actual,
                     "texto": q,
-                    "estrellas": random.randint(1, 2),
+                    "estrellas": random.randint(1, 3),
                 }
                 for idx, q in enumerate(sample_reviews)
             ]
