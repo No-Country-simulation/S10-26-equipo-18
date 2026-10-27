@@ -1,386 +1,137 @@
- ### Revision 25/10/2026 estado actual
+# Revisión del proyecto RepuSense — Estado al 25/10/2026
 
- ### 1. Stack Elegido por el Equipo vs. proyecto-repusense.pdf
+## 1. Stack elegido por el equipo vs. `proyecto-repusense.pdf`
 
-  El stack que decidió el equipo cumple al 100% con el documento:
+El stack definido por el equipo está alineado con el documento del proyecto:
 
-  • Data / Scraping: Python + Playwright + BeautifulSoup / Regex
-  • Backend: FastAPI (Python)
-  • Frontend: Next.js + React + TailwindCSS + Redux Toolkit
-  • Base de Datos: PostgreSQL 17 (en Docker)
-  • IA (LLM): Google Gemini (google-genai)
-  ──────
-  ### 2. Comparativa de los "3 Problemas que el Equipo Tiene que
-  Resolver" (Págs. 1 y 2 del PDF)
+- **Data / Scraping:** Python + Playwright + BeautifulSoup / Regex.
+- **Backend:** FastAPI (Python).
+- **Frontend:** Next.js + React + TailwindCSS + Redux Toolkit.
+- **Base de datos:** PostgreSQL 17 en Docker.
+- **IA (LLM):** Google Gemini (`google-genai`).
 
-   Desafío del PDF │ Qué pide proyecto… │ Estado actual en … │ Brecha /…
-  ─────────────────┼────────────────────┼────────────────────┼───────────
-   1. Manejo de    │ Extraer de Google  │ En                 │ Integrar
-   bloqueos y      │ Maps/Yelp sin ser  │ feature/scraper-re │ el
-   recolección     │ bloqueados         │ al-maps: Usa       │
-   eficiente       │ ser bloqueados  │ Playwright      │
-                   │ (tiempos de     │ headless, User- │
-                   │ espera,         │ Agent, locale   │
-                   │ headless        │ es-AR y         │ ice.py con
-                   │ browser, anti-  │ micro_pausa     │ rotación de
-                   │ bot).           │ aleatoria (0.3s │ User-Agent y
-                   │                 │ 1.5s).En        │ manejo de error
-                   │                 │ Front/Guia/repu │ 429/Captcha
-                   │                     │ 1.5s).En      │ 429/Captcha
-                   │                     │ Front/Guia/re │ (TC-E1-NF-
-                   │                     │ pusense_scrap │ 01).
-                   │                                │ micro_p │ de User-
-                   │                                │ ausa    │ Agent y
-                   │                                │ aleator │ manejo
-                   │                                │ ia      │ de error
-                   │                                │ (0.3s - │ 429/Capt
-                   │                                │ 1.5s).E │ cha (TC-
-                   │                                │ n       │ E1-NF-
-                   │                                │ Front/G │ 01).
-                   │                                │ uia/rep │
-                   │                                │ usense_ │
-                   │                                │ scraper │
-                   │                                │ .py:    │
-                   │                                │ Tiene   │
-                   │                                │ rotació │
-                   │                                │ n de 4  │
-                   │                                │ USER_AG │
-                   │                                │ ENTS y  │
-                   │                                 │              │ ra
-                   │                                 │              │ pe
-                   │                                 │              │ r_
-                   │                                 │              │ se
-                   │                                 │              │ rv
-                   │                                 │              │ ic
-                   │                                 │              │ e.
-                   │                                 │              │ py
-                   │                                 │              │ co
-                   │                                 │              │ n
-                   │                                 │              │ ro
-                   │                                 │              │ ta
-                   │                                 │              │ ci
-                   │                                 │              │ ón
-                   │                                 │              │ de
-                   │                                 │              │ Us
-                   │                                 │              │ er
-                   │                                 │              │ -A
-                   │                                 │              │ ge
-                   │                                 │              │ nt
-                   │                                 │              │ y
-                   │                                 │              │ ma
-                   │                                 │              │ ne
-                   │                                 │              │ jo
-                   │                                 │              │ de
-                   │                                 │              │ er
-                   │                                 │              │ ro
-                   │                                 │              │ r
-                   │                                 │              │ 42
-                   │                                 │              │ 9/
-                   │                                 │              │ Ca
-                   │                                 │              │ pt
-                   │                                 │              │ ch
-                   │                         │                       │ e
-                   │                         │                       │ r
-                   │                         │                       │ _
-                   │                         │                       │ s
-                   │                         │                       │ e
-                   │                         │                       │ r
-                   │                         │                       │ v
-                   │                         │                       │ i
-                   │                         │                       │ c
-                   │                         │                       │ e
-                   │                         │                       │ .
-                   │                         │                       │ p
-                   │                         │                       │ y
-                   │                         │                       │ c
-                   │                         │                       │ o
-                   │                         │                       │ n
-                   │                         │                       │ r
-                   │                         │                       │ o
-                   │                         │                       │ t
-                   │                         │                       │ a
-                   │                         │                       │ c
-                   │                         │                       │ i
-                   │                         │                       │ ó
-                   │                         │                       │ n
-                   │                         │                       │ d
-                   │                         │                       │ e
-                   │                         │                       │ U
-                   │                         │                       │ s
-                   │                         │                       │ e
-                   │                         │                       │ r
-                   │                         │                       │
-                   │                         │                       │
-                   │                         │                       │
-                   │                         │                       │
-                   │                         │                       │
-                   │                         │                       │ -A
-                   │                         │                       │  m
-                   │                         │                       │ a
-                   │                         │                       │ n
-                   │                         │                       │ e
-                   │                         │                       │ j
-                   │                         │                       │ o
-                   │                         │                       │ d
-                   │                         │                       │ e
-                   │                         │                       │ e
-                   │                         │                       │ r
-                   │                         │                       │ r
-                   │                         │                       │ o
-                   │                         │                       │ r
-                   │                         │                       │ 4
-                   │                         │                       │ 2
-                   │                         │                       │ 9
-                   │                         │                       │ /
-                   │                         │                       │ C
-                   │                         │                       │ a
-                   │                         │                       │ p
-                   │                         │                       │ t
-                   │                         │                       │ c
-                   │                         │                       │ h
-                   │                         │                       │ a
-                   │                         │                       │ (
-                   │                         │                       │ T
-                   │                         │                       │ C
-                   │                         │                       │
-                   │                         │                       │
-                   │                         │                       │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │ -E
-   2. El problema  │ Los directorios solo   │ En DB (leads):         │ F
-   del dato de     │ dan teléfono o web.    │ Columnas telefono,     │ a
-   contacto        │ ¿Cómo cruzar           │ web, email, linkedin   │ l
-   (Enriquecimient │ automáticamente la web │ listas.En Front:       │ t
-   o)              │ del negocio para       │ Muestra los 4 canales  │ a
-                   │ hallar email o         │ y filtra por canal.En  │ i
-                   │ LinkedIn válido?       │ Scraper real           │ m
-                   │                        │ (src/scraper.py):      │ p
-                   │                        │ Extrae telefono y web  │ l
-                   │                        │ de Google Maps, pero   │ e
-                   │                        │ deja "email": None,    │ m
-                   │                        │ "linkedin": None       │ e
-                   │                        │ fijos.                 │ n
-                   │                        │                        │ t
-                   │                        │                        │ a
-                   │                        │                        │ r
-                   │                        │                        │ e
-                   │                        │                        │ n
-                   │                        │                        │ e
-                   │                        │                        │ l
-                   │                        │                        │ S
-                   │                        │                        │ c
-                   │                        │                        │ r
-                   │                        │                        │ a
-                   │                        │                        │ p
-                   │                        │                        │ e
-                   │                        │                        │ r
-                   │                        │                        │ /
-                   │                        │                        │ B
-                   │                        │                        │ a
-                   │                        │                        │ c
-                   │                        │                        │ k
-                   │                        │                        │ e
-                   │                        │                        │ l
-                   │                        │                        │ p
-                   │                        │                        │ a
-                   │                        │                        │ s
-                   │                        │                        │ o
-                   │                        │                        │ d
-                   │                        │                        │ e
-                   │                        │                        │ e
-                   │                        │                        │ n
-                   │                        │                        │ t
-                   │                        │                        │ r
-                   │                        │                        │ a
-                   │                        │                        │ r
-                   │                        │                        │ a
-                   │                        │                        │ l
-                   │                        │                        │ a
-                   │                        │                        │ U
-                   │                        │                        │ R
-                   │                        │                        │ L
-                   │                        │                        │ w
-                   │                        │                        │ e
-                   │                        │                        │ b
-                   │                        │                        │ d
-                   │                        │                        │ e
-                   │                        │                        │ l
-                   │                        │                        │ n
-                   │                        │                        │ e
-                   │                        │                        │ g
-                   │                        │                        │ o
-                   │                        │                        │ c
-                   │                        │                        │ i
-                   │                        │                        │ o
-                   │                        │                        │ (
-                   │                        │                        │ c
-                   │                        │                        │ o
-                   │                        │                        │ n
-                   │                        │                        │ h
-                   │                        │                        │ t
-                   │                        │                        │ t
-                   │                        │                        │ p
-                   │                        │                        │ x
-                   │                        │                        │ /
-                   │                        │                        │ B
-                   │                        │                        │ e
-                   │                        │                        │ a
-                   │                        │                        │ u
-                   │                        │                        │ t
-                   │                        │                        │ i
-                   │                        │                        │ f
-                   │                        │                        │ u
-                   │                        │                        │ l
-                   │                        │                        │ S
-                   │                        │                        │ o
-                   │                        │                        │ u
-                   │                        │                        │ p
-                   │                        │                        │ +
-                   │                        │                        │ R
-                   │                        │                        │ e
-                   │                        │                        │ g
-                   │                        │                        │ e
-                   │                        │                        │ x
-                   │                        │                        │ )
-                   │                        │                        │ p
-                   │                        │                        │ a
-                   │                        │                        │ r
-                   │                        │                        │ a
-                   │                        │                        │ e
-                   │                        │                        │ x
-                   │                        │                        │ t
-                   │                        │                        │ r
-                   │                        │                        │ a
-                   │                        │                        │ e
-                   │                        │                        │ r
-                   │                        │                        │ e
-                   │                        │                        │ m
-                   │                        │                        │ a
-                   │                        │                        │ i
-                   │                        │                        │ l
-                   │                        │                        │ y
-                   │                        │                        │ l
-                   │                        │                        │ i
-                   │                        │                        │ n
-                   │                        │                        │ k
-                   │                        │                        │ e
-                   │                        │                        │ d
-                   │                        │                        │ i
-                   │                        │                        │ n
-                   │                        │                        │ r
-                   │                        │                        │ e
-                   │                        │                        │ a
-                   │                        │                        │ l
-                   │                        │                        │ e
-                   │                        │                        │ s
-                   │                        │                        │ (
-                   │                        │                        │ U
-                   │                        │                        │ S
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │ -0
-                   │                        │                        │  U
-                   │                        │                        │ S
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │
-                   │                        │                        │ -0
+---
 
-────────────────────────────────────────────────────────────
-  ──────
-  ###  Resumen de Revisión Integral (QA) — Alineación entre Base de
-  Datos, Back/Scraper y Front según proyecto-repusense.pdf
+## 2. Comparativa de los desafíos del proyecto
 
-  Revision de los avances de Base de Datos, 25/10/26
-  Backend/Scraper y Frontend contrastados contra los requerimientos del
-  proyecto (proyecto-repusense.pdf) y la Matriz de Casos de Prueba de QA,
-  para anticipar posibles choques antes de integrar todo en dev.
+### 2.1. Manejo de bloqueos y recolección eficiente
 
-  Lo qué está listo y qué detalles necesitamos alinear entre
-  las áreas para que no falle la conexión:
+**Qué solicita el proyecto**
 
-  #### 1. Base de Datos (PostgreSQL / dbdiagram)
+Extraer información de Google Maps/Yelp reduciendo el riesgo de bloqueos mediante tiempos de espera, navegador headless y medidas anti-bot.
 
-  El diseño relacional (usuarios, leads, resenas, escaneos,
-  escaneo_leads), el UPSERT anti-duplicados (que actualiza rating y
-  num_resenas sin pisar el estado comercial), los estados de análisis IA
-  (pendiente/completado/fallido), los catálogos (problema_ia, estado) y
-  el umbral resenas_min = 11 están excelentes y alineados a los
-  requisitos.
+**Estado identificado**
 
-  • Ajustes sugeridos en DB para no chocar con Scraper y Front:
-      1. Tabla resenas: Agregar la columna autor VARCHAR(150), ya que
-      tanto el Scraper real como el Drawer del Frontend muestran el
-      nombre del autor de cada reseña.
-      2. Campo huella_texto en resenas: Definir con Back si el hash SHA-
-      256 lo envía FastAPI al insertar o si se genera por defecto en
-      PostgreSQL, ya que hoy es NOT NULL y el scraper no lo calcula.
-      3. Tabla usuarios y seed.sql: En Front el modelo Vendedor usa cargo,
-      iniciales y color, y el login usa valeria.rios@repusense.io.
-      Conviene contemplarlos en usuarios / seed.sql.
+- En `feature/scraper-real-maps` se utiliza Playwright headless, `User-Agent`, locale `es-AR` y una pausa aleatoria (`micro_pausa`) de entre 0,3 y 1,5 segundos.
+- En `Front/Guia/repusense_scraper.py` se identifica una rotación de cuatro `USER_AGENTS`.
 
+**Brecha / pendiente**
 
-  #### ⚙ 2. Backend (FastAPI) y Scraper
+Integrar y validar en el scraper el manejo de errores HTTP 429 y CAPTCHA, con cobertura del caso de prueba `TC-E1-NF-01`. La rotación de `User-Agent` y el manejo de errores también aparecen señalados como pendientes de integración en `scraper_service.py`.
 
-  • Puntos clave para que encaje con la Base de Datos y el Front:
-      1. Claves de deduplicación obligatorias: La tabla leads en DB tiene
-      un CHECK que exige que fuente_id o clave_dedupe no sean nulos. El
-      Scraper/Back debe extraer el ID del lugar (fuente_id) o armar
-      clave_dedupe (ej. nombre|ciudad) al guardar en la DB (hoy el
-      scraper solo genera un id random).
-      2. Unificar respuesta de Gemini (ia_service.py): Tanto la DB (CHECK
-      en problema_ia) como el Front esperan que el problema sea uno de
-      los 6 códigos cerrados: 'atencion', 'precios', 'higiene', 'demoras',
-      'calidad', 'citas', que incluya confianzaIA (0-100) y que el
-      borrador venga separado en asunto y cuerpo (como está en
-      feature/scraper-real-maps). En feat/santi/backend-estructura hoy
-      devuelve texto libre de 10 palabras y el correo en un solo string,
-      lo que daría error de constraint al guardar en DB y al renderizar
-      los badges en Front.
-      3. Reglas de negocio en el Scraper (proyecto-repusense.pdf):
-          • Ajustar filtro de calificación a 1.5 <= rating <= 3.5 (en
-          src/scraper.py hoy dice 0 < rating <= rating_max, dejando pasar
-          menores a 1.5).
-          • Ajustar reseñas mínimas a > 10 (>= 11) (hoy el default es >=
-          10).
-          • Ajustar max_resenas de 4 a 5 reseñas negativas recientes,
-          como pide el PDF.
-      4. Enriquecimiento de contacto (email y linkedin): Falta sumar el
-      paso de entrar a la web del negocio encontrada en Maps para extraer
-      email (descartando falsos positivos como .png o info@domain.com) y
-      enlace de linkedin (en src/scraper.py hoy quedan en None).
-      5. Serialización hacia el Front: Al armar los endpoints de FastAPI
-      (GET /leads, POST /scan), recordar mapear las columnas snake_case
-      de PostgreSQL al formato camelCase que consume el Front (numResenas,
-      problema, confianzaIA, draft: { asunto, cuerpo }, reviewsNegativas:
-      [], actualizado).
+### 2.2. Enriquecimiento de datos de contacto
 
+**Qué solicita el proyecto**
 
-  #### 3. Frontend
+Los directorios pueden proporcionar únicamente el teléfono o la web del negocio. Se necesita visitar la web del negocio para intentar encontrar un email o un perfil válido de LinkedIn.
 
-  El Dashboard, KPIs, gráficos, filtros de tabla, exportación CSV UTF-8 y
-  Drawer con copiado de borrador están muy completos.
+**Estado identificado**
 
-  • Pendientes detectados por QA para alinear:
-      1. Ajustar en /nueva-busqueda el slider de calificación para que
-      permita el rango 1.5 a 3.5 (#24 / TC-SEARCH-01) y que el umbral de
-      reseñas sea > 10 (mínimo 11) (TC-REG-01).
-      2. Corregir el área clicable del botón "Lanzar escaneo radar" en el
-      Dashboard (#34, hoy solo responde del lado izquierdo).
-      3. Reemplazar el llamado local /api/scan y los mocks por los
-      endpoints de FastAPI cuando Back y DB estén integrados.
+- La base de datos (`leads`) contempla las columnas `telefono`, `web`, `email` y `linkedin`.
+- El Frontend muestra los cuatro canales y permite filtrar por canal.
+- El scraper real (`src/scraper.py`) extrae teléfono y web de Google Maps, pero deja `email` y `linkedin` con valores `None`.
 
+**Brecha / pendiente**
 
-  #### 4. Entregable para el Demo Day (200+ Leads Reales)
+Implementar el paso de enriquecimiento que visite la URL del negocio para extraer emails y enlaces de LinkedIn, validando los resultados y descartando falsos positivos.
 
-  • El PDF pide una base de datos poblada con al menos 200 leads reales
-  extraídos durante las pruebas (y en QA validamos que carguen en < 2
-  seg). Apenas quede conectado el Scraper con PostgreSQL, podemos correr
-  las búsquedas para poblar esos 200+ registros reales y dejarlos listos
-  en un script de carga para la Demo.
-  ──────
+---
+
+## 3. Resumen de revisión integral de QA
+
+### Alineación entre Base de Datos, Backend/Scraper y Frontend
+
+**Fecha de revisión:** 25/10/2026.
+
+Se contrastaron los avances de Base de Datos, Backend/Scraper y Frontend con los requisitos de `proyecto-repusense.pdf` y la matriz de casos de prueba de QA, para anticipar incompatibilidades antes de integrar las áreas en `dev`.
+
+El objetivo es identificar qué está listo y qué detalles deben alinearse para evitar fallos de integración.
+
+### 3.1. Base de Datos (PostgreSQL / dbdiagram)
+
+El diseño relacional incluye las tablas `usuarios`, `leads`, `resenas`, `escaneos` y `escaneo_leads`. También contempla:
+
+- UPSERT para evitar duplicados, actualizando `rating` y `num_resenas` sin sobrescribir el estado comercial.
+- Estados de análisis de IA: `pendiente`, `completado` y `fallido`.
+- Catálogos `problema_ia` y `estado`.
+- Umbral `resenas_min = 11`.
+
+Estos elementos están alineados con los requisitos identificados.
+
+**Ajustes sugeridos para evitar incompatibilidades con Scraper y Frontend:**
+
+1. **Tabla `resenas`:** agregar la columna `autor VARCHAR(150)`, ya que tanto el scraper real como el Drawer del Frontend muestran el nombre del autor de cada reseña.
+2. **Campo `huella_texto` en `resenas`:** acordar con Backend si FastAPI enviará el hash SHA-256 al insertar o si se generará por defecto en PostgreSQL. Actualmente el campo es `NOT NULL` y el scraper no calcula ese valor.
+3. **Tabla `usuarios` y `seed.sql`:** el modelo `Vendedor` del Frontend utiliza `cargo`, `iniciales` y `color`. El login usa `valeria.rios@repusense.io`; conviene contemplar estos datos en la tabla y en el archivo de semillas.
+
+### 3.2. Backend (FastAPI) y Scraper
+
+**Puntos clave para alinear con la Base de Datos y el Frontend:**
+
+1. **Claves de deduplicación obligatorias**
+
+   La tabla `leads` tiene una restricción `CHECK` que exige que `fuente_id` o `clave_dedupe` no sean nulos. El Scraper/Backend debe extraer el ID del lugar (`fuente_id`) o generar una `clave_dedupe` —por ejemplo, `nombre|ciudad`— al guardar el registro. Actualmente, el scraper solo genera un ID aleatorio.
+
+2. **Unificar la respuesta de Gemini (`ia_service.py`)**
+
+   La Base de Datos (restricción `CHECK` en `problema_ia`) y el Frontend esperan que el problema pertenezca a uno de estos seis códigos:
+
+   - `atencion`
+   - `precios`
+   - `higiene`
+   - `demoras`
+   - `calidad`
+   - `citas`
+
+   La respuesta también debe incluir `confianzaIA` (de 0 a 100) y separar el borrador de correo en `asunto` y `cuerpo`, como en `feature/scraper-real-maps`.
+
+   En `feat/santi/backend-estructura`, la respuesta identificada devuelve texto libre de 10 palabras y el correo en un único string. Esto podría provocar errores al guardar en la Base de Datos y al representar las etiquetas (*badges*) en el Frontend.
+
+3. **Reglas de negocio del scraper**
+
+   Según `proyecto-repusense.pdf`, se deben aplicar estas reglas:
+
+   - **Calificación:** `1.5 <= rating <= 3.5`. En `src/scraper.py` se identificó la condición `0 < rating <= rating_max`, que permite valores inferiores a 1.5.
+   - **Cantidad mínima de reseñas:** más de 10, es decir, un mínimo de 11. El valor por defecto identificado permite actualmente `>= 10`.
+   - **Reseñas negativas recientes:** ajustar `max_resenas` de 4 a 5, según el PDF.
+
+4. **Enriquecimiento de contacto (`email` y `linkedin`)**
+
+   Falta incorporar la visita a la web del negocio encontrada en Maps para extraer el email —descartando falsos positivos como archivos `.png` o direcciones genéricas como `info@domain.com`— y el enlace de LinkedIn. En `src/scraper.py`, ambos campos quedan actualmente en `None`.
+
+5. **Serialización de datos hacia el Frontend**
+
+   Al implementar los endpoints de FastAPI (`GET /leads` y `POST /scan`), mapear las columnas `snake_case` de PostgreSQL al formato `camelCase` que consume el Frontend. Entre los campos esperados se encuentran:
+
+   - `numResenas`
+   - `problema`
+   - `confianzaIA`
+   - `draft: { asunto, cuerpo }`
+   - `reviewsNegativas: []`
+   - `actualizado`
+
+### 3.3. Frontend
+
+El Dashboard, los KPIs, los gráficos, los filtros de tabla, la exportación CSV en UTF-8 y el Drawer con la función de copiar el borrador están desarrollados.
+
+**Pendientes detectados por QA:**
+
+1. **Filtros de `/nueva-busqueda`:** ajustar el slider de calificación para permitir el rango de 1.5 a 3.5 (`#24` / `TC-SEARCH-01`) y configurar el umbral de reseñas en más de 10, es decir, un mínimo de 11 (`TC-REG-01`) Resuelto 27/10.
+2. **Botón “Lanzar escaneo radar”:** corregir el área clicable en el Dashboard, ya que actualmente solo responde en el lado izquierdo (`#34`) Resuelto 27/10.
+3. **Integración con Backend:** reemplazar la llamada local `/api/scan` y los datos simulados (*mocks*) por los endpoints de FastAPI cuando Backend y Base de Datos estén integrados.
+
+### 3.4. Entregable para el Demo Day: más de 200 leads reales
+
+El PDF solicita una base de datos poblada con al menos **200 leads reales** extraídos durante las pruebas. En QA se valida que los registros carguen en menos de **2 segundos**.
+
+Una vez conectado el Scraper con PostgreSQL, se podrán ejecutar búsquedas para poblar los más de 200 registros reales y dejarlos preparados en un script de carga para la demostración.
