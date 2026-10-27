@@ -50,8 +50,8 @@ export default function RadarPage() {
   return (
     <div className="space-y-6">
       <section className="card relative overflow-hidden p-6">
-        <div className="absolute -right-8 -top-8 h-56 w-56 rounded-full bg-primary/5 blur-3xl" />
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="pointer-events-none absolute -right-8 -top-8 h-56 w-56 rounded-full bg-primary/5 blur-3xl" />
+        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-primary">
               Radar operativo activo

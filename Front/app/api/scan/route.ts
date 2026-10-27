@@ -12,6 +12,11 @@ const PYTHON =
 const SCRAPER = join(process.cwd(), "Guia", "repusense_scraper.py");
 const FALLBACK_JSON = join(process.cwd(), "lib", "mock", "leads.generated.json");
 
+const RATING_MIN = 1.5;
+const RATING_MAX = 3.5;
+const RESENAS_MIN = 10;
+const RESENAS_MAX = 600;
+
 interface ScanBody {
   ciudad?: string;
   rubro?: string;
@@ -86,23 +91,19 @@ function filtrarFallback(
 ): Record<string, unknown>[] {
   const ciudad = opts.ciudad.toLowerCase();
   const rubro = opts.rubro.toLowerCase();
+  // Rango cerrado 1.5–3.5: quedan excluidos los ratings menores a 1.5 y mayores a 3.5.
   const candidatos = todos.filter((l) => {
     const c = String(l.ciudad || "").toLowerCase();
     const r = String(l.rubro || "").toLowerCase();
     if (c !== ciudad || r !== rubro) return false;
     const rating = Number(l.rating);
     const numResenas = Number(l.numResenas || l.num_resenas || 0);
-    if (Number.isFinite(rating) && rating > opts.ratingMax) return false;
-    if (Number.isFinite(numResenas) && numResenas < opts.resenasMin) return false;
+    if (!Number.isFinite(rating)) return false;
+    if (rating < RATING_MIN || rating > opts.ratingMax) return false;
+    if (!Number.isFinite(numResenas) || numResenas < opts.resenasMin) return false;
     return true;
   });
-  // Si hay candidatos que cumplen filtros, devolverlos (máx 10). Si no, devolver los del combo igual para no dejar vacío.
-  const base = candidatos.length > 0 ? candidatos : todos.filter((l) => {
-    const c = String(l.ciudad || "").toLowerCase();
-    const r = String(l.rubro || "").toLowerCase();
-    return c === ciudad && r === rubro;
-  });
-  return base.slice(0, 10);
+  return candidatos.slice(0, 10);
 }
 
 export async function POST(request: Request) {
@@ -122,8 +123,14 @@ export async function POST(request: Request) {
     );
   }
 
-  const ratingMax = typeof body.ratingMax === "number" ? body.ratingMax : 3.5;
-  const resenasMin = typeof body.resenasMin === "number" ? body.resenasMin : 10;
+  const ratingMax =
+    typeof body.ratingMax === "number" && Number.isFinite(body.ratingMax)
+      ? Math.min(RATING_MAX, Math.max(RATING_MIN, body.ratingMax))
+      : RATING_MAX;
+  const resenasMin =
+    typeof body.resenasMin === "number" && Number.isFinite(body.resenasMin)
+      ? Math.min(RESENAS_MAX, Math.max(RESENAS_MIN, Math.floor(body.resenasMin)))
+      : RESENAS_MIN;
   const plataformas =
     Array.isArray(body.plataformas) && body.plataformas.length > 0
       ? body.plataformas
