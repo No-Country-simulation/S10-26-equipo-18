@@ -3,6 +3,8 @@ Table usuarios {
   id varchar(100) [pk]
   nombre varchar(150) [not null]
   email varchar(255) [not null, unique]
+  cargo varchar(100)
+  password_hash varchar(255)
   creado_en timestamptz [not null, default: `now()`]
 }
 Table leads {
@@ -38,11 +40,15 @@ Table leads {
 Table resenas {
   id bigint [pk, increment]
   lead_id varchar(100) [not null]
+  autor varchar(150)
   fecha date
   texto text [not null]
   estrellas int [not null]
   huella_texto varchar(64) [not null]
-  indexes { (lead_id, huella_texto) [unique] }
+
+  indexes {
+    (lead_id, huella_texto) [unique]
+  }
 }
 Table escaneos {
   id varchar(100) [pk]
@@ -73,4 +79,4 @@ Ref: resenas.lead_id > leads.id [delete: cascade]
 Ref: escaneos.usuario_id > usuarios.id [delete: set null]
 Ref: escaneo_leads.escaneo_id > escaneos.id [delete: cascade]
 Ref: escaneo_leads.lead_id > leads.id [delete: cascade]
-// Índices UNIQUE parciales y CHECK complejos están en schema.sql (DBML no los expresa aquí).
+// Los indices UNIQUE parciales y las restricciones CHECK se definen en schema.sql.

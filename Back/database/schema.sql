@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   id VARCHAR(100) PRIMARY KEY,
   nombre VARCHAR(150) NOT NULL,
   email VARCHAR(255) NOT NULL UNIQUE,
+  cargo VARCHAR(100),
+  password_hash VARCHAR(255),
   creado_en TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -41,6 +43,7 @@ CREATE INDEX IF NOT EXISTS ix_leads_vendedor ON leads (vendedor_id);
 CREATE TABLE IF NOT EXISTS resenas (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   lead_id VARCHAR(100) NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  autor VARCHAR(150),
   fecha DATE,
   texto TEXT NOT NULL CHECK (length(btrim(texto)) > 0),
   estrellas INTEGER NOT NULL CHECK (estrellas BETWEEN 1 AND 5),
