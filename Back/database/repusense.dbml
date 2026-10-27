@@ -1,0 +1,82 @@
+Project RepuSense { database_type: 'PostgreSQL' }
+Table usuarios {
+  id varchar(100) [pk]
+  nombre varchar(150) [not null]
+  email varchar(255) [not null, unique]
+  cargo varchar(100)
+  password_hash varchar(255)
+  creado_en timestamptz [not null, default: `now()`]
+}
+Table leads {
+  id varchar(100) [pk]
+  fuente_id varchar(255)
+  clave_dedupe varchar(300)
+  nombre varchar(255) [not null]
+  rubro varchar(100) [not null]
+  ciudad varchar(100) [not null]
+  fuente varchar(100) [not null]
+  rating numeric(3,2) [not null]
+  num_resenas int [not null, default: 0]
+  telefono varchar(50)
+  web text
+  email varchar(255)
+  linkedin text
+  problema_ia varchar(30)
+  confianza_ia int
+  origen_analisis varchar(20)
+  estado_analisis varchar(20) [not null, default: 'pendiente']
+  draft_asunto text
+  draft_cuerpo text
+  estado varchar(20) [not null, default: 'nuevo']
+  vendedor_id varchar(100)
+  creado_en timestamptz [not null, default: `now()`]
+  ultimo_escaneo timestamptz
+  indexes {
+    (ciudad, rubro)
+    estado
+    vendedor_id
+  }
+}
+Table resenas {
+  id bigint [pk, increment]
+  lead_id varchar(100) [not null]
+  autor varchar(150)
+  fecha date
+  texto text [not null]
+  estrellas int [not null]
+  huella_texto varchar(64) [not null]
+
+  indexes {
+    (lead_id, huella_texto) [unique]
+  }
+}
+Table escaneos {
+  id varchar(100) [pk]
+  usuario_id varchar(100)
+  ciudad varchar(100) [not null]
+  rubro varchar(100) [not null]
+  plataformas text[] [not null]
+  rating_min numeric(3,2) [not null, default: 1.5]
+  rating_max numeric(3,2) [not null, default: 3.5]
+  resenas_min int [not null, default: 11]
+  fecha timestamptz [not null, default: `now()`]
+  nuevos int [not null, default: 0]
+  actualizados int [not null, default: 0]
+  total int [not null, default: 0]
+  estado varchar(20) [not null, default: 'en_progreso']
+  duracion_seg int
+}
+Table escaneo_leads {
+  escaneo_id varchar(100) [not null]
+  lead_id varchar(100) [not null]
+  rating_observado numeric(3,2)
+  num_resenas_observadas int
+  detectado_en timestamptz [not null, default: `now()`]
+  indexes { (escaneo_id, lead_id) [pk] }
+}
+Ref: leads.vendedor_id > usuarios.id [delete: set null]
+Ref: resenas.lead_id > leads.id [delete: cascade]
+Ref: escaneos.usuario_id > usuarios.id [delete: set null]
+Ref: escaneo_leads.escaneo_id > escaneos.id [delete: cascade]
+Ref: escaneo_leads.lead_id > leads.id [delete: cascade]
+// Los indices UNIQUE parciales y las restricciones CHECK se definen en schema.sql.
