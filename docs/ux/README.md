@@ -1,16 +1,16 @@
 # Especificación de Diseño y Prototipos UI/UX — Radar de Reputación en Crisis
 
-**Equipo:** S10-26-equipo-18  
-**Proyecto:** Radar de Reputación en Crisis (Simulación Laboral Abierta — NoCountry)  
-**Issue de referencia:** [#15 — [UX/UI] Prototipado y diseño de pantallas de referencia para el Dashboard](https://github.com/No-Country-simulation/S10-26-equipo-18/issues/15)  
-**Fecha:** Octubre 2026  
-**Autor / Responsable:** Maria Chiribao (*QA Tester*)  
+**Equipo:** S10-26-equipo-18
+**Proyecto:** Radar de Reputación en Crisis (Simulación Laboral Abierta — NoCountry)
+**Issue de referencia:** [#15 — [UX/UI] Prototipado y diseño de pantallas de referencia para el Dashboard](https://github.com/No-Country-simulation/S10-26-equipo-18/issues/15)
+**Fecha:** Octubre 2026
+**Autor / Responsable:** Maria Chiribao (*QA Tester*)
 
 ---
 
 ## 1. Propósito y Contexto
 
-Ante la ausencia de un rol formal de **UX/UI Designer** en el equipo, esta propuesta visual fue elaborada desde el área de **QA** a partir del [Análisis Funcional y Criterios de Aceptación (US-01 a US-10)](../qa/ANALISIS_FUNCIONAL_Y_MATRIZ_PRUEBAS.md). 
+Ante la ausencia de un rol formal de **UX/UI Designer** en el equipo, esta propuesta visual fue elaborada desde el área de **QA** a partir del [Análisis Funcional y Criterios de Aceptación (US-01 a US-10)](../qa/ANALISIS_FUNCIONAL_Y_MATRIZ_PRUEBAS.md).
 
 El objetivo es suministrar un marco de referencia visual claro y un flujo de interacción intuitivo para los desarrolladores de **Frontend**, facilitando la ejecución directa de:
 * **Issue #8:** Inicializar proyecto base y configurar framework de estilos (Tailwind CSS).
@@ -21,9 +21,17 @@ El objetivo es suministrar un marco de referencia visual claro y un flujo de int
 
 ## 2. Acceso al Prototipo Interactivo
 
-El diseño interactivo de alta fidelidad y las maquetas de pantallas se encuentran centralizados en Google Stitch:
+Acceso a las referencias visuales
 
-> 🔗 **Enlace al proyecto en Google Stitch:**  
+A) Diseños y pantallas de referencia en Figma
+
+> 🔗 **Enlace al proyecto en Figma:**
+> [https://figma.com/design/8PODoQQvR2ORoprAukt0JL/REPUSENSE?node-id=3-3]
+(https://figma.com/design/8PODoQQvR2ORoprAukt0JL/REPUSENSE?node-id=3-3)
+
+B) El diseño interactivo de alta fidelidad y las maquetas de pantallas se encuentran centralizados en Google Stitch:
+
+> 🔗 **Enlace al proyecto en Google Stitch:**
 > [https://stitch.withgoogle.com/projects/6276686851629626104](https://stitch.withgoogle.com/projects/6276686851629626104)
 
 ---
