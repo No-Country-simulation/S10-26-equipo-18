@@ -1,4 +1,6 @@
 -- RepuSense MVP - PostgreSQL 15+ | esquema idempotente para entorno local
+-- Permite búsquedas sin distinguir acentos
+CREATE EXTENSION IF NOT EXISTS unaccent;
 CREATE TABLE IF NOT EXISTS usuarios (
   id VARCHAR(100) PRIMARY KEY,
   nombre VARCHAR(150) NOT NULL,

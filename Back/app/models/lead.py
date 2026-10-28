@@ -5,6 +5,15 @@ from sqlalchemy.orm import DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
+class Usuario(Base):
+    __tablename__ = "usuarios"
+
+    id = Column(String(100), primary_key=True)
+    nombre = Column(String(255), nullable=False)
+    email = Column(String(255), nullable=False)
+    cargo = Column(String(100))
+    password_hash = Column(String(255))
+    creado_en = Column(DateTime(timezone=True))
 
 class Lead(Base):
     __tablename__ = "leads"

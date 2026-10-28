@@ -1,9 +1,12 @@
+
 from datetime import datetime
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
 
+# Esquema de respuesta para consultar leads
 class LeadResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -28,3 +31,8 @@ class LeadResponse(BaseModel):
     vendedor_id: str | None = None
     creado_en: datetime | None = None
     ultimo_escaneo: datetime | None = None
+
+
+# Esquema para actualizar el estado comercial
+class LeadEstadoUpdate(BaseModel):
+    estado: Literal["nuevo", "contactado", "convertido", "perdido"]
