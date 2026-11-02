@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { mockBaseQuery } from "./mockBaseQuery";
+import { mockBaseQuery, getCurrentMockLeads } from "./mockBaseQuery";
 import type {
   DashboardStats,
   Lead,
@@ -46,27 +46,33 @@ export const leadsApi = createApi({
         if (!API_URL) {
           return response as LeadListResponse;
         }
+        let items: Lead[] = [];
         if (Array.isArray(response)) {
-          const items = mapApiLeadsToLeads(response as any[]);
-          console.log("[API] getLeads mapped items:", items);
-          return {
-            items,
-            total: items.length,
-            nuevos: items.filter((l) => l.estado === "nuevo").length,
-            criticos: items.filter((l) => l.rating <= 2.0).length,
-          } as LeadListResponse;
+          items = mapApiLeadsToLeads(response as any[]);
+        } else {
+          const resp = response as any;
+          if (resp?.value && Array.isArray(resp.value)) {
+            items = mapApiLeadsToLeads(resp.value);
+          } else {
+            return response as LeadListResponse;
+          }
         }
-        const resp = response as any;
-        if (resp?.value && Array.isArray(resp.value)) {
-          const items = mapApiLeadsToLeads(resp.value);
-          return {
-            items,
-            total: resp.Count ?? items.length,
-            nuevos: items.filter((l) => l.estado === "nuevo").length,
-            criticos: items.filter((l) => l.rating <= 2.0).length,
-          } as LeadListResponse;
-        }
-        return response as LeadListResponse;
+
+        // Merge con leads generados por el scanner en esta sesión
+        const mockLeads = getCurrentMockLeads();
+        const scanLeads = mockLeads.filter((l) => l.id.startsWith("lead-scan-"));
+        const existentes = new Set(items.map((l) => l.id));
+        const nuevosScan = scanLeads.filter((l) => !existentes.has(l.id));
+        const merged = [...items, ...nuevosScan];
+
+        console.log("[API] getLeads merged:", { fromBackend: items.length, fromScan: nuevosScan.length, total: merged.length });
+
+        return {
+          items: merged,
+          total: merged.length,
+          nuevos: merged.filter((l) => l.estado === "nuevo").length,
+          criticos: merged.filter((l) => l.rating <= 2.0).length,
+        } as LeadListResponse;
       },
       providesTags: ["Leads"],
     }),
@@ -94,16 +100,16 @@ export const leadsApi = createApi({
       providesTags: ["Filtros"],
     }),
     getDashboard: builder.query<DashboardStats, void>({
-      queryFn: async (_arg, _api, _extraOptions, baseQueryFn) => {
+      queryFn: async (_arg, _api, _extraOptions) => {
         console.log("[API] getDashboard using mockBaseQuery");
-        return baseQueryFn({ url: "dashboard", method: "GET" }, _api, _extraOptions);
+        return mockBaseQuery({ url: "dashboard", method: "GET" }, _api, _extraOptions);
       },
       providesTags: ["Dashboard"],
     }),
     getScans: builder.query<Scan[], void>({
-      queryFn: async (_arg, _api, _extraOptions, baseQueryFn) => {
+      queryFn: async (_arg, _api, _extraOptions) => {
         console.log("[API] getScans using mockBaseQuery");
-        return baseQueryFn({ url: "scans", method: "GET" }, _api, _extraOptions);
+        return mockBaseQuery({ url: "scans", method: "GET" }, _api, _extraOptions);
       },
       providesTags: ["Scans"],
     }),
@@ -138,9 +144,9 @@ export const leadsApi = createApi({
       invalidatesTags: ["Leads", "Dashboard"],
     }),
     createScan: builder.mutation<ScanResult, ScanRequest>({
-      queryFn: async (body, _api, _extraOptions, baseQueryFn) => {
+      queryFn: async (body, _api, _extraOptions) => {
         console.log("[API] createScan using mockBaseQuery");
-        return baseQueryFn({ url: "scans", method: "POST", body }, _api, _extraOptions);
+        return mockBaseQuery({ url: "scans", method: "POST", body }, _api, _extraOptions);
       },
       invalidatesTags: ["Scans", "Dashboard", "Leads"],
     }),
