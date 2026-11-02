@@ -155,4 +155,8 @@ export function reiniciarMock() {
   scans = SCANS.map((s) => ({ ...s }));
 }
 
+export function getCurrentMockLeads(): Lead[] {
+  return leads.map((l) => ({ ...l }));
+}
+
 export type { LeadEstado };
