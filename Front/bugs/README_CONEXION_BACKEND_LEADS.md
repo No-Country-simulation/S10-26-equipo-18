@@ -22,11 +22,13 @@ Conectar el listado, detalle y cambio de estado de leads al backend real, adapta
   - `vendedor_id` (`usr-001/002/003`) → `ven-01/02/03`
   - `draft_asunto`/`draft_cuerpo` → `draft` (con fallback si no vienen)
   - `resenas`/`reviewsNegativas` → array vacío si no vienen
+- **`Front/store/api/mockBaseQuery.ts`**: Se agregó `getCurrentMockLeads()` para exponer los leads en memoria generados por el scanner.
 - **`Front/store/api/leadsApi.ts`**: Adaptado para usar backend real solo en `/leads`.
   - `GET /api/leads/` (array directo) → mapeado a `LeadListResponse`
   - `GET /api/leads/{id}` → mapeado con transformResponse
   - `GET /api/leads/filtros` → conectado al endpoint de filtros
   - `PATCH /api/leads/{id}` → para actualizar estado comercial
+  - **Merge con leads del scanner**: Se combinan los leads provenientes del backend con los leads con `id` `lead-scan-*` generados por `/nueva-busqueda` en la misma sesión.
   - `getDashboard`, `getScans` y `createScan` **sigue usando mockBaseQuery** (no se tocaron)
 - **Console logs** agregados temporalmente para validar mapeo y respuesta del API.
 
