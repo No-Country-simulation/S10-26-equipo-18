@@ -7,6 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.models.lead import Lead
 from app.schemas.lead import LeadResponse, LeadEstadoUpdate
+from app.services.lead_analysis_service import reanalizar_lead
+from app.models.scan import Resena
+from app.schemas.lead import LeadDetailResponse, ResenaResponse
 
 
 router = APIRouter(prefix="/api/leads", tags=["Leads"])
@@ -93,10 +96,11 @@ async def obtener_filtros(db: AsyncSession = Depends(get_db)):
         "rubros": resultado_rubros.scalars().all()
     }
 
-@router.get("/{lead_id}", response_model=LeadResponse)
+
+@router.get("/{lead_id}", response_model=LeadDetailResponse)
 async def obtener_lead(
     lead_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     resultado = await db.execute(
         select(Lead).where(Lead.id == lead_id)
@@ -110,7 +114,23 @@ async def obtener_lead(
             detail="Lead no encontrado"
         )
 
-    return lead
+    resultado_resenas = await db.execute(
+        select(Resena)
+        .where(Resena.lead_id == lead.id)
+        .order_by(Resena.id.desc())
+    )
+
+    resenas = resultado_resenas.scalars().all()
+
+    detalle = LeadDetailResponse.model_validate(lead)
+
+    detalle.resenas = [
+        ResenaResponse.model_validate(resena)
+        for resena in resenas
+    ]
+
+    return detalle
+
 
 @router.patch("/{lead_id}", response_model=LeadResponse)
 async def actualizar_estado_lead(
@@ -136,3 +156,36 @@ async def actualizar_estado_lead(
     await db.refresh(lead)
 
     return lead
+
+@router.post("/{lead_id}/reanalyze")
+async def reanalizar_lead_endpoint(
+    lead_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    resultado = await db.execute(
+        select(Lead).where(Lead.id == lead_id)
+    )
+
+    lead = resultado.scalar_one_or_none()
+
+    if lead is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Lead no encontrado"
+        )
+
+    respuesta = await reanalizar_lead(db, lead)
+
+    if respuesta["estado"] == "sin_resenas":
+        raise HTTPException(
+            status_code=422,
+            detail=respuesta["mensaje"]
+        )
+
+    if respuesta["estado"] == "fallido":
+        raise HTTPException(
+            status_code=503,
+            detail=respuesta["mensaje"]
+        )
+
+    return respuesta

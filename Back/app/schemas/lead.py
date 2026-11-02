@@ -1,12 +1,12 @@
 
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
 
-# Esquema de respuesta para consultar leads
+# Esquema general para listar leads
 class LeadResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,7 +32,25 @@ class LeadResponse(BaseModel):
     creado_en: datetime | None = None
     ultimo_escaneo: datetime | None = None
 
+    draft_asunto: str | None = None
+    draft_cuerpo: str | None = None
 
-# Esquema para actualizar el estado comercial
+
+# Reseña negativa almacenada en PostgreSQL
+class ResenaResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    autor: str | None = None
+    fecha: date | None = None
+    texto: str
+    estrellas: int
+
+
+# Detalle completo de un lead
+class LeadDetailResponse(LeadResponse):
+    resenas: list[ResenaResponse] = []
+
+
+# Actualización del estado comercial
 class LeadEstadoUpdate(BaseModel):
     estado: Literal["nuevo", "contactado", "convertido", "perdido"]
