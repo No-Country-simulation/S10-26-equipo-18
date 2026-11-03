@@ -49,13 +49,15 @@ export function ProblemBarChart({
         <Tooltip
           cursor={{ fill: "rgba(148,163,184,0.08)" }}
           contentStyle={{
-            background: "#0a0f1c",
-            border: "1px solid #1e293b",
+            background: "rgba(2, 6, 23, 0.98)",
+            border: "1px solid #334155",
             borderRadius: 10,
             fontSize: 12,
-            color: "#e2e8f0",
+            color: "#f8fafc",
+            boxShadow: "0 10px 40px -10px rgba(0, 0, 0, 0.8)",
           }}
-          labelStyle={{ color: "#94a3b8" }}
+          labelStyle={{ color: "#cbd5e1" }}
+          itemStyle={{ color: "#f8fafc" }}
         />
         <Bar dataKey="cantidad" radius={[0, 6, 6, 0]} barSize={18}>
           {chartData.map((entry) => (

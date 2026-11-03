@@ -34,12 +34,15 @@ export function SeverityDonut({
           </Pie>
           <Tooltip
             contentStyle={{
-              background: "#0a0f1c",
-              border: "1px solid #1e293b",
+              background: "rgba(2, 6, 23, 0.98)",
+              border: "1px solid #334155",
               borderRadius: 10,
               fontSize: 12,
-              color: "#e2e8f0",
+              color: "#f8fafc",
+              boxShadow: "0 10px 40px -10px rgba(0, 0, 0, 0.8)",
             }}
+            labelStyle={{ color: "#cbd5e1" }}
+            itemStyle={{ color: "#f8fafc" }}
           />
         </PieChart>
       </ResponsiveContainer>
