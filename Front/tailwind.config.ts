@@ -11,10 +11,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#070b14",
-        surface: "#0a0f1c",
-        sidebar: "#080d19",
-        line: "#1e293b",
+        bg: "var(--bg)",
+        surface: "var(--surface)",
+        sidebar: "var(--sidebar)",
+        line: "var(--line)",
         primary: {
           DEFAULT: "#14b8a6",
           glow: "#2dd4bf",

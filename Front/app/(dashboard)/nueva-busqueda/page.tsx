@@ -19,7 +19,7 @@ export default function NuevaBusquedaPage() {
   const [rubro, setRubro] = useState("Restaurantes");
   const [plataformas, setPlataformas] = useState<string[]>(["Google Maps"]);
   const [ratingMax, setRatingMax] = useState(3.5);
-  const [resenasMin, setResenasMin] = useState(20);
+  const [resenasMin, setResenasMin] = useState(10);
 
   const [logs, setLogs] = useState<LogLine[]>([]);
   const [running, setRunning] = useState(false);
@@ -181,8 +181,8 @@ export default function NuevaBusquedaPage() {
             </div>
             <input
               type="range"
-              min={1.8}
-              max={4}
+              min={1.5}
+              max={3.5}
               step={0.1}
               value={ratingMax}
               disabled={running}
@@ -190,7 +190,8 @@ export default function NuevaBusquedaPage() {
               className="w-full accent-primary"
             />
             <p className="mt-1 text-[11px] text-slate-500">
-              Solo negocios por debajo de este umbral entran al radar.
+              Rango requerido: 1.5 a 3.5 ★. Solo ingresan negocios con
+              calificación menor o igual al umbral.
             </p>
           </div>
 
@@ -203,16 +204,17 @@ export default function NuevaBusquedaPage() {
             </div>
             <input
               type="range"
-              min={5}
-              max={120}
-              step={5}
+              min={10}
+              max={600}
+              step={1}
               value={resenasMin}
               disabled={running}
               onChange={(e) => setResenasMin(Number(e.target.value))}
               className="w-full accent-primary"
             />
             <p className="mt-1 text-[11px] text-slate-500">
-              Evita negocios sin volumen suficiente de opiniones.
+              Umbral requerido: 10 reseñas o más. El negocio puede tener hasta
+              600; el MVP registra las 5 reseñas negativas más recientes.
             </p>
           </div>
 

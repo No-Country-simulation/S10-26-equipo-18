@@ -121,7 +121,7 @@ function buildReviews(
       autor: `Usuario Anónimo ${i + 1}`,
       fecha,
       texto: REVIEW_TEXTOS[cat],
-      estrellas: rng() > 0.55 ? 1 : 2,
+      estrellas: 1 + Math.floor(rng() * 3),
     };
   });
 }
@@ -183,7 +183,7 @@ function generarLeads(): Lead[] {
       actualizado: false,
       ultimoEscaneo: fecha,
       vendedor: i % 7 === 0 ? VENDEDORES_IDS[i % VENDEDORES_IDS.length] : null,
-      reviewsNegativas: buildReviews(s.problema, 3 + (i % 2), fecha, rng),
+      reviewsNegativas: buildReviews(s.problema, 5, fecha, rng),
       draft: buildDraft(s),
     };
   });
@@ -202,7 +202,7 @@ function generarLeads(): Lead[] {
       .replace("{Ciudad}", ciudad);
 
     const rating = Math.round((1.8 + rng() * 1.6) * 10) / 10;
-    const numResenas = 10 + Math.floor(rng() * 320);
+    const numResenas = 10 + Math.floor(rng() * 591);
     const problema = pick(rng, PROBLEMAS).key;
     const confianzaIA = 78 + Math.floor(rng() * 15);
     const tieneWeb = rng() > 0.45;
@@ -233,7 +233,7 @@ function generarLeads(): Lead[] {
       linkedin,
       problema,
       confianzaIA,
-      reviewsNegativas: buildReviews(problema, 3 + Math.floor(rng() * 2), fecha, rng),
+      reviewsNegativas: buildReviews(problema, 5, fecha, rng),
       draft: buildDraft({ nombre, rubro, ciudad, rating, problema }),
       estado,
       actualizado: estado !== "nuevo" || rng() > 0.85,

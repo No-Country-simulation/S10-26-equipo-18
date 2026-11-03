@@ -78,7 +78,7 @@ export function LoginForm() {
       </Button>
       <p className="text-center text-[11px] text-slate-500">
         Demo: cualquier email inicia sesión. El operador se asigna según el email
-        de la lista.
+        de la lista. También podés entrar con un clic usando el acceso rápido.
       </p>
     </form>
   );

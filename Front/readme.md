@@ -43,6 +43,8 @@ npm run typecheck  # tsc --noEmit
 
 El login es **demo**: cualquier email/contraseña entra. El operador se asigna según el
 email (ver `lib/constants.ts` → `VENDEDORES`), por defecto `valeria.rios@repusense.io`.
+Además, la pantalla de login incluye un **acceso rápido de un clic** para cada uno de los
+tres vendedores, mostrando su nombre, rol y email corporativo.
 
 ### 2.1 Datos reales desde el scraper
 
@@ -76,6 +78,9 @@ devuelve los leads. Estos se agregan/actualizan en la app y se invalidan `Dashbo
   falta un backend aparte). Sigue requiriendo **Python 3** en la máquina que sirve la app.
 - Si el mismo negocio ya existe (mismo nombre + ciudad), se marca como **actualizado**
   en vez de duplicarse; el resto entra como lead **nuevo** en estado `nuevo`.
+- **Reglas de captura:** calificación entre **1.5 y 3.5 ★** (ambos inclusive) y
+  **10 reseñas o más** (el negocio puede tener hasta 600). De cada negocio se
+  registran sus **5 reseñas negativas** (1–3 ★) para el análisis de IA.
 
 > Nota: el scraper es una **simulación** de extracción (genera negocios de muestra con
 > la forma real de los datos), no hace scraping real de Google Maps.
@@ -98,7 +103,7 @@ Front/
 │     └─ leads/page.tsx          # "/leads"    → Pantalla 4: explorador de leads
 │
 ├─ components/                   # UI reutilizable
-│  ├─ auth/                      # LoginForm, RadarAnimation, AuthGuard, AuthHydrator
+│  ├─ auth/                      # LoginForm, QuickLogin, RadarAnimation, AuthGuard, AuthHydrator
 │  ├─ layout/                    # Sidebar, Topbar, AppShell, nav.ts (config de menú)
 │  ├─ config/ConfigModal.tsx     # Modal global: operador, reglas, conexión backend
 │  ├─ dashboard/ScanHistory.tsx  # Historial de escaneos
@@ -174,7 +179,7 @@ automáticamente: al cambiar un estado o lanzar un escaneo, las vistas se actual
 
 ## 6. Pantallas implementadas (según los diseños de `Guia/stitch_...`)
 
-1. **Login** (`/login`) — acceso + animación de radar de fondo.
+1. **Login** (`/login`) — acceso con credenciales, acceso rápido de vendedores + animación de radar de fondo.
 2. **Panel de Control** (`/`) — KPIs, distribución de problemas, semáforo de severidad,
    top ciudades, rubros, contactabilidad e historial de escaneos.
 3. **Nueva Búsqueda** (`/nueva-busqueda`) — parámetros (ciudad, rubro, plataformas,

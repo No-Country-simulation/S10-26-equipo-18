@@ -115,3 +115,38 @@ Seguimos el estándar **Conventional Commits**. El formato es:
 npm run lint
 npm run build
 ```
+
+---
+
+## 🐳 Levantar con Docker
+
+Si no querés instalar Node localmente, podés levantar el frontend con Docker.
+
+**Requisitos:** tener [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo.
+
+### Primera vez
+
+```bash
+# Desde la raíz del repo
+docker compose up --build
+```
+
+Esto construye la imagen y levanta el frontend en `http://localhost:3000`.
+
+### Uso diario
+
+```bash
+docker compose up        # levanta el contenedor (usa imagen cacheada)
+docker compose down      # baja el contenedor
+docker compose up --build  # rebuild completo (si cambiaron dependencias)
+```
+
+### Variables de entorno
+
+Copiá el archivo de ejemplo y completá los valores que necesites:
+
+```bash
+cp Front/.env.local.example Front/.env.local
+```
+
+Docker Compose lo levanta automáticamente si existe. Si no existe, la app corre igual usando datos mock.

@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/LoginForm";
+import { QuickLogin } from "@/components/auth/QuickLogin";
 import { RadarAnimation } from "@/components/auth/RadarAnimation";
 import { RadarIcon } from "@/components/ui/icons";
 
@@ -30,6 +31,7 @@ export default function LoginPage() {
           </p>
 
           <LoginForm />
+          <QuickLogin />
         </div>
       </div>
 
