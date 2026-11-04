@@ -113,6 +113,7 @@ export const mockBaseQuery: BaseQueryFn<
       ciudad: req.ciudad,
       rubro: req.rubro,
       plataformas: req.plataformas,
+      ratingMin: req.ratingMin ?? 1.5,
       ratingMax: req.ratingMax,
       resenasMin: req.resenasMin,
       fecha: new Date().toISOString(),
@@ -125,6 +126,31 @@ export const mockBaseQuery: BaseQueryFn<
     scans = [scan, ...scans];
     return {
       data: { scan, nuevos, actualizados, total: nuevos + actualizados },
+    };
+  }
+
+  const reanalyze = url?.match(/^leads\/([^/]+)\/reanalyze$/);
+  if (reanalyze && method === "POST") {
+    const index = leads.findIndex((l) => l.id === reanalyze[1]);
+    if (index === -1) return notFound(`Lead ${reanalyze[1]} no encontrado`);
+    const lead = leads[index];
+    if (lead.reviewsNegativas.length === 0) {
+      return {
+        data: {
+          estado: "sin_resenas",
+          lead_id: lead.id,
+          mensaje: "El lead no tiene reseñas guardadas.",
+        },
+      };
+    }
+    return {
+      data: {
+        estado: "completado",
+        lead_id: lead.id,
+        problema: lead.problema,
+        confianzaIA: lead.confianzaIA,
+        draft: lead.draft,
+      },
     };
   }
 

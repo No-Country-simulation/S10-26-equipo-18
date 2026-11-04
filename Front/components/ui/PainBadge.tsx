@@ -6,9 +6,16 @@ export function PainBadge({
   problema,
   short = false,
 }: {
-  problema: Problema;
+  problema: Problema | null;
   short?: boolean;
 }) {
+  if (!problema) {
+    return (
+      <Chip className="border-slate-600/40 bg-slate-700/10 text-slate-400">
+        Sin analizar
+      </Chip>
+    );
+  }
   const meta = PROBLEMA_MAP[problema];
   if (!meta) return null;
   return (
