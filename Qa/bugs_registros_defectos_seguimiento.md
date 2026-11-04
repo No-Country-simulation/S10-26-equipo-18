@@ -6,3 +6,4 @@
 | 20/10/2026 | #25 | El botón «Lanzar escaneo radar» no ejecuta la acción esperada desde el Dashboard. | Closed 27/10 | Resuelto |
 | 20/10/2026 | #24 | Validar filtros de búsqueda por radar (puntuación de 1.5 a 3.5 estrellas, igual o mayor a 10 reseñas) bloqueado por error de despliegue. | Closed 27/10 | Resuelto |
 | 24/10/2026 | #34 | Tras el arreglo del botón «Lanzar escaneo radar», la superficie interactiva no cubre todo el botón; solo responde al hacer clic en la zona izquierda. | Closed 27/10 | Resuelto |
+| 03/11/2026 | Radar / Scraper | Escaneos completados con `total = 0`: el filtro de rating (≤3.5) descarta los 20 primeros resultados de Google Maps, que suelen tener ratings altos. Detalle y opciones de solución en [ISSUE_LEADS_SIN_RESULTADOS.md](./ISSUE_LEADS_SIN_RESULTADOS.md). | Open | Pendiente de decisión |
