@@ -12,9 +12,12 @@ export type Severidad = "critica" | "riesgo" | "vigilancia";
 
 export type Canal = "email" | "telefono" | "web" | "linkedin";
 
+export type ScanEstado = "completado" | "en_progreso" | "fallido";
+
 export interface ReviewNegativa {
   autor: string;
-  fecha: string;
+  /** El backend guarda `fecha = null` a propósito: la fecha extraída no es confiable. */
+  fecha: string | null;
   texto: string;
   estrellas: number;
 }
@@ -36,13 +39,15 @@ export interface Lead {
   web: string | null;
   email: string | null;
   linkedin: string | null;
-  problema: Problema;
+  /** `null` cuando Gemini todavía no clasificó el problema ("sin analizar"). */
+  problema: Problema | null;
   confianzaIA: number;
   reviewsNegativas: ReviewNegativa[];
-  draft: Draft;
+  /** `null` cuando el backend no generó un borrador todavía. */
+  draft: Draft | null;
   estado: LeadEstado;
   actualizado: boolean;
-  ultimoEscaneo: string;
+  ultimoEscaneo: string | null;
   vendedor: string | null;
 }
 
@@ -51,14 +56,15 @@ export interface Scan {
   ciudad: string;
   rubro: string;
   plataformas: string[];
+  ratingMin: number;
   ratingMax: number;
   resenasMin: number;
   fecha: string;
   nuevos: number;
   actualizados: number;
   total: number;
-  estado: "completado" | "en_progreso" | "fallido";
-  duracionSeg: number;
+  estado: ScanEstado;
+  duracionSeg: number | null;
 }
 
 export interface Vendedor {
@@ -105,12 +111,28 @@ export interface DashboardStats {
   porSeveridad: { severidad: Severidad; cantidad: number }[];
 }
 
+export interface FiltrosResponse {
+  ciudades: string[];
+  rubros: string[];
+}
+
 export interface ScanRequest {
   ciudad: string;
   rubro: string;
   plataformas: string[];
   ratingMax: number;
+  /** Opcional: el backend usa 1.5 por defecto. */
+  ratingMin?: number;
   resenasMin: number;
+  /** El backend acepta entre 1 y 5. Por defecto 2. */
+  maxResultados?: number;
+}
+
+/** Respuesta inmediata (HTTP 202) de `POST /api/scans`. */
+export interface ScanStartResponse {
+  id: string;
+  estado: string;
+  mensaje: string;
 }
 
 export interface ScanResult {
@@ -118,4 +140,14 @@ export interface ScanResult {
   nuevos: number;
   actualizados: number;
   total: number;
+}
+
+/** Respuesta exitosa de `POST /api/leads/{id}/reanalyze`. */
+export interface ReanalyzeResponse {
+  estado: string;
+  lead_id?: string;
+  problema?: Problema | null;
+  confianzaIA?: number;
+  draft?: Draft | null;
+  mensaje?: string;
 }

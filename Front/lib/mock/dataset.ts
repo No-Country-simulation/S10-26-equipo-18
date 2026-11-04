@@ -286,6 +286,7 @@ function derivarScans(leads: Lead[]): Scan[] {
     const plataformas = [...new Set(lista.map((l) => l.fuente))];
     const fecha = lista
       .map((l) => l.ultimoEscaneo)
+      .filter((valor): valor is string => Boolean(valor))
       .sort()
       .at(-1);
     return {
@@ -293,6 +294,7 @@ function derivarScans(leads: Lead[]): Scan[] {
       ciudad,
       rubro,
       plataformas,
+      ratingMin: 1.5,
       ratingMax: 3.5,
       resenasMin: 10,
       fecha: fecha ? `${fecha}T09:00:00` : new Date().toISOString(),
@@ -428,7 +430,9 @@ export function calcularStats(leads: Lead[]): DashboardStats {
     conTelefono,
     conWeb,
     contactosTotales,
-    tasaAbordaje: Math.round((abordados / leads.length) * 100),
+    tasaAbordaje: leads.length
+      ? Math.round((abordados / leads.length) * 100)
+      : 0,
     porProblema: PROBLEMAS.map((p) => ({
       problema: p.key,
       cantidad: porProblema.get(p.key) ?? 0,

@@ -1,7 +1,15 @@
-import type { Lead, Problema, ReviewNegativa, Draft } from "@/lib/types";
+import type { Draft, Lead, LeadEstado, Problema, ReviewNegativa } from "@/lib/types";
 import { VENDEDORES } from "@/lib/constants";
 
-interface ApiLead {
+/** Contrato real de `GET /api/leads/`, `GET /api/leads/{id}` (snake_case). */
+export interface ApiResena {
+  autor: string | null;
+  fecha: string | null;
+  texto: string;
+  estrellas: number;
+}
+
+export interface ApiLead {
   id: string;
   nombre: string;
   rubro: string;
@@ -22,83 +30,100 @@ interface ApiLead {
   ultimo_escaneo: string | null;
   draft_asunto?: string | null;
   draft_cuerpo?: string | null;
-  resenas?: ReviewNegativa[];
-  reviewsNegativas?: ReviewNegativa[];
+  resenas?: ApiResena[];
 }
 
-const PROBLEMA_MAP: Record<string, Problema> = {
-  atencion: "atencion",
-  precios: "precios",
-  higiene: "higiene",
-  demoras: "demoras",
-  calidad: "calidad",
-  citas: "citas",
+const PROBLEMAS_VALIDOS: Problema[] = [
+  "atencion",
+  "precios",
+  "higiene",
+  "demoras",
+  "calidad",
+  "citas",
+];
+
+const ESTADOS_VALIDOS: LeadEstado[] = [
+  "nuevo",
+  "contactado",
+  "convertido",
+  "perdido",
+];
+
+/** El seed del backend usa usuarios demo; el front usa vendedores del mock. */
+const VENDEDOR_DEMO: Record<string, string> = {
+  "usr-001": "ven-01",
+  "usr-002": "ven-02",
+  "usr-003": "ven-03",
 };
 
-function getVendedorId(vendedorId: string | null): string | null {
-  if (!vendedorId) return null;
-  // Mapeo para datos de demo del backend
-  if (vendedorId === "usr-001") return "ven-01";
-  if (vendedorId === "usr-002") return "ven-02";
-  if (vendedorId === "usr-003") return "ven-03";
-  const vendedor = VENDEDORES.find((v) => v.id === vendedorId);
-  console.log("[MAPPER] getVendedorId:", vendedorId, "found:", vendedor?.nombre);
-  return vendedor ? vendedor.id : null;
+function parseProblema(valor: string | null): Problema | null {
+  if (!valor) return null;
+  return PROBLEMAS_VALIDOS.includes(valor as Problema)
+    ? (valor as Problema)
+    : null;
 }
 
-function buildDraft(apiLead: ApiLead): Draft {
-  if (apiLead.draft_asunto && apiLead.draft_cuerpo) {
-    console.log("[MAPPER] Using draft from backend for", apiLead.id);
-    return {
-      asunto: apiLead.draft_asunto,
-      cuerpo: apiLead.draft_cuerpo,
-    };
-  }
-  console.log("[MAPPER] Using fallback draft for", apiLead.id);
-  const asunto = `${apiLead.nombre}: propuesta para recuperar la reputación online`;
-  const cuerpo = `Hola, equipo de ${apiLead.nombre}:\n\nRevisando su negocio en ${apiLead.ciudad}, detectamos oportunidades para mejorar su reputación online.\n\nNos gustaría compartirles un diagnóstico sin costo.\n\nSaludos cordiales,\nEquipo RepuSense`;
-  return { asunto, cuerpo };
+function parseRating(valor: string | number): number {
+  const numero = typeof valor === "string" ? Number.parseFloat(valor) : valor;
+  return Number.isFinite(numero) ? numero : 0;
+}
+
+function parseEstado(valor: string | null): LeadEstado {
+  return ESTADOS_VALIDOS.includes(valor as LeadEstado)
+    ? (valor as LeadEstado)
+    : "nuevo";
+}
+
+function parseVendedor(vendedorId: string | null): string | null {
+  if (!vendedorId) return null;
+  if (VENDEDOR_DEMO[vendedorId]) return VENDEDOR_DEMO[vendedorId];
+  return VENDEDORES.some((v) => v.id === vendedorId) ? vendedorId : null;
+}
+
+function parseDraft(apiLead: ApiLead): Draft | null {
+  const asunto = apiLead.draft_asunto?.trim();
+  const cuerpo = apiLead.draft_cuerpo?.trim();
+  if (!asunto && !cuerpo) return null;
+  return { asunto: asunto ?? "", cuerpo: cuerpo ?? "" };
+}
+
+function parseResenas(resenas?: ApiResena[]): ReviewNegativa[] {
+  if (!Array.isArray(resenas)) return [];
+  return resenas
+    .filter((resena) => Boolean(resena?.texto?.trim()))
+    .map((resena) => ({
+      autor: resena.autor?.trim() || "Usuario anónimo",
+      fecha: resena.fecha ?? null,
+      texto: resena.texto,
+      estrellas: resena.estrellas ?? 0,
+    }));
 }
 
 export function mapApiLeadToLead(apiLead: ApiLead): Lead {
-  console.log("[MAPPER] Mapping lead:", apiLead.id, apiLead);
-  const rating = typeof apiLead.rating === "string" 
-    ? parseFloat(apiLead.rating) 
-    : apiLead.rating;
-
-  const problema = apiLead.problema_ia && PROBLEMA_MAP[apiLead.problema_ia] 
-    ? PROBLEMA_MAP[apiLead.problema_ia] 
-    : "atencion";
-
-  const reviewsNegativas = apiLead.reviewsNegativas || apiLead.resenas || [];
-  console.log("[MAPPER] reviewsNegativas count:", reviewsNegativas.length);
-
-  const mapped = {
+  return {
     id: apiLead.id,
     nombre: apiLead.nombre,
     rubro: apiLead.rubro,
     ciudad: apiLead.ciudad,
     fuente: apiLead.fuente,
-    rating: isNaN(rating) ? 0 : rating,
-    numResenas: apiLead.num_resenas || 0,
+    rating: parseRating(apiLead.rating),
+    numResenas: apiLead.num_resenas ?? 0,
     telefono: apiLead.telefono,
     web: apiLead.web,
     email: apiLead.email,
     linkedin: apiLead.linkedin,
-    problema,
-    confianzaIA: apiLead.confianza_ia || 0,
-    reviewsNegativas,
-    draft: buildDraft(apiLead),
-    estado: (apiLead.estado as Lead["estado"]) || "nuevo",
-    actualizado: apiLead.estado !== "nuevo" && apiLead.estado !== null,
-    ultimoEscaneo: apiLead.ultimo_escaneo || new Date().toISOString(),
-    vendedor: getVendedorId(apiLead.vendedor_id),
+    problema: parseProblema(apiLead.problema_ia),
+    confianzaIA: apiLead.confianza_ia ?? 0,
+    reviewsNegativas: parseResenas(apiLead.resenas),
+    draft: parseDraft(apiLead),
+    estado: parseEstado(apiLead.estado),
+    // El backend no expone "actualizado" por lead: no lo inventamos.
+    actualizado: false,
+    ultimoEscaneo: apiLead.ultimo_escaneo ?? null,
+    vendedor: parseVendedor(apiLead.vendedor_id),
   };
-  console.log("[MAPPER] Mapped lead:", mapped);
-  return mapped;
 }
 
 export function mapApiLeadsToLeads(apiLeads: ApiLead[]): Lead[] {
-  console.log("[MAPPER] Mapping leads array, count:", apiLeads.length);
   return apiLeads.map(mapApiLeadToLead);
 }

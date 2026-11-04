@@ -1,8 +1,12 @@
 import type { Lead, Severidad } from "./types";
 
+/**
+ * Mismos umbrales que usa `GET /api/dashboard` en el backend para que el
+ * semáforo del tablero y las insignias del listado digan lo mismo.
+ */
 export function clasificarSeveridad(rating: number): Severidad {
-  if (rating < 2.5) return "critica";
-  if (rating < 3.5) return "riesgo";
+  if (rating <= 2.0) return "critica";
+  if (rating <= 3.0) return "riesgo";
   return "vigilancia";
 }
 
@@ -14,7 +18,8 @@ export function formatNumero(n: number): string {
   return new Intl.NumberFormat("es-AR").format(n);
 }
 
-export function formatFecha(iso: string): string {
+export function formatFecha(iso: string | null | undefined): string {
+  if (!iso) return "Fecha no disponible";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("es-AR", {
@@ -24,7 +29,8 @@ export function formatFecha(iso: string): string {
   });
 }
 
-export function formatFechaHora(iso: string): string {
+export function formatFechaHora(iso: string | null | undefined): string {
+  if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleString("es-AR", {
