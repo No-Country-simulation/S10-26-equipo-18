@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useGetFiltrosQuery } from "@/store/api/leadsApi";
 import { resetFiltros, setFiltro } from "@/store/slices/uiSlice";
 import {
   CANALES,
@@ -40,6 +41,13 @@ function Select({
 export function LeadFilters({ total }: { total: number }) {
   const filtros = useAppSelector((s) => s.ui.filtros);
   const dispatch = useAppDispatch();
+  const { data: opciones } = useGetFiltrosQuery();
+
+  // En modo backend los desplegables salen de GET /api/leads/filtros.
+  // Si todavía no respondió (o estamos en modo mock) usamos las constantes.
+  const ciudades =
+    opciones && opciones.ciudades.length > 0 ? opciones.ciudades : CIUDADES;
+  const rubros = opciones && opciones.rubros.length > 0 ? opciones.rubros : RUBROS;
 
   const set = (key: keyof LeadQuery) => (value: string) =>
     dispatch(setFiltro({ key, value }));
@@ -73,7 +81,7 @@ export function LeadFilters({ total }: { total: number }) {
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6">
         <Select label="Ciudad" valor={filtros.ciudad ?? ""} onChange={set("ciudad")}>
           <option value="">Todas las ciudades</option>
-          {CIUDADES.map((c) => (
+          {ciudades.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
@@ -81,7 +89,7 @@ export function LeadFilters({ total }: { total: number }) {
         </Select>
         <Select label="Rubro" valor={filtros.rubro ?? ""} onChange={set("rubro")}>
           <option value="">Todos los rubros</option>
-          {RUBROS.map((r) => (
+          {rubros.map((r) => (
             <option key={r} value={r}>
               {r}
             </option>

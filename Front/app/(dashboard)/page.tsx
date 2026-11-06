@@ -41,6 +41,15 @@ export default function RadarPage() {
   }
 
   const maxCiudad = Math.max(...stats.porCiudad.map((c) => c.cantidad), 1);
+  const porcentajeCriticos =
+    stats.totalLeads > 0
+      ? Math.round((stats.criticos / stats.totalLeads) * 100)
+      : 0;
+  const clasificados = stats.porProblema.reduce(
+    (acc, item) => acc + item.cantidad,
+    0,
+  );
+  const sinAnalizar = Math.max(0, stats.totalLeads - clasificados);
   const contactabilidad = [
     { label: "Con email", valor: stats.conEmail, color: "bg-primary" },
     { label: "Con teléfono", valor: stats.conTelefono, color: "bg-sky-400" },
@@ -96,28 +105,30 @@ export default function RadarPage() {
           hint={
             <span>
               <span className="font-mono text-rose-400">
-                {Math.round((stats.criticos / stats.totalLeads) * 100)}%
+                {porcentajeCriticos}%
               </span>{" "}
               en máxima urgencia
             </span>
           }
         />
         <KpiCard
-          label="Contacto directo"
+          label="Contactados o convertidos"
           value={formatNumero(stats.contactosTotales)}
           accent="text-sky-400"
           icon={<MailIcon className="h-4 w-4" />}
-          hint="Listos para cold outreach"
+          hint="Ya abordados por el equipo"
         />
         <KpiCard
-          label="Pipeline efectivo"
-          value={formatNumero(stats.totalLeads - stats.nuevos)}
+          label="Tasa de abordaje"
+          value={`${stats.tasaAbordaje}%`}
           accent="text-emerald-400"
           icon={<SparklesIcon className="h-4 w-4" />}
           hint={
             <span>
-              Tasa de abordaje:{" "}
-              <strong className="text-emerald-300">{stats.tasaAbordaje}%</strong>
+              <span className="font-mono text-emerald-300">
+                {formatNumero(stats.contactosTotales)}
+              </span>{" "}
+              de {formatNumero(stats.totalLeads)} ya abordados
             </span>
           }
         />
@@ -223,7 +234,11 @@ export default function RadarPage() {
                   <div
                     className={cn("h-full rounded-full", c.color)}
                     style={{
-                      width: `${(c.valor / stats.totalLeads) * 100}%`,
+                      width: `${
+                        stats.totalLeads > 0
+                          ? (c.valor / stats.totalLeads) * 100
+                          : 0
+                      }%`,
                     }}
                   />
                 </div>
@@ -231,10 +246,13 @@ export default function RadarPage() {
             ))}
             <div className="rounded-lg border border-line bg-bg px-3 py-2">
               <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
-                Reseñas negativas analizadas
+                Leads sin clasificar
               </p>
               <p className="font-grotesk text-lg font-bold tabular-nums text-white">
-                {formatNumero(stats.totalLeads * 3)}+
+                {formatNumero(sinAnalizar)}
+              </p>
+              <p className="text-[11px] text-slate-500">
+                Sin problema IA asignado todavía
               </p>
             </div>
           </div>

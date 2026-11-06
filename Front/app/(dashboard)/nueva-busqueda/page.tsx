@@ -1,7 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useCreateScanMutation } from "@/store/api/leadsApi";
+import {
+  mensajeDeError,
+  useCreateScanMutation,
+  USING_BACKEND,
+} from "@/store/api/leadsApi";
 import { CIUDADES, PLATAFORMAS, RUBROS } from "@/lib/constants";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +14,6 @@ import type { ScanResult } from "@/lib/types";
 import { cn } from "@/lib/cn";
 import { RadarIcon } from "@/components/ui/icons";
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const hora = () =>
   new Date().toLocaleTimeString("es-AR", { hour12: false });
 
@@ -20,6 +23,7 @@ export default function NuevaBusquedaPage() {
   const [plataformas, setPlataformas] = useState<string[]>(["Google Maps"]);
   const [ratingMax, setRatingMax] = useState(3.5);
   const [resenasMin, setResenasMin] = useState(10);
+  const [maxResultados, setMaxResultados] = useState(2);
 
   const [logs, setLogs] = useState<LogLine[]>([]);
   const [running, setRunning] = useState(false);
@@ -34,6 +38,7 @@ export default function NuevaBusquedaPage() {
   }
 
   function togglePlataforma(p: string) {
+    if (USING_BACKEND) return;
     setPlataformas((prev) =>
       prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
     );
@@ -46,44 +51,52 @@ export default function NuevaBusquedaPage() {
     setLogs([]);
     idRef.current = 0;
 
+    const plataformasEfectivas = USING_BACKEND
+      ? ["Google Maps"]
+      : plataformas.length
+        ? plataformas
+        : ["Google Maps"];
+
     push(`[INIT] Configurando radar · ${ciudad} · ${rubro}`);
-    await sleep(250);
-    push(`[NET] Conectando con ${plataformas.join(" + ") || "Google Maps"}...`);
-    await sleep(300);
     push(
-      `[SCAN] Buscando negocios con ≤ ${ratingMax.toFixed(1)}★ y ≥ ${resenasMin} reseñas`,
+      `[NET] POST /api/scans · ${plataformasEfectivas.join(" + ")} · máx. ${maxResultados} negocios`,
     );
-    await sleep(300);
-    push("[AI] Analizando reseñas negativas (6 categorías)...");
-    await sleep(250);
-    push("[PY] Ejecutando scraper...");
+    push(
+      `[SCAN] Buscando negocios con ${1.5.toFixed(1)}–${ratingMax.toFixed(1)}★ y ≥ ${resenasMin} reseñas`,
+    );
+    if (USING_BACKEND) {
+      push(
+        "[PY] El backend ejecuta el scraper en segundo plano; consultamos el estado cada 2,5 s.",
+      );
+    } else {
+      push("[PY] Ejecutando scraper local...");
+    }
 
     try {
       const res = await createScan({
         ciudad,
         rubro,
-        plataformas: plataformas.length ? plataformas : ["Google Maps"],
+        plataformas: plataformasEfectivas,
+        ratingMin: 1.5,
         ratingMax,
         resenasMin,
+        maxResultados,
       }).unwrap();
 
-      push("[AI] Redactando draft de primer contacto...");
-      await sleep(250);
-      push(
-        `[OK] ${res.nuevos} leads nuevos · ${res.actualizados} actualizados · ${res.total} en total`,
-        "ok",
-      );
+      if (res.scan.estado === "fallido") {
+        push(
+          "[ERR] El escaneo terminó con estado fallido. Revisá los logs del backend.",
+          "warn",
+        );
+      } else {
+        push(
+          `[OK] ${res.nuevos} leads nuevos · ${res.actualizados} actualizados · ${res.total} en total`,
+          "ok",
+        );
+      }
       setResult(res);
     } catch (err) {
-      const detalle = (err as { data?: unknown })?.data;
-      push(
-        `[ERR] ${
-          typeof detalle === "string"
-            ? detalle
-            : "El escaneo falló. Reintentá en unos segundos."
-        }`,
-        "warn",
-      );
+      push(`[ERR] ${mensajeDeError(err)}`, "warn");
     } finally {
       setRunning(false);
     }
@@ -145,11 +158,17 @@ export default function NuevaBusquedaPage() {
             <div className="flex flex-wrap gap-2">
               {PLATAFORMAS.map((p) => {
                 const activo = plataformas.includes(p);
+                const deshabilitado = running || (USING_BACKEND && p !== "Google Maps");
                 return (
                   <button
                     key={p}
                     onClick={() => togglePlataforma(p)}
-                    disabled={running}
+                    disabled={deshabilitado}
+                    title={
+                      USING_BACKEND && p !== "Google Maps"
+                        ? "El backend solo scrapea Google Maps por ahora"
+                        : undefined
+                    }
                     className={cn(
                       "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition disabled:opacity-50",
                       activo
@@ -170,6 +189,12 @@ export default function NuevaBusquedaPage() {
                 );
               })}
             </div>
+            {USING_BACKEND ? (
+              <p className="mt-1 text-[11px] text-amber-400/80">
+                El backend actual solo soporta Google Maps; las demás
+                plataformas quedan deshabilitadas.
+              </p>
+            ) : null}
           </div>
 
           <div>
@@ -190,8 +215,8 @@ export default function NuevaBusquedaPage() {
               className="w-full accent-primary"
             />
             <p className="mt-1 text-[11px] text-slate-500">
-              Rango requerido: 1.5 a 3.5 ★. Solo ingresan negocios con
-              calificación menor o igual al umbral.
+              Rango: 1.5 a 3.5 ★. El backend filtra con `rating_min = 1.5` y el
+              umbral superior que elijas.
             </p>
           </div>
 
@@ -204,7 +229,7 @@ export default function NuevaBusquedaPage() {
             </div>
             <input
               type="range"
-              min={10}
+              min={0}
               max={600}
               step={1}
               value={resenasMin}
@@ -213,8 +238,31 @@ export default function NuevaBusquedaPage() {
               className="w-full accent-primary"
             />
             <p className="mt-1 text-[11px] text-slate-500">
-              Umbral requerido: 10 reseñas o más. El negocio puede tener hasta
-              600; el MVP registra las 5 reseñas negativas más recientes.
+              El backend acepta desde 0; por defecto usa 10. El MVP registra las
+              5 reseñas negativas más recientes de cada negocio.
+            </p>
+          </div>
+
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <p className="label mb-0">Máximo de negocios</p>
+              <span className="font-mono text-sm text-primary">
+                {maxResultados}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              step={1}
+              value={maxResultados}
+              disabled={running}
+              onChange={(e) => setMaxResultados(Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+            <p className="mt-1 text-[11px] text-slate-500">
+              El backend acepta entre 1 y 5 resultados por escaneo (por defecto
+              2).
             </p>
           </div>
 

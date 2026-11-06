@@ -102,17 +102,21 @@ export function LeadsTable({
                 </div>
               </td>
               <td className="px-3 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-1.5 w-14 overflow-hidden rounded-full bg-slate-800">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{ width: `${lead.confianzaIA}%` }}
-                    />
+                {lead.problema ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-14 overflow-hidden rounded-full bg-slate-800">
+                      <div
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${lead.confianzaIA}%` }}
+                      />
+                    </div>
+                    <span className="font-mono text-xs text-slate-400">
+                      {lead.confianzaIA}%
+                    </span>
                   </div>
-                  <span className="font-mono text-xs text-slate-400">
-                    {lead.confianzaIA}%
-                  </span>
-                </div>
+                ) : (
+                  <span className="font-mono text-xs text-slate-500">—</span>
+                )}
               </td>
               <td className="px-3 py-3">
                 <EstadoBadge estado={lead.estado} />

@@ -2,14 +2,20 @@
 
 import { useEffect, useState } from "react";
 import {
+  mensajeDeError,
   useGetLeadQuery,
+  useReanalyzeLeadMutation,
   useUpdateLeadMutation,
 } from "@/store/api/leadsApi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { seleccionarLead } from "@/store/slices/uiSlice";
-import { ESTADOS, VENDEDORES } from "@/lib/constants";
+import {
+  ESTADOS,
+  PROBLEMA_MAP,
+  SEVERIDAD_MAP,
+  VENDEDORES,
+} from "@/lib/constants";
 import { clasificarSeveridad, formatFecha, formatNumero } from "@/lib/format";
-import { SEVERIDAD_MAP } from "@/lib/constants";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { PainBadge } from "@/components/ui/PainBadge";
 import { EstadoBadge } from "@/components/ui/EstadoBadge";
@@ -32,6 +38,8 @@ export function LeadDrawer() {
   const dispatch = useAppDispatch();
   const { data: lead, isFetching } = useGetLeadQuery(id ?? "", { skip: !id });
   const [updateLead, { isLoading: guardando }] = useUpdateLeadMutation();
+  const [reanalyzeLead, { isLoading: reanalizando, error: errorReanalisis }] =
+    useReanalyzeLeadMutation();
   const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
@@ -51,7 +59,7 @@ export function LeadDrawer() {
   const sev = lead ? SEVERIDAD_MAP[clasificarSeveridad(lead.rating)] : null;
 
   function copiarDraft() {
-    if (!lead) return;
+    if (!lead?.draft) return;
     const texto = `Asunto: ${lead.draft.asunto}\n\n${lead.draft.cuerpo}`;
     navigator.clipboard?.writeText(texto).then(() => {
       setCopiado(true);
@@ -111,30 +119,41 @@ export function LeadDrawer() {
             </div>
 
             <section className="rounded-xl border border-line bg-bg p-4">
-              <div className="mb-3 flex items-center gap-2">
-                <SparklesIcon className="h-4 w-4 text-primary" />
-                <h3 className="font-grotesk text-sm font-semibold text-white">
-                  Diagnóstico IA
-                </h3>
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <SparklesIcon className="h-4 w-4 text-primary" />
+                  <h3 className="font-grotesk text-sm font-semibold text-white">
+                    Diagnóstico IA
+                  </h3>
+                </div>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={reanalizando}
+                  onClick={() => reanalyzeLead(lead.id)}
+                >
+                  <SparklesIcon className="h-3.5 w-3.5" />
+                  {reanalizando ? "Analizando..." : "Reanalizar"}
+                </Button>
               </div>
               <div className="mb-3 flex items-center justify-between text-xs">
                 <span className="text-slate-400">
                   Dolor principal:{" "}
                   <span className="text-slate-200">
-                    {lead.problema === "atencion"
-                      ? "Atención al cliente"
-                      : lead.problema}
+                    {lead.problema
+                      ? (PROBLEMA_MAP[lead.problema]?.label ?? lead.problema)
+                      : "Sin analizar"}
                   </span>
                 </span>
                 <span className="font-mono text-slate-400">
-                  Confianza {lead.confianzaIA}%
+                  {lead.problema ? `Confianza ${lead.confianzaIA}%` : "Confianza —"}
                 </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
                 <div
                   className="h-full rounded-full"
                   style={{
-                    width: `${lead.confianzaIA}%`,
+                    width: `${lead.problema ? Math.min(100, Math.max(0, lead.confianzaIA)) : 0}%`,
                     backgroundColor: sev?.color,
                   }}
                 />
@@ -145,6 +164,11 @@ export function LeadDrawer() {
                 clasificación semántica de {lead.reviewsNegativas.length} reseñas
                 negativas.
               </p>
+              {errorReanalisis ? (
+                <p className="mt-2 text-[11px] text-rose-400">
+                  {mensajeDeError(errorReanalisis)}
+                </p>
+              ) : null}
             </section>
 
             <section>
@@ -184,14 +208,19 @@ export function LeadDrawer() {
                 Reseñas negativas
               </h3>
               <div className="space-y-2">
+                {lead.reviewsNegativas.length === 0 ? (
+                  <p className="rounded-lg border border-line bg-bg p-3 text-xs text-slate-500">
+                    No hay reseñas negativas guardadas para este lead.
+                  </p>
+                ) : null}
                 {lead.reviewsNegativas.map((r, i) => (
                   <div
                     key={i}
                     className="rounded-lg border border-line bg-bg p-3"
                   >
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="font-mono text-[11px] text-slate-500">
-                        {r.autor}
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="truncate font-mono text-[11px] text-slate-500">
+                        {r.autor} · {formatFecha(r.fecha)}
                       </span>
                       <span className="flex items-center gap-0.5 text-amber-400">
                         {Array.from({ length: r.estrellas }).map((_, s) => (
@@ -213,7 +242,12 @@ export function LeadDrawer() {
                   <MailIcon className="h-4 w-4 text-primary" />
                   Draft de primer contacto
                 </h3>
-                <Button size="sm" variant="secondary" onClick={copiarDraft}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={copiarDraft}
+                  disabled={!lead.draft}
+                >
                   {copiado ? (
                     <>
                       <CheckIcon className="h-3.5 w-3.5" /> Copiado
@@ -223,12 +257,21 @@ export function LeadDrawer() {
                   )}
                 </Button>
               </div>
-              <p className="mb-2 text-xs font-medium text-primary">
-                {lead.draft.asunto}
-              </p>
-              <p className="whitespace-pre-line text-[13px] leading-relaxed text-slate-300">
-                {lead.draft.cuerpo}
-              </p>
+              {lead.draft ? (
+                <>
+                  <p className="mb-2 text-xs font-medium text-primary">
+                    {lead.draft.asunto || "Sin asunto"}
+                  </p>
+                  <p className="whitespace-pre-line text-[13px] leading-relaxed text-slate-300">
+                    {lead.draft.cuerpo}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  El backend todavía no generó un borrador para este lead.
+                  Probá con “Reanalizar” cuando haya reseñas cargadas.
+                </p>
+              )}
             </section>
 
             <section>
