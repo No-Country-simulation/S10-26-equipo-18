@@ -4,9 +4,11 @@ import sys
 import json
 import time
 import random
+import concurrent.futures
 from pathlib import Path
 from datetime import datetime, timezone
 from dotenv import load_dotenv
+from app.services.enrichment_service import extraer_contacto_web
 
 # Cargar variables desde .env en la raíz de 'back'
 env_path = Path(__file__).resolve().parents[3] / ".env"
@@ -197,11 +199,15 @@ def extraer_negocios_google_maps(ciudad: str, rubro: str, max_resultados: int = 
 
                     # Abrir la ficha del negocio
                     card.click(force=True)
-                    page.wait_for_selector("h1.DUwDvf", timeout=5000)
-                    micro_pausa(0.4, 0.7)
-
-                    nombre_el = page.locator("h1.DUwDvf")
-                    nombre = nombre_el.first.inner_text().strip() if nombre_el.count() > 0 else nombre_preview
+                
+                    try:
+                        page.wait_for_selector("h1.DUwDvf", timeout=10000)
+                        micro_pausa(0.4, 0.7)
+                        nombre_el = page.locator("h1.DUwDvf")
+                        nombre = nombre_el.first.inner_text().strip() if nombre_el.count() > 0 else nombre_preview
+                    except Exception:
+                        # Si Maps patina o da timeout, usamos el nombre del preview como plan B y seguimos
+                        nombre = nombre_preview
 
                     nombre_key = nombre.lower()
                     if nombre_key in nombres_vistos:
@@ -214,6 +220,13 @@ def extraer_negocios_google_maps(ciudad: str, rubro: str, max_resultados: int = 
                     web_el = page.locator('a[data-item-id="authority"]')
                     web = web_el.first.get_attribute("href") if web_el.count() > 0 else None
 
+                    if web:
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            future = executor.submit(extraer_contacto_web, web)
+                            datos_contacto = future.result()
+                    else:
+                        datos_contacto = {"email": None, "linkedin": None}
+
                     # Teléfono limpio de glifos/íconos
                     tel_el = page.locator('button[data-item-id^="phone:"]')
                     telefono_raw = tel_el.first.inner_text().strip() if tel_el.count() > 0 else None
@@ -221,13 +234,11 @@ def extraer_negocios_google_maps(ciudad: str, rubro: str, max_resultados: int = 
 
                     # Extracción de quejas negativas
                     quejas = extraer_resenas_negativas(page, max_resenas=4)
-                    if quejas:
-                        print(f"   Quejas recolectadas: {len(quejas)}. Analizando con Gemini...")
-                    else:
-                        print("   [Aviso] No se pudieron extraer textos de quejas, generando draft general...")
-
+                
+                    # Análisis con la IA de Gemini
                     enriquecimiento = analizar_con_ia(nombre, rubro, ciudad, quejas)
 
+                    # 👉 2. AQUÍ REEMPLAZAS LOS NULOS POR LOS DATOS REALES
                     lead = {
                         "id": f"lead-{re.sub(r'[^a-z0-9]', '', ciudad.lower())[:3]}-{random.randint(100, 999)}",
                         "nombre": nombre,
@@ -238,8 +249,8 @@ def extraer_negocios_google_maps(ciudad: str, rubro: str, max_resultados: int = 
                         "numResenas": num_resenas,
                         "telefono": telefono,
                         "web": web,
-                        "email": None,
-                        "linkedin": None,
+                        "email": datos_contacto["email"],      
+                        "linkedin": datos_contacto["linkedin"], 
                         "problema": enriquecimiento["problema"],
                         "confianzaIA": enriquecimiento["confianzaIA"],
                         "reviewsNegativas": quejas,
@@ -251,7 +262,6 @@ def extraer_negocios_google_maps(ciudad: str, rubro: str, max_resultados: int = 
                     }
                     leads_encontrados.append(lead)
                     idx += 1
-
                 except Exception as e:
                     print(f"[Scraper] Error procesando negocio: {e}")
                     continue
