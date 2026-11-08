@@ -560,7 +560,7 @@ def extraer_negocios_google_maps(
                                 "[Aviso] No se encontraron reseñas negativas accesibles. "
                                 "Se generará un correo comercial general."
                             )
-                        enriquecimiento = fallback_local(nombre)
+                            enriquecimiento = fallback_local(nombre)
                         lead = {
                             "id": (
                                 f"lead-"
