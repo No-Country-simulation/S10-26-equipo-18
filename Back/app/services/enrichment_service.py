@@ -1,10 +1,11 @@
 import re
-from playwright.sync_api import sync_playwright
+import httpx
+from bs4 import BeautifulSoup
 
 def extraer_contacto_web(url_web: str) -> dict:
     """
-    Visita el sitio web oficial del negocio para extraer mediante expresiones regulares (regex)
-    el correo electrónico y perfiles de LinkedIn corporativos.
+    Visita el sitio web oficial del negocio mediante httpx y BeautifulSoup
+    para extraer de forma ligera y segura el correo electrónico y perfiles de LinkedIn.
     """
     resultado = {
         "email": None,
@@ -14,60 +15,56 @@ def extraer_contacto_web(url_web: str) -> dict:
     if not url_web or not url_web.startswith("http"):
         return resultado
 
-    print(f"    [Enrichment] Analizando sitio web: {url_web}...")
+    print(f"    [Enrichment] Analizando sitio web con httpx: {url_web}...")
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept-Language": "es-ES,es;q=0.9"
+    }
 
     try:
-        with sync_playwright() as p:
-            # Lanzamos navegador en modo headless y seguro
-            browser = p.chromium.launch(
-                headless=True,
-                args=["--disable-blink-features=AutomationControlled"]
-            )
-            context = browser.new_context(
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                locale="es-ES"
-            )
-            page = context.new_page()
-
-            # Bloquear imágenes, fuentes y estilos para acelerar drásticamente la carga
-            page.route(
-                "**/*",
-                lambda route: route.abort()
-                if route.request.resource_type in ["image", "media", "font", "stylesheet"]
-                else route.continue_()
-            )
-
-            # Navegar a la web con un timeout prudente
-            page.goto(url_web, timeout=15000, wait_until="domcontentloaded")
+        # Petición HTTP rápida y segura con un timeout prudente de 8 segundos
+        with httpx.Client(headers=headers, follow_redirects=True, timeout=8.0) as client:
+            response = client.get(url_web)
             
-            # Obtener el contenido HTML completo de la página
-            html_content = page.content()
+            # Si la web responde correctamente, procesamos el HTML
+            if response.status_code == 200:
+                html_content = response.text
+                soup = BeautifulSoup(html_content, "html.parser")
+                
+                # Opcional: limpiar scripts y estilos para que la búsqueda sea más limpia
+                for script_or_style in soup(["script", "style"]):
+                    script_or_style.decompose()
+                
+                texto_limpio = soup.get_text()
 
-            # 1. Extracción de Email mediante Regex avanzada
-            # Busca patrones estándar de correo electrónico
-            emailsEncontrados = re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", html_content)
-            
-            # Filtrar posibles falsos positivos (extensiones de archivos de imagen o código)
-            extensionesInvalidas = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.css', '.js')
-            emailsValidos = [
-                correo.lower() for correo in emailsEncontrados 
-                if not correo.endswith(extensionesInvalidas)
-            ]
+                # 1. Extracción de Email mediante Regex avanzada
+                emails_encontrados = re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", texto_limpio)
+                
+                # Filtrar falsos positivos (extensiones de imágenes, archivos o código)
+                extensiones_invalidas = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.css', '.js', '.ico')
+                emails_validos = [
+                    correo.lower() for correo in emails_encontrados 
+                    if not correo.endswith(extensiones_invalidas) and not any(ext in correo for ext in ['.png?', '.jpg?'])
+                ]
 
-            if emailsValidos:
-                # Tomamos el primer email corporativo válido que aparezca
-                resultado["email"] = emailsValidos[0]
-                print(f"    [Enrichment] ¡Email detectado!: {resultado['email']}")
+                if emails_validos:
+                    resultado["email"] = emails_validos[0]
+                    print(f"    [Enrichment] ¡Email detectado via httpx!: {resultado['email']}")
 
-            # 2. Extracción de perfil o página de LinkedIn mediante Regex
-            matchLinkedin = re.search(r"https?:\/\/(?:www\.)?linkedin\.com\/(?:in|company)\/[a-zA-Z0-9_-]+", html_content)
-            if matchLinkedin:
-                resultado["linkedin"] = matchLinkedin.group(0)
-                print(f"    [Enrichment] ¡LinkedIn detectado!: {resultado['linkedin']}")
+                # 2. Extracción de perfil o página de LinkedIn mediante Regex
+                match_linkedin = re.search(r"https?:\/\/(?:www\.)?linkedin\.com\/(?:in|company)\/[a-zA-Z0-9_-]+", html_content)
+                if match_linkedin:
+                    resultado["linkedin"] = match_linkedin.group(0)
+                    print(f"    [Enrichment] ¡LinkedIn detectado via httpx!: {resultado['linkedin']}")
+            else:
+                print(f"    [Enrichment] La web respondió con estado HTTP {response.status_code}")
 
-            browser.close()
-
+    except httpx.TimeoutException:
+        print(f"    [Enrichment] Timeout al intentar conectar con {url_web}")
+    except httpx.RequestError as req_err:
+        print(f"    [Enrichment] Error de conexión con {url_web}: {req_err}")
     except Exception as error:
-        print(f"    [Enrichment] No se pudo extraer información de contacto de {url_web}: {error}")
+        print(f"    [Enrichment] Error inesperado procesando {url_web}: {error}")
 
     return resultado
