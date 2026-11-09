@@ -360,8 +360,24 @@ def extraer_negocios_google_maps(
     headless_mode = os.getenv("SCRAPER_HEADLESS", "True").lower() in (
         "true", "1", "yes"
     )
+    browserless_url = os.getenv("BROWSERLESS_URL", "").strip()
+    if os.getenv("RENDER") and not browserless_url:
+        raise RuntimeError(
+            "BROWSERLESS_URL no está configurada en Render. "
+            "El scraper necesita Browserless para ejecutarse."
+        )
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless_mode)
+        if browserless_url:
+            print("[Browserless] Conectando al navegador remoto...")
+            browser = p.chromium.connect_over_cdp(
+                browserless_url,
+                timeout=60000,
+            )
+            print("[Browserless] Conexión establecida correctamente.")
+        else:
+            print("[Playwright] Iniciando Chromium local...")
+            browser = p.chromium.launch(headless=headless_mode)
+
         context = browser.new_context(locale="es-ES")
         page = context.new_page()
         page.set_default_timeout(8000)
