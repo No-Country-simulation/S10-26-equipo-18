@@ -1,7 +1,7 @@
 import { LoginForm } from "@/components/auth/LoginForm";
 import { QuickLogin } from "@/components/auth/QuickLogin";
 import { RadarAnimation } from "@/components/auth/RadarAnimation";
-import { RadarIcon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 
 export default function LoginPage() {
   return (
@@ -9,9 +9,7 @@ export default function LoginPage() {
       <div className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary shadow-subtle-glow">
-              <RadarIcon className="h-6 w-6" />
-            </div>
+            <Logo size={44} priority className="rounded-xl shadow-subtle-glow" />
             <div>
               <h1 className="font-grotesk text-2xl font-bold tracking-tight text-white">
                 RepuSense
