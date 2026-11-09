@@ -1,3 +1,4 @@
+import concurrent.futures
 import json
 import os
 import random
@@ -7,13 +8,18 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
+
 from dotenv import load_dotenv
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
+
 from app.services.ai_service import analizar_con_ia, fallback_local
-# Mantener la ubicación del .env utilizada en el proyecto.
+from app.services.enrichment_service import extraer_contacto_web
+
+# Cargar las variables de entorno desde la raíz del proyecto.
 env_path = Path(__file__).resolve().parents[3] / ".env"
 load_dotenv(dotenv_path=env_path)
+
 if hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding="utf-8")
@@ -520,6 +526,21 @@ def extraer_negocios_google_maps(
                                 f"[Scraper] No se pudo leer la web "
                                 f"de '{nombre}'. Se continúa sin web."
                             )
+
+                        # Enriquecimiento de contactos desde la web del negocio
+                        datos_contacto = {"email": None, "linkedin": None}
+
+                        if web:
+                            try:
+                                with concurrent.futures.ThreadPoolExecutor() as executor:
+                                    future = executor.submit(extraer_contacto_web, web)
+                                    datos_contacto = future.result(timeout=15)
+                            except Exception as exc:
+                                print(
+                                    f"[Enrichment] No se pudieron obtener "
+                                    f"contactos de '{nombre}': {exc}"
+                                )
+
                         # Teléfono
                         telefono = None
                         try:
@@ -575,8 +596,8 @@ def extraer_negocios_google_maps(
                             "numResenas": num_resenas,
                             "telefono": telefono,
                             "web": web,
-                            "email": None,
-                            "linkedin": None,
+                            "email": datos_contacto.get("email"),
+                            "linkedin": datos_contacto.get("linkedin"),
                             "problema": enriquecimiento["problema"],
                             "confianzaIA": enriquecimiento["confianzaIA"],
                             "reviewsNegativas": quejas,
@@ -618,6 +639,7 @@ def extraer_negocios_google_maps(
                     break
                 # Volver al listado y cargar más negocios
                 try:
+
                     feed.scroll_into_view_if_needed(
                         timeout=3000
                     )
@@ -640,6 +662,7 @@ def extraer_negocios_google_maps(
                 f"Tarjetas inspeccionadas: {total_inspeccionadas} "
                 f"| Leads encontrados: {len(leads_encontrados)}"
             )
+
         finally:
             # Mantener Chromium abierto durante las pruebas locales
             if not headless_mode and debug_interactivo:
