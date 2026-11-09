@@ -125,8 +125,15 @@ async def guardar_leads_escaneo(
 
             if valores["telefono"]:
                 lead.telefono = valores["telefono"]
+
             if valores["web"]:
                 lead.web = valores["web"]
+
+            if valores["email"]:
+                lead.email = valores["email"]
+
+            if valores["linkedin"]:
+                lead.linkedin = valores["linkedin"]
 
             # No sobrescribir un análisis previo exitoso con fallback.
             if analisis_valido:
