@@ -123,20 +123,24 @@ def obtener_datos_panel_negocio(page):
                 rating = float(
                     match.group(0).replace(",", ".")
                 )
+        # Buscar el contador dentro del panel del negocio abierto
         resenas_locator = page.locator(
-            "div.F7nice span[aria-label]"
+            "div.F7nice span[role='img'][aria-label*='reseña' i], "
+            "div.F7nice span[role='img'][aria-label*='review' i]"
         )
+
         for i in range(resenas_locator.count()):
             aria_label = (
                 resenas_locator.nth(i).get_attribute("aria-label")
                 or ""
             )
-            if (
-                "reseña" not in aria_label.lower()
-                and "review" not in aria_label.lower()
-            ):
-                continue
-            match = re.search(r"(\d[\d.,\s]*)", aria_label)
+
+            match = re.search(
+                r"(\d[\d.,\s]*)\s*(?:reseñas?|reviews?)",
+                aria_label,
+                re.IGNORECASE
+            )
+
             if match:
                 num_resenas = int(
                     re.sub(r"\D", "", match.group(1))
@@ -454,7 +458,7 @@ def extraer_negocios_google_maps(
                                     match_resenas.group(1)
                                 )
                             )
-                            if match_resenas else 0
+                            if match_resenas else None
                         )
                         if clave in nombres_vistos:
                             print(f"[DUPLICADO] {nombre_preview}")
@@ -493,7 +497,9 @@ def extraer_negocios_google_maps(
                             motivos.append(
                                 f"rating fuera del rango {rating_min}-{rating_max}"
                             )
-                        if num_resenas < resenas_min:
+                        if num_resenas is None:
+                            motivos.append("cantidad de reseñas no disponible")
+                        elif num_resenas < resenas_min:
                             motivos.append(
                                 f"reseñas insuficientes ({num_resenas} < {resenas_min})"
                             )
