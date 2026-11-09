@@ -8,8 +8,8 @@ import {
   ConfigIcon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
-  RadarIcon,
 } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { abrirConfig, toggleSidebar } from "@/store/slices/uiSlice";
 import { VENDEDORES } from "@/lib/constants";
@@ -34,9 +34,11 @@ export function Sidebar() {
           colapsado ? "justify-center px-2 py-5" : "gap-3 px-5 py-5",
         )}
       >
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary shadow-subtle-glow">
-          <RadarIcon className="h-5 w-5" />
-        </div>
+        <Logo
+          size={40}
+          priority
+          className="rounded-xl shadow-subtle-glow"
+        />
         {!colapsado && (
           <div className="min-w-0">
             <div className="flex items-center gap-2">
