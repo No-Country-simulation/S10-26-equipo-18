@@ -34,21 +34,50 @@ def extraer_contacto_web(url_web: str) -> dict:
                 for script_or_style in soup(["script", "style"]):
                     script_or_style.decompose()
 
-                texto_limpio = soup.get_text()
+                # 1. Extracción de correos electrónicos
+                patron_email = (
+                    r"[a-zA-Z0-9._%+-]+@"
+                    r"[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                )
 
-                # 1. Extracción de Email mediante Regex avanzada
-                emails_encontrados = re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", texto_limpio)
+                extensiones_invalidas = (
+                    ".png", ".jpg", ".jpeg", ".gif",
+                    ".svg", ".webp", ".css", ".js", ".ico"
+                )
 
-                # Filtrar falsos positivos (extensiones de imágenes, archivos o código)
-                extensiones_invalidas = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.css', '.js', '.ico')
-                emails_validos = [
-                    correo.lower() for correo in emails_encontrados
-                    if not correo.endswith(extensiones_invalidas) and not any(ext in correo for ext in ['.png?', '.jpg?'])
-                ]
+                emails_encontrados = []
+
+                # Priorizar enlaces mailto:
+                for enlace in soup.select('a[href^="mailto:"]'):
+                    href = enlace.get("href", "")
+                    correo = href[7:].split("?")[0].strip()
+
+                    if re.fullmatch(patron_email, correo):
+                        emails_encontrados.append(correo.lower())
+
+                # Buscar también en el texto visible
+                texto_limpio = soup.get_text(separator=" ", strip=True)
+
+                for correo in re.findall(patron_email, texto_limpio):
+                    emails_encontrados.append(correo.lower())
+
+                # Eliminar duplicados y extensiones no válidas
+                emails_validos = []
+
+                for correo in emails_encontrados:
+                    if correo.endswith(extensiones_invalidas):
+                        continue
+
+                    if correo not in emails_validos:
+                        emails_validos.append(correo)
 
                 if emails_validos:
                     resultado["email"] = emails_validos[0]
-                    print(f"    [Enrichment] ¡Email detectado via httpx!: {resultado['email']}")
+
+                    print(
+                        f"    [Enrichment] Email detectado via httpx: "
+                        f"{resultado['email']}"
+                    )
 
                 # 2. Extracción de perfil o página de LinkedIn mediante Regex
                 match_linkedin = re.search(r"https?:\/\/(?:www\.)?linkedin\.com\/(?:in|company)\/[a-zA-Z0-9_-]+", html_content)
