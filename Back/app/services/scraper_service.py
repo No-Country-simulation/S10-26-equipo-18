@@ -349,7 +349,7 @@ def extraer_negocios_google_maps(
 ) -> list:
     """Busca negocios en Maps y devuelve leads con análisis o correo general."""
     query = f"{rubro} en {ciudad}"
-    url = f"https://www.google.com/maps/search/{quote(query)}"
+    url = f"https://www.google.com/maps/search/{quote(query)}?hl=es"
     leads_encontrados = []
     fecha_actual = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     print(f"\n[RepuSense Pipeline] Buscando '{rubro}' en '{ciudad}'...")
@@ -396,19 +396,34 @@ def extraer_negocios_google_maps(
             except PlaywrightTimeoutError:
                 print("[Scraper] La navegación demoró; comprobando si cargó Maps...")
             try:
-                consentimiento = page.locator(
-                    "button:has-text('Rechazar todo'), "
-                    "button:has-text('Aceptar todo')"
+                consentimiento = page.get_by_role(
+                    "button",
+                    name=re.compile(
+                        r"Rechazar todo|Aceptar todo|Reject all|Accept all",
+                        re.IGNORECASE,
+                    ),
                 )
+
                 if consentimiento.count() > 0:
-                    consentimiento.first.click(timeout=1500)
-            except Exception:
-                pass
+                    consentimiento.first.click(timeout=5000)
+                    print("[Scraper] Consentimiento de Google gestionado.")
+            except Exception as error:
+                print(
+                    f"[Scraper] No se pudo gestionar el consentimiento: "
+                    f"{type(error).__name__}"
+                )
             try:
-                page.locator('div[role="feed"]').first.wait_for(timeout=12000)
-            except PlaywrightTimeoutError:
+                page.locator('div[role="feed"]').first.wait_for(timeout=20000)
+
+            except PlaywrightTimeoutError as error:
                 print("[Scraper] No se encontró el listado de negocios.")
-                return leads_encontrados
+                print(f"[Scraper] URL actual: {page.url}")
+                print(f"[Scraper] Título: {page.title()}")
+
+                raise RuntimeError(
+                    "Google Maps no cargó el listado de negocios. "
+                    "Revisar consentimiento, navegación o acceso desde Browserless."
+                ) from error
             # Recorrer progresivamente los negocios de Google Maps
             feed = page.locator('div[role="feed"]').first
             nombres_vistos = set()
