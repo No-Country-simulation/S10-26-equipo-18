@@ -39,7 +39,7 @@ export default function LeadsPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => descargarCsv(items)}
+              onClick={() => descargarCsv(items, { filtros })}
               disabled={items.length === 0}
             >
               <DownloadIcon className="h-3.5 w-3.5" />

@@ -14,9 +14,9 @@ import {
   MoonIcon,
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
-  RadarIcon,
   SunIcon,
 } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/Logo";
 import { VENDEDORES } from "@/lib/constants";
 
 export function Topbar() {
@@ -61,7 +61,7 @@ export function Topbar() {
           </button>
           <div className="min-w-0">
             <div className="flex items-center gap-2 md:hidden">
-              <RadarIcon className="h-5 w-5 text-primary" />
+              <Logo size={20} className="rounded-md" />
               <span className="font-grotesk text-base font-bold text-white">
                 RepuSense
               </span>
