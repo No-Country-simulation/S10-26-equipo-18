@@ -494,6 +494,15 @@ def extraer_negocios_google_maps(
                         if clave in nombres_vistos:
                             print(f"[DUPLICADO] {nombre_preview}")
                             continue
+
+                        # Descartar negocios fuera del rango sin abrir la ficha
+                        if rating > 0 and not (rating_min <= rating <= rating_max):
+                            print(
+                                f"[FILTRO RAPIDO] {nombre_preview} | "
+                                f"Rating: {rating} | Fuera de rango"
+                            )
+                            continue
+
                         # Abrir ficha del negocio con reintento
                         if not abrir_ficha_con_reintento(
                             page,
