@@ -125,8 +125,8 @@ def obtener_datos_panel_negocio(page):
                 )
         # Buscar el contador dentro del panel del negocio abierto
         resenas_locator = page.locator(
-            "div.F7nice span[role='img'][aria-label*='reseña' i], "
-            "div.F7nice span[role='img'][aria-label*='review' i]"
+            "div.F7nice span[aria-label*='reseña' i], "
+            "div.F7nice span[aria-label*='review' i]"
         )
 
         for i in range(resenas_locator.count()):
