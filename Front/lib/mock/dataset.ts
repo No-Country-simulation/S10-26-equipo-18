@@ -8,7 +8,7 @@ import type {
   Scan,
   Severidad,
 } from "../types";
-import { CIUDADES, PROBLEMAS, RUBROS } from "../constants";
+import { CIUDADES_LISTA, PROBLEMAS, RUBROS } from "../constants";
 import { clasificarSeveridad } from "../format";
 import rawGenerado from "./leads.generated.json";
 
@@ -189,7 +189,7 @@ function generarLeads(): Lead[] {
   });
   leads.push(...seedLeads);
 
-  const ciudades = CIUDADES;
+  const ciudades = CIUDADES_LISTA;
   const rubros = RUBROS;
   let n = 0;
   while (leads.length < total) {

@@ -118,13 +118,14 @@ export interface FiltrosResponse {
 
 export interface ScanRequest {
   ciudad: string;
+  barrio?: string;
   rubro: string;
   plataformas: string[];
   ratingMax: number;
   /** Opcional: el backend usa 1.5 por defecto. */
   ratingMin?: number;
   resenasMin: number;
-  /** El backend acepta entre 1 y 5. Por defecto 2. */
+  /** El backend acepta entre 1 y 10. Por defecto 2. */
   maxResultados?: number;
 }
 

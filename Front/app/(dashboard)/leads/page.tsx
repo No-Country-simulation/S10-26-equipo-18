@@ -17,7 +17,26 @@ export default function LeadsPage() {
   const dispatch = useAppDispatch();
   const { data, isLoading, isFetching } = useGetLeadsQuery(filtros);
 
-  const items = data?.items ?? [];
+  // Items traídos del backend. Orden prioritario:
+  // 1) estado === "nuevo" (los leads recién traídos saltan a la cabeza)
+  // 2) dentro del mismo estado, fecha de escaneo descendente (los más recientes primero)
+  const items = data
+    ? [...(data.items ?? {})].sort(
+        (a, b) => {
+          // Prioridad 1: ¿son nuevos?
+          const aNuevo = a.estado === "nuevo";
+          const bNuevo = b.estado === "nuevo";
+          if (aNuevo && !bNuevo) return -1;
+          if (!aNuevo && bNuevo) return 1;
+          // Empate en nuevo: ordenar por fecha de escaneo (los más recientes primero)
+          const aDate = a.ultimoEscaneo ?? '';
+          const bDate = b.ultimoEscaneo ?? '';
+          if (aDate > bDate) return -1;
+          if (aDate < bDate) return 1;
+          return 0;
+        },
+      )
+    : [];
 
   return (
     <div className="space-y-4">

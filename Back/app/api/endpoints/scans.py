@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/scans", tags=["Escaneos"])
 class ScanRequest(BaseModel):
     ciudad: str = Field(min_length=2, max_length=100)
     rubro: str = Field(min_length=2, max_length=100)
-    max_resultados: int = Field(default=2, ge=1, le=5)
+    max_resultados: int = Field(default=2, ge=1, le=10)
     rating_min: float = Field(default=1.5, ge=0, le=5)
     rating_max: float = Field(default=3.5, ge=0, le=5)
     resenas_min: int = Field(default=10, ge=0)

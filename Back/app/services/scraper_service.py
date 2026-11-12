@@ -105,50 +105,285 @@ def abrir_ficha_con_reintento(
         if intento < max_intentos:
             page.wait_for_timeout(1200)
     return False
+def _a_entero(texto):
+    """'5.107' / '5,107' / '5 107' -> 5107. Devuelve None si no hay dígitos."""
+    digitos = re.sub(r"\D", "", texto or "")
+    return int(digitos) if digitos else None
+def obtener_histograma_resenas(page) -> dict:
+    """
+    Lee el gráfico de barras de estrellas de la ficha.
+    Devuelve {5: 2000, 4: 1008, 3: 714, 2: 527, 1: 858} o {} si no está.
+    """
+    histograma = {}
+    try:
+        filas = page.locator('tr[role="img"][aria-label]')
+        for i in range(filas.count()):
+            label = filas.nth(i).get_attribute("aria-label") or ""
+            m = re.search(
+                r"(\d)\s*(?:estrellas?|stars?)\s*,\s*([\d.,\s\u00a0]+)",
+                label,
+                re.IGNORECASE,
+            )
+            if m:
+                histograma[int(m.group(1))] = _a_entero(m.group(2)) or 0
+    except Exception as error:
+        print(f"[Scraper] Error leyendo histograma: {error}")
+    return histograma
 def obtener_datos_panel_negocio(page):
     """
-    Obtiene el rating y la cantidad de reseñas
-    desde la ficha abierta de Google Maps.
+    Obtiene rating y cantidad de reseñas desde la ficha abierta.
+    El conteo se busca en varios lugares porque Maps cambia el markup
+    y el separador de miles (5.107 / 5,107).
     """
     rating = None
     num_resenas = None
+    patron_label = re.compile(
+        r"([\d][\d.,\s\u00a0]*)\s*(?:reseñas?|opiniones?|reviews?)",
+        re.IGNORECASE,
+    )
     try:
-        rating_locator = page.locator(
-            "div.F7nice span[aria-hidden='true']"
-        ).first
-        if rating_locator.count() > 0:
-            texto_rating = rating_locator.inner_text().strip()
-            match = re.search(r"\d+[.,]\d+", texto_rating)
-            if match:
-                rating = float(
-                    match.group(0).replace(",", ".")
-                )
-        # Buscar el contador dentro del panel del negocio abierto
-        resenas_locator = page.locator(
-            "div.F7nice span[aria-label*='reseña' i], "
-            "div.F7nice span[aria-label*='review' i]"
-        )
-
-        for i in range(resenas_locator.count()):
-            aria_label = (
-                resenas_locator.nth(i).get_attribute("aria-label")
-                or ""
+        bloque = page.locator("div.F7nice").first
+        if bloque.count() > 0:
+            # Rating
+            rating_el = bloque.locator("span[aria-hidden='true']").first
+            if rating_el.count() > 0:
+                m = re.search(r"\d+[.,]\d+|\d+", rating_el.inner_text().strip())
+                if m:
+                    rating = float(m.group(0).replace(",", "."))
+            # Conteo 1: cualquier aria-label con "reseñas/opiniones" dentro del bloque
+            etiquetas = bloque.locator("[aria-label]")
+            for i in range(etiquetas.count()):
+                label = etiquetas.nth(i).get_attribute("aria-label") or ""
+                m = patron_label.search(label)
+                if m:
+                    num_resenas = _a_entero(m.group(1))
+                    break
+            # Conteo 2: texto "3,5 (5.107)" del bloque
+            if num_resenas is None:
+                texto = bloque.inner_text(timeout=2000)
+                m = re.search(r"\(([\d.,\s\u00a0]+)\)", texto)
+                if m:
+                    num_resenas = _a_entero(m.group(1))
+        # Conteo 4 (independiente de clases CSS): texto del encabezado del panel
+        if num_resenas is None or rating is None:
+            texto = texto_panel_ficha(page)
+            # Acotar al encabezado: lo que sigue al título (rating, conteo, categoría)
+            titulo_el = page.locator("h1.DUwDvf").first
+            titulo = (
+                titulo_el.inner_text(timeout=1500).strip()
+                if titulo_el.count() > 0
+                else ""
             )
-
-            match = re.search(
-                r"(\d[\d.,\s]*)\s*(?:reseñas?|reviews?)",
-                aria_label,
-                re.IGNORECASE
-            )
-
-            if match:
-                num_resenas = int(
-                    re.sub(r"\D", "", match.group(1))
-                )
-                break
+            if titulo and titulo in texto:
+                texto = texto.split(titulo, 1)[1]
+            texto = texto[:300]
+            if rating is None:
+                m = re.search(r"(\d[.,]\d)\s*\n?\s*\(", texto)
+                if m:
+                    rating = float(m.group(1).replace(",", "."))
+            if num_resenas is None:
+                m = re.search(r"\(([\d][\d.,\s\u00a0]*)\)", texto)
+                if not m:
+                    m = re.search(
+                        r"([\d][\d.,\s\u00a0]*)\s*(?:reseñas?|opiniones?|reviews?)",
+                        texto,
+                        re.IGNORECASE,
+                    )
+                if m:
+                    num_resenas = _a_entero(m.group(1))
     except Exception as error:
         print(f"[Scraper] Error leyendo panel: {error}")
     return rating, num_resenas
+def abrir_pestana_resenas(page) -> bool:
+    """Abre la pestaña de reseñas probando varias formas de localizarla."""
+    patron = re.compile(r"Reseñas|Opiniones|Revisiones|Reviews", re.IGNORECASE)
+    page.wait_for_timeout(1000)
+    candidatos = [
+        # El nombre accesible del tab es su aria-label ("Revisiones para X"),
+        # no el texto visible ("Opiniones"), por eso get_by_role(name=...) falla.
+        # Se filtra primero por el texto del DOM.
+        page.locator('button[role="tab"]').filter(has_text=patron),
+        page.locator(
+            'button[role="tab"][aria-label*="Revisiones" i], '
+            'button[role="tab"][aria-label*="Reseñas" i], '
+            'button[role="tab"][aria-label*="Opiniones" i], '
+            'button[role="tab"][aria-label*="Reviews" i]'
+        ),
+        page.get_by_role("tab", name=patron),
+        page.get_by_role(
+            "button", name=re.compile(r"^Más opiniones|^More reviews", re.IGNORECASE)
+        ),
+        page.locator('button[jsaction*="reviewChart"]'),
+    ]
+    for candidato in candidatos:
+        try:
+            candidato.first.wait_for(state="visible", timeout=3500)
+            candidato.first.click(timeout=3000)
+            page.wait_for_timeout(1500)
+            return True
+        except Exception:
+            continue
+    return False
+def ordenar_por_mas_bajas(page) -> bool:
+    """Ordena las reseñas de menor a mayor calificación."""
+    try:
+        boton = page.get_by_role(
+            "button", name=re.compile(r"Ordenar|Sort", re.IGNORECASE)
+        ).first
+        boton.wait_for(state="visible", timeout=4000)
+        boton.click(timeout=3000)
+        opcion = page.locator(
+            '[role="menuitemradio"], [role="menuitem"]'
+        ).filter(has_text=re.compile(r"m[aá]s baja|lowest", re.IGNORECASE)).first
+        opcion.wait_for(state="visible", timeout=3000)
+        opcion.click(timeout=3000)
+        page.wait_for_timeout(2000)
+        print("[Reseñas] Ordenadas por calificación más baja.")
+        return True
+    except Exception as e:
+        print(f"[Reseñas] No se pudo ordenar por más bajas: {e}")
+        return False
+SELECTORES_RESENAS = [
+    "div.jftiEf[data-review-id]",
+    "div[data-review-id][aria-label]",
+    "div[data-review-id]",
+]
+def detectar_selector_resenas(page, timeout_ms: int = 0):
+    """Devuelve el primer selector de tarjetas de reseña que tenga resultados."""
+    limite = time.monotonic() + timeout_ms / 1000
+    while True:
+        for selector in SELECTORES_RESENAS:
+            try:
+                if page.locator(selector).count() > 0:
+                    return selector
+            except Exception:
+                pass
+        if time.monotonic() >= limite:
+            return None
+        page.wait_for_timeout(400)
+_JS_SCROLL_PANEL = """(dy) => {
+  // Parte del título de la ficha abierta y sube hasta el primer contenedor
+  // desplazable. Así no se confunde con el listado de resultados.
+  const hs = [...document.querySelectorAll('h1.DUwDvf')];
+  const h = hs.find(e => e.offsetParent !== null) || hs[0];
+  let el = h;
+  while (el) {
+    const s = getComputedStyle(el);
+    const scroll = s.overflowY === 'auto' || s.overflowY === 'scroll';
+    if (scroll && el.scrollHeight > el.clientHeight + 20) {
+      el.scrollBy(0, dy);
+      return true;
+    }
+    el = el.parentElement;
+  }
+  return false;
+}"""
+_JS_PANEL_FICHA = """(modo) => {
+  // Devuelve el HTML o el texto del panel de la ficha (el que contiene el h1).
+  const hs = [...document.querySelectorAll('h1.DUwDvf')];
+  const h = hs.find(e => e.offsetParent !== null) || hs[0];
+  if (!h) return '';
+  let el = h.closest('[role="main"]');
+  if (!el) {
+    el = h;
+    for (let i = 0; i < 8 && el.parentElement; i++) el = el.parentElement;
+  }
+  return modo === 'html' ? el.outerHTML : el.innerText;
+}"""
+def texto_panel_ficha(page) -> str:
+    """Texto visible del panel de la ficha abierta (no del listado)."""
+    try:
+        return page.evaluate(_JS_PANEL_FICHA, "text") or ""
+    except Exception:
+        return ""
+def scrollear_panel(page, dy: int = 1400) -> None:
+    """
+    Scrollea el panel lateral de la ficha partiendo de su título.
+    Si no lo logra, pone el mouse sobre el panel de la ficha y usa la rueda.
+    """
+    try:
+        if page.evaluate(_JS_SCROLL_PANEL, dy):
+            return
+    except Exception:
+        pass
+    try:
+        page.locator("h1.DUwDvf").first.hover(timeout=2000)
+        page.mouse.wheel(0, dy)
+    except Exception:
+        pass
+def cargar_seccion_resenas(page, intentos: int = 10) -> bool:
+    """
+    En algunas variantes de Maps no hay pestaña de reseñas: viven en la
+    vista general y se cargan por secciones al scrollear el panel.
+    """
+    for _ in range(intentos):
+        if detectar_selector_resenas(page) is not None:
+            return True
+        scrollear_panel(page, 1400)
+        page.wait_for_timeout(800)
+    return detectar_selector_resenas(page) is not None
+def abrir_mas_resenas(page) -> bool:
+    """Intenta expandir la lista completa con 'Más reseñas / Más opiniones'."""
+    candidatos = [
+        page.get_by_role(
+            "button",
+            name=re.compile(
+                r"^M[aá]s (?:reseñas|opiniones)|^More reviews", re.IGNORECASE
+            ),
+        ),
+        page.locator('button[jsaction*="moreReviews"]'),
+    ]
+    for candidato in candidatos:
+        try:
+            candidato.first.wait_for(state="visible", timeout=2500)
+            candidato.first.scroll_into_view_if_needed(timeout=2000)
+            candidato.first.click(timeout=3000)
+            page.wait_for_timeout(1500)
+            return True
+        except Exception:
+            continue
+    return False
+def volcar_debug_ficha(page, etiqueta: str = "ficha") -> None:
+    """Guarda el HTML del panel de la FICHA (no del listado) + captura."""
+    try:
+        carpeta = Path(__file__).resolve().parent / "debug_scraper"
+        carpeta.mkdir(exist_ok=True)
+        marca = datetime.now().strftime("%H%M%S")
+        base = carpeta / f"{etiqueta}_{marca}"
+        html = page.evaluate(_JS_PANEL_FICHA, "html") or ""
+        if not html:
+            print("[DEBUG] No se encontró el panel de la ficha; se guarda toda la página.")
+            html = page.content()
+        base.with_suffix(".html").write_text(html, encoding="utf-8")
+        page.screenshot(path=str(base.with_suffix(".png")))
+        print(f"[DEBUG] Panel guardado en {base.with_suffix('.html')}")
+    except Exception as error:
+        print(f"[DEBUG] No se pudo volcar el panel: {error}")
+def es_vista_limitada(page) -> bool:
+    """
+    Maps muestra un banner informativo 'Estás en una vista limitada de Google Maps'
+    en la parte inferior del mapa, pero eso NO significa que no tenga la pestaña de reseñas.
+    Solo es limitada real si NO tiene tabs ni reseñas disponibles.
+    """
+    try:
+        # Si la pestaña de Reseñas/Opiniones existe, NO es limitada.
+        tabs = page.locator('button[role="tab"]').all_inner_texts()
+        if any(re.search(r"reseñas|opiniones|reviews", t, re.IGNORECASE) for t in tabs):
+            return False
+
+        # Si no hay tab pero hay tarjetas de reseñas directas, tampoco es limitada
+        if page.locator('div.jftiEf[data-review-id]').count() > 0:
+            return False
+
+        coincidencias = page.get_by_text(
+            re.compile(r"vista limitada|limited view", re.IGNORECASE)
+        )
+        for i in range(min(coincidencias.count(), 5)):
+            if coincidencias.nth(i).is_visible():
+                return True
+    except Exception:
+        pass
+    return False
 def extraer_resenas_negativas(
     page,
     max_resenas: int = 5,
@@ -163,23 +398,39 @@ def extraer_resenas_negativas(
     textos_vistos = set()
     tarjetas_vistas = set()
     try:
-        # 1. Esperar la pestaña de reseñas
-        tab_resenas = page.get_by_role(
-            "tab",
-            name=re.compile(r"Reseñas|Opiniones", re.IGNORECASE)
-        )
-        try:
-            tab_resenas.first.wait_for(
-                state="visible",
-                timeout=10000
+        if es_vista_limitada(page):
+            print(
+                "[AVISO] Google Maps entregó la 'vista limitada': no incluye "
+                "conteo ni reseñas. Probá SCRAPER_HEADLESS=False o "
+                "SCRAPER_BROWSER_CHANNEL=chrome."
             )
-            tab_resenas.first.click(timeout=5000)
-            print("[Reseñas] Pestaña abierta.")
-        except Exception as e:
-            print(f"[Reseñas] No se pudo abrir la pestaña: {e}")
             return reviews
+        # 1. Abrir la pestaña de reseñas. Si esta variante de Maps no la tiene,
+        #    las reseñas están en la vista general: se scrollea hasta cargarlas.
+        if abrir_pestana_resenas(page):
+            print("[Reseñas] Pestaña abierta.")
+        else:
+            try:
+                print(
+                    "[Reseñas] Pestañas visibles:",
+                    page.locator('[role="tab"]').all_inner_texts(),
+                )
+            except Exception:
+                pass
+            print("[Reseñas] Sin pestaña de reseñas; se buscan en la vista general.")
+            cargar_seccion_resenas(page)
+            abrir_mas_resenas(page)
+            if detectar_selector_resenas(page) is None:
+                print("[Reseñas] No aparecieron tarjetas de reseñas.")
+                volcar_debug_ficha(page, "sin_resenas")
+                return reviews
+        ordenado = ordenar_por_mas_bajas(page)
         # 2. Esperar a que carguen las tarjetas de reseñas
-        selector_tarjetas = 'div.jftiEf[data-review-id]'
+        selector_tarjetas = (
+            detectar_selector_resenas(page, 6000)
+            or 'div.jftiEf[data-review-id]'
+        )
+        print(f"[Reseñas] Selector de tarjetas: {selector_tarjetas}")
         try:
             page.locator(selector_tarjetas).first.wait_for(
                 state="attached",
@@ -197,6 +448,7 @@ def extraer_resenas_negativas(
         # 3. Revisar tarjetas y desplazar el listado
         sin_nuevas = 0
         cantidad_anterior = 0
+        fin_negativas = False
         for intento in range(max_scrolls + 1):
             tarjetas = page.locator(selector_tarjetas)
             cantidad = tarjetas.count()
@@ -217,7 +469,9 @@ def extraer_resenas_negativas(
                     tarjetas_vistas.add(review_id)
                     # Leer estrellas; no asumir que faltantes son 1
                     star_el = tarjeta.locator(
-                        'span.kvMYJc[aria-label]'
+                        'span.kvMYJc[aria-label], '
+                        '[role="img"][aria-label*="estrella" i], '
+                        '[role="img"][aria-label*="star" i]'
                     )
                     if star_el.count() == 0:
                         continue
@@ -228,6 +482,10 @@ def extraer_resenas_negativas(
                     if not match_s:
                         continue
                     estrellas = int(match_s.group(1))
+                    # Ordenadas de menor a mayor: al llegar a 4-5★ ya no hay más negativas
+                    if ordenado and estrellas >= 4:
+                        fin_negativas = True
+                        break
                     if not (1 <= estrellas <= 3):
                         continue
                     # Expandir texto solamente en reseñas negativas
@@ -268,6 +526,9 @@ def extraer_resenas_negativas(
                 except Exception as e:
                     print(f"[Reseñas] Error en tarjeta: {e}")
                     continue
+            if fin_negativas:
+                print("[Reseñas] Ya no hay reseñas negativas (llegaron las 4-5★).")
+                break
             print(
                 f"[Reseñas] Scroll {intento}/{max_scrolls} | "
                 f"Tarjetas revisadas: {len(tarjetas_vistas)} | "
@@ -311,19 +572,11 @@ def extraer_resenas_negativas(
                 )
                 if panel_resenas.count() > 0:
                     panel_resenas.evaluate(
-                        "(element) => element.scrollBy(0, 1200)"
+                        "(element) => element.scrollBy(0, 1500)"
                     )
                 else:
-                    # Alternativa: desplazar la última reseña
-                    ultima_tarjeta = page.locator(
-                        selector_tarjetas
-                    ).last
-                    ultima_tarjeta.scroll_into_view_if_needed(
-                        timeout=3000
-                    )
-                    ultima_tarjeta.hover(timeout=3000)
-                    page.mouse.wheel(0, 1200)
-                micro_pausa(1.0, 1.5)
+                    scrollear_panel(page, 1500)
+                page.wait_for_timeout(1000)
             except Exception as e:
                 print(
                     f"[Reseñas] No se pudo desplazar: {e}"
@@ -343,8 +596,8 @@ def extraer_negocios_google_maps(
     rating_min: float = 1.5,
     rating_max: float = 3.5,
     resenas_min: int = 10,
-    max_tarjetas_negocios: int = 60,
-    max_scrolls_negocios: int = 8,
+    max_tarjetas_negocios: int = 200,
+    max_scrolls_negocios: int = 25,
     debug_interactivo: bool = False,
 ) -> list:
     """Busca negocios en Maps y devuelve leads con análisis o correo general."""
@@ -376,20 +629,38 @@ def extraer_negocios_google_maps(
             print("[Browserless] Conexión establecida correctamente.")
         else:
             print("[Playwright] Iniciando Chromium local...")
-            browser = p.chromium.launch(headless=headless_mode)
+            # Maps cae a la 'vista limitada' si el navegador no tiene WebGL.
+            # Estos flags habilitan WebGL por software en Chromium headless.
+            browser = p.chromium.launch(
+                headless=headless_mode,
+                channel=os.getenv("SCRAPER_BROWSER_CHANNEL", "").strip() or None,
+                args=[
+                    "--use-angle=swiftshader",
+                    "--enable-unsafe-swiftshader",
+                    "--ignore-gpu-blocklist",
+                    "--enable-webgl",
+                ],
+            )
 
-        context = browser.new_context(locale="es-ES")
+        context = browser.new_context(
+            locale="es-ES",
+            viewport={"width": 1366, "height": 900},
+        )
         page = context.new_page()
         page.set_default_timeout(8000)
-        # Reducir recursos descargados sin bloquear scripts o estilos necesarios.
-        page.route(
-            "**/*",
-            lambda route: (
-                route.abort()
-                if route.request.resource_type in ("image", "media", "font")
-                else route.continue_()
-            ),
-        )
+        # Bloquear imágenes/fuentes acelera, pero puede cambiar lo que sirve Maps.
+        # Desactivado por defecto; activar con SCRAPER_BLOCK_RESOURCES=true.
+        if os.getenv("SCRAPER_BLOCK_RESOURCES", "false").lower() in (
+            "true", "1", "yes"
+        ):
+            page.route(
+                "**/*",
+                lambda route: (
+                    route.abort()
+                    if route.request.resource_type in ("image", "media", "font")
+                    else route.continue_()
+                ),
+            )
         try:
             try:
                 page.goto(url, wait_until="domcontentloaded", timeout=35000)
@@ -522,27 +793,67 @@ def extraer_negocios_google_maps(
                             nombre = nombre_preview
                         # Confirmar rating y cantidad de reseñas desde el panel
                         rating_panel, num_resenas_panel = obtener_datos_panel_negocio(page)
+                        histograma = obtener_histograma_resenas(page)
+                        if histograma:
+                            total_h = sum(histograma.values())
+                            if num_resenas_panel is None and total_h:
+                                num_resenas_panel = total_h
+                            bajas = sum(histograma.get(s, 0) for s in (1, 2, 3))
+                            print(
+                                f"[HISTOGRAMA] {histograma} | "
+                                f"1-3★: {bajas / max(total_h, 1):.0%}"
+                            )
+                        # Normalizar a entero: si no hay dato, usamos 0
+                        # (la BD tiene NOT NULL DEFAULT 0)
+                        # Prioridad: panel > tarjeta del listado > 0
+                        resenas_conocidas = (
+                            num_resenas_panel is not None or num_resenas is not None
+                        )
+                        if num_resenas_panel is not None:
+                            if (
+                                num_resenas is not None
+                                and num_resenas != int(num_resenas_panel)
+                            ):
+                                print(
+                                    f"[AVISO] Conteo distinto: tarjeta={num_resenas} "
+                                    f"| panel={num_resenas_panel}"
+                                )
+                            num_resenas = int(num_resenas_panel)
+                        elif num_resenas is None:
+                            num_resenas = 0
                         if rating_panel is not None:
                             rating = rating_panel
-                        if num_resenas_panel is not None:
-                            num_resenas = num_resenas_panel
                         print(
                             f"[PANEL] {nombre} | "
                             f"Rating: {rating} | "
                             f"Reseñas: {num_resenas}"
                         )
                         # Aplicar filtros con los datos actualizados
+                        # NOTA: el contador de reseñas a veces no aparece en el panel
+                        # de Google Maps aun cuando el negocio tiene reseñas. Por eso
+                        # ya no descartamos por "reseñas insuficientes" o "no disponibles".
+                        # Si num_resenas es None o 0, igual guardamos el lead.
                         motivos = []
                         if not rating_min <= rating <= rating_max:
                             motivos.append(
                                 f"rating fuera del rango {rating_min}-{rating_max}"
                             )
-                        if num_resenas is None:
-                            motivos.append("cantidad de reseñas no disponible")
-                        elif num_resenas < resenas_min:
+                        # Filtro de reseñas: solo aplica si el dato es conocido
+                        if resenas_conocidas and num_resenas < resenas_min:
                             motivos.append(
                                 f"reseñas insuficientes ({num_resenas} < {resenas_min})"
                             )
+                        # (antes desactivado para la demo)
+                        # si tenemos dato, lo registramos; si no, igual seguimos.
+                        if num_resenas is not None and num_resenas > 0:
+                            print(
+                                f"[INFO] {nombre} | reseñas disponibles: {num_resenas}"
+                            )
+                        else:
+                            print(
+                                f"[INFO] {nombre} | sin dato de reseñas (igual se guarda)"
+                            )
+                        # Si hubo error de rating, seguimos filtrando solo eso
                         if motivos:
                             print(
                                 f"[DESCARTADO] {nombre} "
@@ -732,8 +1043,8 @@ if __name__ == "__main__":
         rating_min=1.5,
         rating_max=3.5,
         resenas_min=10,
-        max_tarjetas_negocios=60,
-        max_scrolls_negocios=8,
+        max_tarjetas_negocios=200,
+        max_scrolls_negocios=25,
         debug_interactivo=True,
     )
     print("\n--- OBJETO FINAL LISTO PARA FRONTEND / PERSISTENCIA ---")

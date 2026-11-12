@@ -5,7 +5,7 @@ import { useGetFiltrosQuery } from "@/store/api/leadsApi";
 import { resetFiltros, setFiltro } from "@/store/slices/uiSlice";
 import {
   CANALES,
-  CIUDADES,
+  CIUDADES_LISTA,
   ESTADOS,
   PROBLEMAS,
   RUBROS,
@@ -45,9 +45,15 @@ export function LeadFilters({ total }: { total: number }) {
 
   // En modo backend los desplegables salen de GET /api/leads/filtros.
   // Si todavía no respondió (o estamos en modo mock) usamos las constantes.
+  // Validamos con Array.isArray por si la API devuelve un formato inesperado.
   const ciudades =
-    opciones && opciones.ciudades.length > 0 ? opciones.ciudades : CIUDADES;
-  const rubros = opciones && opciones.rubros.length > 0 ? opciones.rubros : RUBROS;
+    opciones && Array.isArray(opciones.ciudades) && opciones.ciudades.length > 0
+      ? opciones.ciudades
+      : CIUDADES_LISTA;
+  const rubros =
+    opciones && Array.isArray(opciones.rubros) && opciones.rubros.length > 0
+      ? opciones.rubros
+      : RUBROS;
 
   const set = (key: keyof LeadQuery) => (value: string) =>
     dispatch(setFiltro({ key, value }));

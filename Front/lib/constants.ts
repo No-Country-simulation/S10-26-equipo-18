@@ -193,6 +193,9 @@ export const CIUDADES = {
   ],
 };
 
+/** Nombres de ciudades para desplegables y datos mock. */
+export const CIUDADES_LISTA = Object.keys(CIUDADES);
+
 export const RUBROS = [
   "Restaurantes",
   "Clínicas Dentales",

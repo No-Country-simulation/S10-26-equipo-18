@@ -26,7 +26,7 @@ export const USING_BACKEND = Boolean(API_URL);
 
 const API_BASE = API_URL ? `${API_URL.replace(/\/+$/, "")}/api` : "";
 const SCAN_POLL_MS = 2500;
-const SCAN_TIMEOUT_MS = 6 * 60 * 1000;
+const SCAN_TIMEOUT_MS = 15 * 60 * 1000;
 
 const realBaseQuery = fetchBaseQuery({
   baseUrl: API_BASE || "/api",
@@ -101,9 +101,9 @@ async function ejecutarEscaneoReal(
   signal: AbortSignal,
 ): Promise<{ data: ScanResult } | QueryError> {
   const payload = {
-    ciudad: body.ciudad.trim(),
+    ciudad: body.barrio ? `${body.barrio}, ${body.ciudad}`.trim() : body.ciudad.trim(),
     rubro: body.rubro.trim(),
-    max_resultados: Math.min(5, Math.max(1, body.maxResultados ?? 2)),
+    max_resultados: Math.min(10, Math.max(1, body.maxResultados ?? 2)),
     rating_min: body.ratingMin ?? 1.5,
     rating_max: body.ratingMax,
     resenas_min: Math.max(0, Math.floor(body.resenasMin)),
@@ -126,7 +126,7 @@ async function ejecutarEscaneoReal(
     while (!scan || scan.estado === "en_progreso") {
       if (Date.now() > limite) {
         return customError(
-          "El escaneo superó el tiempo máximo de espera (6 minutos).",
+          "El escaneo superó el tiempo máximo de espera (15 minutos).",
         );
       }
 
@@ -239,8 +239,8 @@ export const leadsApi = createApi({
         const datos = (resultado.data ?? {}) as Partial<FiltrosResponse>;
         return {
           data: {
-            ciudades: datos.ciudades ?? [],
-            rubros: datos.rubros ?? [],
+            ciudades: Array.isArray(datos.ciudades) ? datos.ciudades : [],
+            rubros: Array.isArray(datos.rubros) ? datos.rubros : [],
           },
         };
       },

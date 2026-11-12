@@ -19,6 +19,7 @@ const hora = () =>
 
 export default function NuevaBusquedaPage() {
   const [ciudad, setCiudad] = useState("Buenos Aires");
+  const [barrio, setBarrio] = useState(CIUDADES["Buenos Aires"][0]);
   const [rubro, setRubro] = useState("Restaurantes");
   const [plataformas, setPlataformas] = useState<string[]>(["Google Maps"]);
   const [ratingMax, setRatingMax] = useState(3.5);
@@ -34,7 +35,8 @@ export default function NuevaBusquedaPage() {
 
   function push(texto: string, tipo: LogLine["tipo"] = "info") {
     idRef.current += 1;
-    setLogs((l) => [...l, { id: idRef.current, hora: hora(), texto, tipo }]);
+    const item = { id: idRef.current, hora: hora(), texto, tipo };
+    setLogs((l) => [...l, item]);
   }
 
   function togglePlataforma(p: string) {
@@ -57,7 +59,7 @@ export default function NuevaBusquedaPage() {
         ? plataformas
         : ["Google Maps"];
 
-    push(`[INIT] Configurando radar · ${ciudad} · ${rubro}`);
+    push(`[INIT] Configurando radar · ${ciudad} › ${barrio} · ${rubro}`);
     push(
       `[NET] POST /api/scans · ${plataformasEfectivas.join(" + ")} · máx. ${maxResultados} negocios`,
     );
@@ -75,6 +77,7 @@ export default function NuevaBusquedaPage() {
     try {
       const res = await createScan({
         ciudad,
+        barrio,
         rubro,
         plataformas: plataformasEfectivas,
         ratingMin: 1.5,
@@ -114,10 +117,13 @@ export default function NuevaBusquedaPage() {
           <div>
             <p className="label">Ciudad</p>
             <div className="flex flex-wrap gap-2">
-              {CIUDADES.map((c) => (
+              {Object.keys(CIUDADES).map((c) => (
                 <button
                   key={c}
-                  onClick={() => setCiudad(c)}
+                  onClick={() => {
+                    setCiudad(c);
+                    setBarrio(CIUDADES[c as keyof typeof CIUDADES][0]);
+                  }}
                   disabled={running}
                   className={cn(
                     "rounded-lg border px-3 py-1.5 text-xs font-medium transition disabled:opacity-50",
@@ -127,6 +133,27 @@ export default function NuevaBusquedaPage() {
                   )}
                 >
                   {c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="label">Barrio</p>
+            <div className="flex flex-wrap gap-2">
+              {CIUDADES[ciudad as keyof typeof CIUDADES].map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setBarrio(b)}
+                  disabled={running}
+                  className={cn(
+                    "rounded-lg border px-3 py-1.5 text-xs font-medium transition disabled:opacity-50",
+                    barrio === b
+                      ? "border-primary/40 bg-primary/10 text-primary"
+                      : "border-line bg-bg text-slate-400 hover:text-slate-200",
+                  )}
+                >
+                  {b}
                 </button>
               ))}
             </div>
@@ -253,7 +280,7 @@ export default function NuevaBusquedaPage() {
             <input
               type="range"
               min={1}
-              max={5}
+              max={10}
               step={1}
               value={maxResultados}
               disabled={running}
@@ -261,8 +288,8 @@ export default function NuevaBusquedaPage() {
               className="w-full accent-primary"
             />
             <p className="mt-1 text-[11px] text-slate-500">
-              El backend acepta entre 1 y 5 resultados por escaneo (por defecto
-              2).
+              El backend acepta entre 1 y 10 resultados por escaneo (por defecto
+              2). Subilo si querés más leads en la misma búsqueda.
             </p>
           </div>
 
