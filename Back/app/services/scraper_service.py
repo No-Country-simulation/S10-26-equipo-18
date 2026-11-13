@@ -25,89 +25,126 @@ if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-def micro_pausa(min_s: float = 0.3, max_s: float = 0.6) -> None:
-    """Pausa breve para permitir actualizaciones de la interfaz."""
+
+
+def micro_pausa(min_s: float = 0.2, max_s: float = 0.4) -> None:
+    """Pausa breve para permitir actualizaciones del DOM."""
     time.sleep(random.uniform(min_s, max_s))
-def esperar_ficha_negocio(page, nombre_esperado, timeout_ms=12000):
+
+
+def parsear_tarjetas_feed_en_bloque(page) -> list:
     """
-    Espera a que Google Maps abra la ficha del negocio
-    seleccionado y verifica que el nombre coincida.
+    Extrae la metadata de todas las tarjetas visibles en el feed
+    mediante una única ejecución en JavaScript (1 solo viaje de red CDP).
+    Esto reduce drásticamente la latencia en Browserless remoto.
     """
-    nombre_esperado = " ".join(nombre_esperado.casefold().split())
+    js_code = """
+    () => {
+        const feed = document.querySelector('div[role="feed"]');
+        if (!feed) return [];
+        const articles = feed.querySelectorAll('div[role="article"]');
+        const items = [];
+        
+        articles.forEach((art, idx) => {
+            const fullText = art.innerText || '';
+            const lines = fullText.split('\\n').map(l => l.trim()).filter(Boolean);
+            const name = lines[0] || '';
+            if (!name) return;
+
+            // Extraer Rating: ej "3,2", "3.2", "3,2 estrellas"
+            let rating = null;
+            const ratingMatch = fullText.match(/(\\d+[.,]\\d+)\\s*(?:★|estrellas)?/);
+            if (ratingMatch) {
+                rating = parseFloat(ratingMatch[1].replace(',', '.'));
+            }
+
+            // Extraer cantidad de reseñas: ej "(15)", "(1.230)", "(14 reseñas)"
+            let reviews = null;
+            const revMatch = fullText.match(/\\(([\\d.,]+)\\)/) || fullText.match(/([\\d.,]+)\\s*(?:reseñas?|reviews?)/i);
+            if (revMatch) {
+                reviews = parseInt(revMatch[1].replace(/\\D/g, ''), 10);
+            }
+
+            // Link a la ficha si está presente
+            const link = art.querySelector('a[href*="/maps/place/"]');
+            const href = link ? link.getAttribute('href') : null;
+
+            items.push({
+                index: idx,
+                nombre: name,
+                rating: rating,
+                numResenas: reviews,
+                href: href
+            });
+        });
+        return items;
+    }
+    """
+    try:
+        return page.evaluate(js_code) or []
+    except Exception as e:
+        print(f"[Scraper] Error evaluando feed en bloque: {e}")
+        return []
+
+
+def volver_al_feed(page, timeout_ms: int = 5000) -> bool:
+    """
+    CORRECCIÓN CRÍTICA:
+    Regresa al feed principal de resultados después de haber abierto
+    la ficha de un negocio, evitando que el scraper quede atrapado.
+    """
+    try:
+        # 1. Intentar hacer clic en el botón Atrás oficial de Google Maps
+        btn_atras = page.locator(
+            'button[aria-label*="Atrás" i], '
+            'button[aria-label*="Back" i], '
+            'button[jsaction*="back"], '
+            'button[aria-label*="Volver" i]'
+        ).first
+
+        if btn_atras.count() > 0 and btn_atras.is_visible():
+            btn_atras.click(timeout=2500)
+            page.locator('div[role="feed"]').first.wait_for(
+                state="visible",
+                timeout=timeout_ms
+            )
+            return True
+    except Exception:
+        pass
+
+    try:
+        # 2. Alternativa: navegación histórica del navegador
+        page.go_back(timeout=3000)
+        page.locator('div[role="feed"]').first.wait_for(
+            state="visible",
+            timeout=timeout_ms
+        )
+        return True
+    except Exception:
+        pass
+
+    return False
+
+
+def esperar_ficha_negocio(page, nombre_esperado: str, timeout_ms: int = 6000) -> bool:
+    """
+    Espera a que Google Maps abra la ficha del negocio seleccionado.
+    """
     limite = time.monotonic() + timeout_ms / 1000
     while time.monotonic() < limite:
         try:
             titulo = page.locator("h1.DUwDvf").first
             if titulo.count() > 0 and titulo.is_visible():
-                nombre_actual = " ".join(
-                    titulo.inner_text(timeout=1000).casefold().split()
-                )
-                if nombre_actual == nombre_esperado:
-                    return True
+                return True
         except Exception:
             pass
-        page.wait_for_timeout(400)
+        page.wait_for_timeout(250)
     return False
-def abrir_ficha_con_reintento(
-    page,
-    nombre_esperado,
-    max_intentos=2
-):
+
+
+def obtener_datos_panel_negocio(page) -> tuple:
     """
-    Intenta abrir la ficha de un negocio en Google Maps.
-    Si la ficha no se abre correctamente, realiza
-    un segundo intento antes de descartarla.
-    """
-    for intento in range(1, max_intentos + 1):
-        try:
-            print(
-                f"[Ficha] Abriendo '{nombre_esperado}' "
-                f"(intento {intento}/{max_intentos})"
-            )
-            # Volver a localizar la tarjeta por nombre.
-            # Evita reutilizar un elemento que Maps haya reemplazado.
-            tarjetas = page.locator(
-                'div[role="feed"] div[role="article"]'
-            )
-            tarjeta_actual = None
-            for i in range(tarjetas.count()):
-                candidata = tarjetas.nth(i)
-                texto = candidata.inner_text(timeout=2000)
-                nombre = texto.split("\n")[0].strip()
-                if nombre.casefold() == nombre_esperado.casefold():
-                    tarjeta_actual = candidata
-                    break
-            if tarjeta_actual is None:
-                print(
-                    f"[Ficha] No se encontró nuevamente "
-                    f"'{nombre_esperado}' en el listado."
-                )
-                return False
-            tarjeta_actual.click(timeout=5000)
-            if esperar_ficha_negocio(
-                page,
-                nombre_esperado,
-                timeout_ms=10000
-            ):
-                print(
-                    f"[Ficha] Abierta correctamente: "
-                    f"{nombre_esperado}"
-                )
-                return True
-            print(
-                f"[Ficha] No se confirmó la apertura "
-                f"en el intento {intento}."
-            )
-        except Exception as exc:
-            print(
-                f"[Ficha] Error en intento {intento}: {exc}"
-            )
-        if intento < max_intentos:
-            page.wait_for_timeout(1200)
-    return False
-def obtener_datos_panel_negocio(page):
-    """
-    Obtiene el rating y la cantidad de reseñas
+    Obtiene el rating y la cantidad de reseñas confirmadas
     desde la ficha abierta de Google Maps.
     """
     rating = None
@@ -117,225 +154,174 @@ def obtener_datos_panel_negocio(page):
             "div.F7nice span[aria-hidden='true']"
         ).first
         if rating_locator.count() > 0:
-            texto_rating = rating_locator.inner_text().strip()
+            texto_rating = rating_locator.inner_text(timeout=1500).strip()
             match = re.search(r"\d+[.,]\d+", texto_rating)
             if match:
-                rating = float(
-                    match.group(0).replace(",", ".")
-                )
-        # Buscar el contador dentro del panel del negocio abierto
+                rating = float(match.group(0).replace(",", "."))
+
         resenas_locator = page.locator(
             "div.F7nice span[aria-label*='reseña' i], "
             "div.F7nice span[aria-label*='review' i]"
         )
 
         for i in range(resenas_locator.count()):
-            aria_label = (
-                resenas_locator.nth(i).get_attribute("aria-label")
-                or ""
-            )
-
+            aria_label = resenas_locator.nth(i).get_attribute("aria-label") or ""
             match = re.search(
                 r"(\d[\d.,\s]*)\s*(?:reseñas?|reviews?)",
                 aria_label,
                 re.IGNORECASE
             )
-
             if match:
-                num_resenas = int(
-                    re.sub(r"\D", "", match.group(1))
-                )
+                num_resenas = int(re.sub(r"\D", "", match.group(1)))
                 break
     except Exception as error:
         print(f"[Scraper] Error leyendo panel: {error}")
+
     return rating, num_resenas
+
+
+def ordenar_resenas_mas_bajas(page) -> bool:
+    """
+    Cambia el filtro de reseñas a 'Más bajas' para obtener de inmediato
+    las reseñas negativas sin tener que hacer scrolls infinitos.
+    """
+    try:
+        btn_ordenar = page.locator(
+            'button[aria-label*="Ordenar" i], '
+            'button[data-value="Ordenar"], '
+            'button:has-text("Ordenar"), '
+            'button[aria-label*="Sort" i]'
+        ).first
+
+        if btn_ordenar.count() > 0 and btn_ordenar.is_visible():
+            btn_ordenar.click(timeout=2000)
+            page.wait_for_timeout(350)
+
+            opcion_bajas = page.locator(
+                'div[role="menuitemradio"]:has-text("baja"), '
+                'div[role="menuitem"]:has-text("baja"), '
+                'div[role="menuitemradio"]:has-text("lowest" i)'
+            ).first
+
+            if opcion_bajas.count() > 0 and opcion_bajas.is_visible():
+                opcion_bajas.click(timeout=2000)
+                page.wait_for_timeout(800)
+                print("[Reseñas] Filtro 'Más bajas' aplicado.")
+                return True
+    except Exception:
+        pass
+    return False
+
+
 def extraer_resenas_negativas(
     page,
     max_resenas: int = 5,
-    max_tarjetas: int = 60,
-    max_scrolls: int = 8
+    max_scrolls: int = 2
 ) -> list:
     """
-    Recorre progresivamente las reseñas visibles, con límites
-    de tarjetas y desplazamientos.
+    Extrae hasta 5 reseñas negativas optimizando la interacción por bloques JS.
     """
     reviews = []
-    textos_vistos = set()
-    tarjetas_vistas = set()
     try:
-        # 1. Esperar la pestaña de reseñas
+        # 1. Pestaña de reseñas
         tab_resenas = page.get_by_role(
             "tab",
-            name=re.compile(r"Reseñas|Opiniones", re.IGNORECASE)
-        )
+            name=re.compile(r"Reseñas|Opiniones|Reviews", re.IGNORECASE)
+        ).first
+
         try:
-            tab_resenas.first.wait_for(
-                state="visible",
-                timeout=10000
-            )
-            tab_resenas.first.click(timeout=5000)
-            print("[Reseñas] Pestaña abierta.")
-        except Exception as e:
-            print(f"[Reseñas] No se pudo abrir la pestaña: {e}")
+            tab_resenas.wait_for(state="visible", timeout=4000)
+            tab_resenas.click(timeout=3000)
+            print("[Reseñas] Pestaña de reseñas abierta.")
+        except Exception:
             return reviews
-        # 2. Esperar a que carguen las tarjetas de reseñas
+
+        # 2. Ordenar por más bajas para capturar las quejas de inmediato
+        ordenar_resenas_mas_bajas(page)
+
         selector_tarjetas = 'div.jftiEf[data-review-id]'
         try:
             page.locator(selector_tarjetas).first.wait_for(
                 state="attached",
-                timeout=12000
+                timeout=5000
             )
-            print("[Reseñas] Tarjetas cargadas correctamente.")
-            # Esperar a que Google Maps estabilice el panel
-            page.wait_for_timeout(2000)
         except PlaywrightTimeoutError:
-            print(
-                "[Reseñas] No se encontraron tarjetas "
-                "con el selector principal."
-            )
+            print("[Reseñas] No se encontraron tarjetas de reseñas.")
             return reviews
-        # 3. Revisar tarjetas y desplazar el listado
-        sin_nuevas = 0
-        cantidad_anterior = 0
+
+        # 3. Expandir textos truncados ("Más" / "Ver más") de una sola vez
+        try:
+            page.evaluate("""
+                () => {
+                    const btns = document.querySelectorAll('button.w8nwRe, button[aria-label*="ver más" i]');
+                    btns.forEach(b => b.click());
+                }
+            """)
+        except Exception:
+            pass
+
+        # 4. Extraer reseñas negativas mediante evaluate en un solo paso
+        js_extract_reviews = """
+        () => {
+            const cards = document.querySelectorAll('div.jftiEf[data-review-id]');
+            const results = [];
+            cards.forEach(card => {
+                if (results.length >= 5) return;
+                
+                // Estrellas
+                let stars = 0;
+                const starEl = card.querySelector('span.kvMYJc[aria-label]');
+                if (starEl) {
+                    const m = (starEl.getAttribute('aria-label') || '').match(/(\\d+)/);
+                    if (m) stars = parseInt(m[1], 10);
+                }
+                
+                // Filtrar solo negativas (1 a 3 estrellas)
+                if (stars < 1 || stars > 3) return;
+
+                const textEl = card.querySelector('span.wiI7pd');
+                const text = textEl ? textEl.innerText.trim() : '';
+                if (!text) return;
+
+                const authorEl = card.querySelector('div.d4r55');
+                const author = authorEl ? authorEl.innerText.trim() : 'Usuario Anónimo';
+
+                results.push({
+                    autor: author,
+                    fecha: null,
+                    texto: text,
+                    estrellas: stars
+                });
+            });
+            return results;
+        }
+        """
+
         for intento in range(max_scrolls + 1):
-            tarjetas = page.locator(selector_tarjetas)
-            cantidad = tarjetas.count()
-            for i in range(cantidad):
-                if len(reviews) >= max_resenas:
-                    break
-                if len(tarjetas_vistas) >= max_tarjetas:
-                    break
-                try:
-                    tarjeta = tarjetas.nth(i)
-                    review_id = tarjeta.get_attribute(
-                        "data-review-id"
-                    )
-                    if not review_id:
-                        continue
-                    if review_id in tarjetas_vistas:
-                        continue
-                    tarjetas_vistas.add(review_id)
-                    # Leer estrellas; no asumir que faltantes son 1
-                    star_el = tarjeta.locator(
-                        'span.kvMYJc[aria-label]'
-                    )
-                    if star_el.count() == 0:
-                        continue
-                    aria_star = (
-                        star_el.first.get_attribute("aria-label") or ""
-                    )
-                    match_s = re.search(r"(\d+)", aria_star)
-                    if not match_s:
-                        continue
-                    estrellas = int(match_s.group(1))
-                    if not (1 <= estrellas <= 3):
-                        continue
-                    # Expandir texto solamente en reseñas negativas
-                    botones_mas = tarjeta.locator(
-                        'button:has-text("Más"), '
-                        'button[aria-label*="ver más"]'
-                    )
-                    if botones_mas.count() > 0:
-                        try:
-                            botones_mas.first.click(timeout=1500)
-                        except Exception:
-                            pass
-                    texto_el = tarjeta.locator(
-                        "span.wiI7pd"
-                    )
-                    if texto_el.count() == 0:
-                        continue
-                    texto = texto_el.first.inner_text().strip()
-                    if not texto or texto in textos_vistos:
-                        continue
-                    autor_el = tarjeta.locator("div.d4r55")
-                    autor = (
-                        autor_el.first.inner_text().strip()
-                        if autor_el.count() > 0
-                        else "Usuario Anónimo"
-                    )
-                    textos_vistos.add(texto)
-                    reviews.append({
-                        "autor": autor,
-                        "fecha": None,
-                        "texto": texto,
-                        "estrellas": estrellas
-                    })
-                    print(
-                        f"[Reseñas] Negativa encontrada: "
-                        f"{estrellas}★"
-                    )
-                except Exception as e:
-                    print(f"[Reseñas] Error en tarjeta: {e}")
-                    continue
-            print(
-                f"[Reseñas] Scroll {intento}/{max_scrolls} | "
-                f"Tarjetas revisadas: {len(tarjetas_vistas)} | "
-                f"Negativas: {len(reviews)}"
-            )
-            # Detectar cuando dejan de aparecer reseñas nuevas
-            if len(tarjetas_vistas) == cantidad_anterior:
-                sin_nuevas += 1
-            else:
-                sin_nuevas = 0
-            cantidad_anterior = len(tarjetas_vistas)
-            if sin_nuevas >= 2:
-                print(
-                    "[Reseñas] No aparecen nuevas opiniones. "
-                    "Se detiene la búsqueda."
-                )
-                break
-            # Condiciones de finalización
+            reviews = page.evaluate(js_extract_reviews) or []
             if len(reviews) >= max_resenas:
                 break
-            if len(tarjetas_vistas) >= max_tarjetas:
-                break
-            if intento >= max_scrolls:
-                break
-            # 4. Desplazar el panel de reseñas
-            try:
-                if page.locator(selector_tarjetas).count() == 0:
-                    print(
-                        "[Reseñas] No hay tarjetas disponibles "
-                        "para desplazar."
-                    )
+
+            if intento < max_scrolls:
+                # Si faltan reseñas, hacer un scroll rápido del contenedor
+                try:
+                    page.evaluate("""
+                        () => {
+                            const panel = document.querySelector('div.m6QErb.DxyBCb');
+                            if (panel) panel.scrollBy(0, 1000);
+                        }
+                    """)
+                    micro_pausa(0.4, 0.7)
+                except Exception:
                     break
-                # Buscar el contenedor desplazable
-                panel_resenas = page.locator(
-                    'div[data-review-id]'
-                ).first.locator(
-                    'xpath=ancestor::*['
-                    'contains(@class, "m6QErb")'
-                    ' and contains(@class, "DxyBCb")'
-                    '][1]'
-                )
-                if panel_resenas.count() > 0:
-                    panel_resenas.evaluate(
-                        "(element) => element.scrollBy(0, 1200)"
-                    )
-                else:
-                    # Alternativa: desplazar la última reseña
-                    ultima_tarjeta = page.locator(
-                        selector_tarjetas
-                    ).last
-                    ultima_tarjeta.scroll_into_view_if_needed(
-                        timeout=3000
-                    )
-                    ultima_tarjeta.hover(timeout=3000)
-                    page.mouse.wheel(0, 1200)
-                micro_pausa(1.0, 1.5)
-            except Exception as e:
-                print(
-                    f"[Reseñas] No se pudo desplazar: {e}"
-                )
-                break
-        print(
-            f"[Reseñas] Finalizado. "
-            f"Negativas extraídas: {len(reviews)}"
-        )
+
+        print(f"[Reseñas] Negativas extraídas: {len(reviews)}")
     except Exception as e:
-        print(f"[Reseñas] Error general: {e}")
-    return reviews
+        print(f"[Reseñas] Error general al extraer reseñas: {e}")
+
+    return reviews[:max_resenas]
+
+
 def extraer_negocios_google_maps(
     ciudad: str,
     rubro: str,
@@ -343,29 +329,33 @@ def extraer_negocios_google_maps(
     rating_min: float = 1.5,
     rating_max: float = 3.5,
     resenas_min: int = 10,
-    max_tarjetas_negocios: int = 60,
-    max_scrolls_negocios: int = 8,
+    max_tarjetas_negocios: int = 40,
+    max_scrolls_negocios: int = 5,
     debug_interactivo: bool = False,
 ) -> list:
-    """Busca negocios en Maps y devuelve leads con análisis o correo general."""
+    """Busca negocios en Google Maps y devuelve leads calificados con análisis."""
     query = f"{rubro} en {ciudad}"
     url = f"https://www.google.com/maps/search/{quote(query)}?hl=es"
     leads_encontrados = []
     fecha_actual = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
     print(f"\n[RepuSense Pipeline] Buscando '{rubro}' en '{ciudad}'...")
     print(
         f"[Filtros: Rating {rating_min}★ - {rating_max}★ "
         f"| Min. Reseñas >= {resenas_min}]"
     )
+
     headless_mode = os.getenv("SCRAPER_HEADLESS", "True").lower() in (
         "true", "1", "yes"
     )
     browserless_url = os.getenv("BROWSERLESS_URL", "").strip()
+
     if os.getenv("RENDER") and not browserless_url:
         raise RuntimeError(
             "BROWSERLESS_URL no está configurada en Render. "
             "El scraper necesita Browserless para ejecutarse."
         )
+
     with sync_playwright() as p:
         if browserless_url:
             print("[Browserless] Conectando al navegador remoto...")
@@ -380,8 +370,9 @@ def extraer_negocios_google_maps(
 
         context = browser.new_context(locale="es-ES")
         page = context.new_page()
-        page.set_default_timeout(8000)
-        # Reducir recursos descargados sin bloquear scripts o estilos necesarios.
+        page.set_default_timeout(7000)
+
+        # Bloquear imágenes, fuentes, estilos pesados y medios para máxima velocidad
         page.route(
             "**/*",
             lambda route: (
@@ -390,11 +381,14 @@ def extraer_negocios_google_maps(
                 else route.continue_()
             ),
         )
+
         try:
             try:
-                page.goto(url, wait_until="domcontentloaded", timeout=35000)
+                page.goto(url, wait_until="domcontentloaded", timeout=25000)
             except PlaywrightTimeoutError:
                 print("[Scraper] La navegación demoró; comprobando si cargó Maps...")
+
+            # Gestionar consentimiento de Google (cookies)
             try:
                 consentimiento = page.get_by_role(
                     "button",
@@ -403,338 +397,203 @@ def extraer_negocios_google_maps(
                         re.IGNORECASE,
                     ),
                 )
-
                 if consentimiento.count() > 0:
-                    consentimiento.first.click(timeout=5000)
+                    consentimiento.first.click(timeout=3000)
                     print("[Scraper] Consentimiento de Google gestionado.")
-            except Exception as error:
-                print(
-                    f"[Scraper] No se pudo gestionar el consentimiento: "
-                    f"{type(error).__name__}"
-                )
-            try:
-                page.locator('div[role="feed"]').first.wait_for(timeout=20000)
+            except Exception:
+                pass
 
+            try:
+                page.locator('div[role="feed"]').first.wait_for(timeout=15000)
             except PlaywrightTimeoutError as error:
                 print("[Scraper] No se encontró el listado de negocios.")
-                print(f"[Scraper] URL actual: {page.url}")
-                print(f"[Scraper] Título: {page.title()}")
-
                 raise RuntimeError(
                     "Google Maps no cargó el listado de negocios. "
-                    "Revisar consentimiento, navegación o acceso desde Browserless."
+                    "Revisar consentimiento o acceso desde Browserless."
                 ) from error
-            # Recorrer progresivamente los negocios de Google Maps
-            feed = page.locator('div[role="feed"]').first
-            nombres_vistos = set()
-            tarjetas_inspeccionadas = set()
+
+            nombres_inspeccionados = set()
             scrolls_realizados = 0
-            intentos_sin_nuevas = 0
-            total_inspeccionadas = 0
+
             while (
                 len(leads_encontrados) < max_resultados
-                and total_inspeccionadas < max_tarjetas_negocios
+                and len(nombres_inspeccionados) < max_tarjetas_negocios
+                and scrolls_realizados <= max_scrolls_negocios
             ):
-                cards = feed.locator('div[role="article"]')
-                total_cards = cards.count()
+                # 1. Analizar todas las tarjetas del feed de una vez en JavaScript
+                candidatos = parsear_tarjetas_feed_en_bloque(page)
                 print(
-                    f"\n[Negocios] Tarjetas disponibles: {total_cards} "
-                    f"| Inspeccionadas: {total_inspeccionadas} "
-                    f"| Leads: {len(leads_encontrados)}/{max_resultados}"
+                    f"\n[Negocios] Tarjetas visibles: {len(candidatos)} "
+                    f"| Leads encontrados: {len(leads_encontrados)}/{max_resultados}"
                 )
-                nuevas_en_ronda = 0
-                for i in range(total_cards):
-                    if (
-                        len(leads_encontrados) >= max_resultados
-                        or total_inspeccionadas >= max_tarjetas_negocios
-                    ):
+
+                encontrado_en_ronda = False
+
+                for cand in candidatos:
+                    if len(leads_encontrados) >= max_resultados:
                         break
-                    nombre_preview = f"tarjeta {i + 1}"
-                    try:
-                        # Volver a localizar la tarjeta porque Maps
-                        # puede actualizar el listado dinámicamente
-                        card = feed.locator(
-                            'div[role="article"]'
-                        ).nth(i)
-                        card_text = card.inner_text(timeout=3000)
-                        nombre_preview = card_text.split("\n")[0].strip()
-                        if not nombre_preview:
-                            continue
-                        clave = nombre_preview.casefold()
-                        if clave in tarjetas_inspeccionadas:
-                            continue
-                        tarjetas_inspeccionadas.add(clave)
-                        total_inspeccionadas += 1
-                        nuevas_en_ronda += 1
-                        # Obtener rating
-                        match_rating = re.search(
-                            r"(\d+[.,]\d+)\s*(?:★|estrellas)?",
-                            card_text
-                        )
-                        rating = (
-                            float(
-                                match_rating.group(1).replace(",", ".")
-                            )
-                            if match_rating else 0.0
-                        )
-                        # Obtener cantidad de reseñas
-                        match_resenas = re.search(
-                            r"\((\d[\d.,]*)\)",
-                            card_text
-                        )
-                        num_resenas = (
-                            int(
-                                re.sub(
-                                    r"\D", "",
-                                    match_resenas.group(1)
-                                )
-                            )
-                            if match_resenas else None
-                        )
-                        if clave in nombres_vistos:
-                            print(f"[DUPLICADO] {nombre_preview}")
-                            continue
 
-                        # Descartar negocios fuera del rango sin abrir la ficha
-                        if rating > 0 and not (rating_min <= rating <= rating_max):
-                            print(
-                                f"[FILTRO RAPIDO] {nombre_preview} | "
-                                f"Rating: {rating} | Fuera de rango"
-                            )
-                            continue
+                    nombre_cand = cand["nombre"]
+                    clave = nombre_cand.casefold().strip()
 
-                        # Abrir ficha del negocio con reintento
-                        if not abrir_ficha_con_reintento(
-                            page,
-                            nombre_preview,
-                            max_intentos=2
-                        ):
-                            print(
-                                f"[Scraper] No se pudo abrir "
-                                f"'{nombre_preview}' después "
-                                f"de 2 intentos. Se omite."
-                            )
-                            continue
-                        nombre = page.locator(
-                            "h1.DUwDvf"
-                        ).first.inner_text().strip()
-                        if not nombre:
-                            nombre = nombre_preview
-                        # Confirmar rating y cantidad de reseñas desde el panel
-                        rating_panel, num_resenas_panel = obtener_datos_panel_negocio(page)
-                        if rating_panel is not None:
-                            rating = rating_panel
-                        if num_resenas_panel is not None:
-                            num_resenas = num_resenas_panel
-                        print(
-                            f"[PANEL] {nombre} | "
-                            f"Rating: {rating} | "
-                            f"Reseñas: {num_resenas}"
-                        )
-                        # Aplicar filtros con los datos actualizados
-                        motivos = []
-                        if not rating_min <= rating <= rating_max:
-                            motivos.append(
-                                f"rating fuera del rango {rating_min}-{rating_max}"
-                            )
-                        if num_resenas is None:
-                            motivos.append("cantidad de reseñas no disponible")
-                        elif num_resenas < resenas_min:
-                            motivos.append(
-                                f"reseñas insuficientes ({num_resenas} < {resenas_min})"
-                            )
-                        if motivos:
-                            print(
-                                f"[DESCARTADO] {nombre} "
-                                f"| Motivo: {', '.join(motivos)}"
-                            )
-                            continue
-                        if nombre.casefold() in nombres_vistos:
-                            continue
-                        nombres_vistos.add(nombre.casefold())
-                        print(
-                            f"-> [CALIFICA] {nombre} "
-                            f"({rating}★ | {num_resenas} reseñas)"
-                        )
-                        # Sitio web (dato opcional)
-                        web = None
-                        try:
-                            web_el = page.locator(
-                                'a[data-item-id="authority"]'
-                            ).first
-                            if web_el.count() > 0:
-                                web = web_el.get_attribute(
-                                    "href",
-                                    timeout=2000
-                                )
-                        except PlaywrightTimeoutError:
-                            print(
-                                f"[Scraper] No se pudo leer la web "
-                                f"de '{nombre}'. Se continúa sin web."
-                            )
-
-                        # Enriquecimiento de contactos desde la web del negocio
-                        datos_contacto = {"email": None, "linkedin": None}
-
-                        if web:
-                            try:
-                                with concurrent.futures.ThreadPoolExecutor() as executor:
-                                    future = executor.submit(extraer_contacto_web, web)
-                                    datos_contacto = future.result(timeout=15)
-                            except Exception as exc:
-                                print(
-                                    f"[Enrichment] No se pudieron obtener "
-                                    f"contactos de '{nombre}': {exc}"
-                                )
-
-                        # Teléfono
-                        telefono = None
-                        try:
-                            tel_el = page.locator(
-                                'button[data-item-id^="phone:"]'
-                            ).first
-                            if tel_el.count() > 0:
-                                telefono_raw = tel_el.inner_text(
-                                    timeout=2000
-                                ).strip()
-                                telefono = re.sub(
-                                    r"[^\d+\s\-()]",
-                                    "",
-                                    telefono_raw
-                                ).strip() or None
-                        except PlaywrightTimeoutError:
-                            print(
-                                f"[Scraper] No se pudo leer el teléfono "
-                                f"de '{nombre}'. Se continúa sin teléfono."
-                            )
-                        # Extraer reseñas negativas
-                        quejas = extraer_resenas_negativas(
-                            page,
-                            max_resenas=5,
-                            max_tarjetas=60,
-                            max_scrolls=8
-                        )
-                        if quejas:
-                            print(
-                                f"   Quejas recolectadas: {len(quejas)}. "
-                                "Analizando con Gemini..."
-                            )
-                            enriquecimiento = analizar_con_ia(
-                                nombre, rubro, ciudad, quejas
-                            )
-                        else:
-                            print(
-                                "[Aviso] No se encontraron reseñas negativas accesibles. "
-                                "Se generará un correo comercial general."
-                            )
-                            enriquecimiento = fallback_local(nombre)
-                        lead = {
-                            "id": (
-                                f"lead-"
-                                f"{re.sub(r'[^a-z0-9]', '', ciudad.lower())[:3]}-"
-                                f"{random.randint(100, 999)}"
-                            ),
-                            "nombre": nombre,
-                            "rubro": rubro,
-                            "ciudad": ciudad,
-                            "fuente": "Google Maps",
-                            "rating": rating,
-                            "numResenas": num_resenas,
-                            "telefono": telefono,
-                            "web": web,
-                            "email": datos_contacto.get("email"),
-                            "linkedin": datos_contacto.get("linkedin"),
-                            "problema": enriquecimiento["problema"],
-                            "confianzaIA": enriquecimiento["confianzaIA"],
-                            "reviewsNegativas": quejas,
-                            "draft": enriquecimiento["draft"],
-                            "estado": "nuevo",
-                            "actualizado": False,
-                            "ultimoEscaneo": fecha_actual,
-                            "vendedor": None,
-                        }
-                        leads_encontrados.append(lead)
-                    except Exception as exc:
-                        print(
-                            f"[Scraper] Error procesando "
-                            f"'{nombre_preview}': {exc}"
-                        )
+                    if clave in nombres_inspeccionados:
                         continue
-                # Detener si ya conseguimos los leads necesarios
+                    nombres_inspeccionados.add(clave)
+
+                    rating = cand["rating"]
+                    num_resenas = cand["numResenas"]
+
+                    # FILTRO RÁPIDO EN LISTA: descartar si no califica sin abrir la ficha
+                    if rating is not None and not (rating_min <= rating <= rating_max):
+                        print(f"[FILTRO RÁPIDO] {nombre_cand} | Rating: {rating}★ fuera de rango.")
+                        continue
+
+                    if num_resenas is not None and num_resenas < resenas_min:
+                        print(f"[FILTRO RÁPIDO] {nombre_cand} | Reseñas: {num_resenas} < {resenas_min}.")
+                        continue
+
+                    # Si el negocio califica en el listado, abrir su ficha
+                    print(f"-> [EVALUANDO FICHA] {nombre_cand} ({rating}★ | {num_resenas} reseñas)")
+                    
+                    tarjetas_feed = page.locator('div[role="feed"] div[role="article"]')
+                    if cand["index"] >= tarjetas_feed.count():
+                        continue
+
+                    try:
+                        tarjetas_feed.nth(cand["index"]).click(timeout=4000)
+                    except Exception as e:
+                        print(f"[Scraper] No se pudo hacer clic en '{nombre_cand}': {e}")
+                        continue
+
+                    if not esperar_ficha_negocio(page, nombre_cand, timeout_ms=5000):
+                        print(f"[Scraper] No se confirmó apertura de '{nombre_cand}'. Regresando.")
+                        volver_al_feed(page)
+                        continue
+
+                    # Confirmar datos en panel
+                    r_panel, n_panel = obtener_datos_panel_negocio(page)
+                    if r_panel is not None:
+                        rating = r_panel
+                    if n_panel is not None:
+                        num_resenas = n_panel
+
+                    # Validación de seguridad con datos del panel
+                    if not (rating_min <= (rating or 0.0) <= rating_max) or (num_resenas or 0) < resenas_min:
+                        print(f"[DESCARTADO EN PANEL] {nombre_cand} ({rating}★ | {num_resenas} reseñas)")
+                        volver_al_feed(page)
+                        continue
+
+                    encontrado_en_ronda = True
+                    print(f"-> [CALIFICA CONFIRMADO] {nombre_cand} ({rating}★ | {num_resenas} reseñas)")
+
+                    # Teléfono y Web
+                    telefono = None
+                    try:
+                        tel_el = page.locator('button[data-item-id^="phone:"]').first
+                        if tel_el.count() > 0:
+                            telefono_raw = tel_el.inner_text(timeout=1000).strip()
+                            telefono = re.sub(r"[^\d+\s\-()]", "", telefono_raw).strip() or None
+                    except Exception:
+                        pass
+
+                    web = None
+                    try:
+                        web_el = page.locator('a[data-item-id="authority"]').first
+                        if web_el.count() > 0:
+                            web = web_el.get_attribute("href", timeout=1000)
+                    except Exception:
+                        pass
+
+                    # Reseñas negativas ordenadas
+                    quejas = extraer_resenas_negativas(page, max_resenas=5, max_scrolls=2)
+
+                    # Enriquecimiento web rápido (timeout acotado a 5s para no demorar)
+                    datos_contacto = {"email": None, "linkedin": None}
+                    if web:
+                        try:
+                            with concurrent.futures.ThreadPoolExecutor() as executor:
+                                future = executor.submit(extraer_contacto_web, web)
+                                datos_contacto = future.result(timeout=5)
+                        except Exception:
+                            pass
+
+                    # Análisis con IA
+                    if quejas:
+                        print(f"   Quejas recolectadas: {len(quejas)}. Analizando con Gemini...")
+                        enriquecimiento = analizar_con_ia(nombre_cand, rubro, ciudad, quejas)
+                    else:
+                        enriquecimiento = fallback_local(nombre_cand)
+
+                    lead = {
+                        "id": (
+                            f"lead-"
+                            f"{re.sub(r'[^a-z0-9]', '', ciudad.lower())[:3]}-"
+                            f"{random.randint(100, 999)}"
+                        ),
+                        "nombre": nombre_cand,
+                        "rubro": rubro,
+                        "ciudad": ciudad,
+                        "fuente": "Google Maps",
+                        "rating": rating,
+                        "numResenas": num_resenas,
+                        "telefono": telefono,
+                        "web": web,
+                        "email": datos_contacto.get("email"),
+                        "linkedin": datos_contacto.get("linkedin"),
+                        "problema": enriquecimiento.get("problema", "sin_clasificar"),
+                        "confianzaIA": enriquecimiento.get("confianzaIA", 0),
+                        "reviewsNegativas": quejas,
+                        "draft": enriquecimiento.get("draft", {}),
+                        "estado": "nuevo",
+                        "actualizado": False,
+                        "ultimoEscaneo": fecha_actual,
+                        "vendedor": None,
+                    }
+                    leads_encontrados.append(lead)
+
+                    # CORRECCIÓN VITAL: Volver al feed antes de procesar la siguiente tarjeta
+                    volver_al_feed(page)
+
                 if len(leads_encontrados) >= max_resultados:
                     break
-                # Detener si alcanzamos el límite de tarjetas
-                if total_inspeccionadas >= max_tarjetas_negocios:
-                    break
-                # Evitar desplazamientos ilimitados
-                if scrolls_realizados >= max_scrolls_negocios:
-                    print(
-                        "[Negocios] Se alcanzó el límite de scrolls."
-                    )
-                    break
-                # Detectar rondas sin nuevas tarjetas
-                if nuevas_en_ronda == 0:
-                    intentos_sin_nuevas += 1
-                else:
-                    intentos_sin_nuevas = 0
-                if intentos_sin_nuevas >= 2:
-                    print(
-                        "[Negocios] No aparecen nuevos negocios. "
-                        "Se detiene la búsqueda."
-                    )
-                    break
-                # Volver al listado y cargar más negocios
-                try:
 
-                    feed.scroll_into_view_if_needed(
-                        timeout=3000
-                    )
-                    feed.hover(timeout=3000)
-                    page.mouse.wheel(0, 2500)
-                    page.wait_for_timeout(1200)
-                    scrolls_realizados += 1
-                    print(
-                        f"[Negocios] Scroll "
-                        f"{scrolls_realizados}/{max_scrolls_negocios}"
-                    )
+                # Desplazar el feed para cargar nuevos negocios
+                try:
+                    feed = page.locator('div[role="feed"]').first
+                    if feed.count() > 0:
+                        page.evaluate("""
+                            () => {
+                                const feed = document.querySelector('div[role="feed"]');
+                                if (feed) feed.scrollBy(0, 1500);
+                            }
+                        """)
+                        scrolls_realizados += 1
+                        page.wait_for_timeout(1000)
                 except Exception as exc:
-                    print(
-                        f"[Negocios] No se pudo continuar "
-                        f"el scroll: {exc}"
-                    )
+                    print(f"[Negocios] No se pudo desplazar el feed: {exc}")
                     break
+
             print(
                 f"\n[Negocios] Búsqueda finalizada. "
-                f"Tarjetas inspeccionadas: {total_inspeccionadas} "
+                f"Tarjetas inspeccionadas: {len(nombres_inspeccionados)} "
                 f"| Leads encontrados: {len(leads_encontrados)}"
             )
 
         finally:
-            # Mantener Chromium abierto durante las pruebas locales
-            if not headless_mode and debug_interactivo:
-                print("\n[DEBUG] El navegador seguirá abierto.")
-                print("[DEBUG] Revisá Google Maps y sus menús.")
-                try:
-                    input(
-                        "\nPresioná ENTER en la terminal "
-                        "para cerrar Chromium..."
-                    )
-                except EOFError:
-                    pass
             context.close()
             browser.close()
+
     return leads_encontrados
+
+
 if __name__ == "__main__":
     leads = extraer_negocios_google_maps(
         ciudad="Buenos Aires",
         rubro="clinicas",
-        max_resultados=5,
+        max_resultados=2,
         rating_min=1.5,
         rating_max=3.5,
         resenas_min=10,
-        max_tarjetas_negocios=60,
-        max_scrolls_negocios=8,
-        debug_interactivo=True,
     )
     print("\n--- OBJETO FINAL LISTO PARA FRONTEND / PERSISTENCIA ---")
     print(json.dumps(leads, indent=2, ensure_ascii=False))
