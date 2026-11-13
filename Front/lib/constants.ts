@@ -199,6 +199,7 @@ export const CIUDADES_LISTA = Object.keys(CIUDADES);
 export const RUBROS = [
   "Restaurantes",
   "Clínicas Dentales",
+  "Hoteles",
   "Hoteles Boutique",
   "Centros Estéticos",
   "Gimnasios",
