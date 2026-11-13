@@ -261,7 +261,7 @@ def _usar_openai(nombre: str, rubro: str, ciudad: str, reviews: list) -> dict:
     return _fallback_local(nombre)
 
 
-def _fallback_local(nombre: str) -> dict:
+def fallback_local(nombre: str) -> dict:
     """Respuesta alternativa cuando ninguna IA está disponible."""
     return {
         "problema": "sin_clasificar",
