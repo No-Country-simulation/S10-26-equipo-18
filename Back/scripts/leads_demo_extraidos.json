@@ -1,0 +1,37 @@
+[
+  {
+    "id": "lead-bog-gatogris-01",
+    "nombre": "Restaurante El Gato Gris",
+    "rubro": "restaurante",
+    "ciudad": "Bogotá",
+    "fuente": "Google Maps",
+    "rating": 4.2,
+    "numResenas": 1250,
+    "telefono": "+57 310 2345678",
+    "web": "https://elgatogris.com.co",
+    "email": "contacto@elgatogris.com.co",
+    "linkedin": null,
+    "problema": "atencion",
+    "confianzaIA": 92,
+    "reviewsNegativas": [
+      {
+        "autor": "Cliente Maps",
+        "estrellas": 1,
+        "texto": "Había venido 1 vez anteriormente y estuvo rico, por eso hoy volví, pero no me gustó la atención, los platos tardaron más de 45 minutos y la comida llegó fría a la mesa."
+      },
+      {
+        "autor": "Cliente Maps 2",
+        "estrellas": 1,
+        "texto": "Para empezar había realizado mi reserva con confirmación y llegué allá y me dijeron que no la tenían registrada. El personal de recepción fue muy poco empático y nos tocó esperar de pie."
+      }
+    ],
+    "draft": {
+      "asunto": "Oportunidad para optimizar la experiencia de servicio en Restaurante El Gato Gris",
+      "cuerpo": "Estimado equipo de Restaurante El Gato Gris,\n\nHemos observado recientemente comentarios de clientes que señalan ciertos inconvenientes en la atención recibida, tiempos de espera y gestión de reservas en su local de Bogotá. Entendemos que estos imprevistos operativos pueden afectar la reputación de un lugar tan reconocido como el suyo.\n\nDesde RepuSense nos especializamos en ayudar a restaurantes a solucionar estos cuellos de botella para garantizar la máxima satisfacción del cliente. Me gustaría ofrecerles una breve llamada de diagnóstico de 15 minutos, totalmente sin costo, para revisar estos puntos y compartirles estrategias concretas de mejora."
+    },
+    "estado": "nuevo",
+    "actualizado": false,
+    "ultimoEscaneo": "2026-11-13",
+    "vendedor": null
+  }
+]
