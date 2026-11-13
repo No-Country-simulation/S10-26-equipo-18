@@ -71,7 +71,7 @@ async def reanalizar_lead(
     lead.draft_asunto = draft.get("asunto")
     lead.draft_cuerpo = draft.get("cuerpo")
     lead.estado_analisis = "completado"
-    lead.origen_analisis = "gemini"
+    lead.origen_analisis = analisis.get("origen_analisis", "gemini")
 
     await db.commit()
     await db.refresh(lead)
